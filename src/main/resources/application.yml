@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    include: secret
+    include: application-secret.yml
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DATABASE_URL}
