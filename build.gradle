@@ -21,7 +21,12 @@ dependencies {
     //    swagger
     implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
     compileOnly 'org.projectlombok:lombok'
+
+//    postgresql
     runtimeOnly 'org.postgresql:postgresql'
+//    hibernate spatial
+    implementation 'org.hibernate:hibernate-spatial:5.6.11.Final'
+
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

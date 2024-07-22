@@ -3,14 +3,17 @@ server:
 
 spring:
   profiles:
-    include: application-secret.yml
+    active: secret
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DATABASE_URL}
     username: ${DATABASE_USER_NAME}
     password: ${DATABASE_PASSWORD}
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
+    show-sql: true
+    generate-ddl: true
+    open-in-view: false
     hibernate:
       ddl-auto: create
 
