@@ -1,4 +1,4 @@
-package com.example.want.block.dto;
+package com.example.want.api.block.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

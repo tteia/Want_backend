@@ -1,4 +1,4 @@
-package com.example.want.user.domain;
+package com.example.want.api.user.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
