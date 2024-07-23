@@ -1,34 +1,8 @@
-server:
-  port: 8081
-
 spring:
   profiles:
-    active: secret
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USER_NAME}
-    password: ${DATABASE_PASSWORD}
-  jpa:
-    database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
-    show-sql: true
-    generate-ddl: true
-    open-in-view: false
-    hibernate:
-      ddl-auto: create
-
-springdoc:
-  packages-to-scan: com.example.want
-  paths-to-match: /**
-  default-consumes-media-type: application/json;charset=UTF-8
-  default-produces-media-type: application/json;charset=UTF-8
-  swagger-ui:
-    path: /swagger-ui.html
-    tags-sorter: alpha
-    operations-sorter: alpha
-  api-docs:
-    path: /v3/api-docs
-    groups:
-      enabled: true
-  cache:
-    disabled: true
+    active: local # default
+    group:
+      local:
+        - secret
+      dev:   # dev, jwt, oauth profile을 그룹지어 함께 어플리케이션 구동
+        - secret

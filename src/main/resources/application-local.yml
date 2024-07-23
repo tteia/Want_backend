@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${dev.dataspurce.url}
+    username: ${dev.dataspurce.username}
+    password: ${dev.dataspurce.password}
+  jpa:
+    database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
+    show-sql: true
+    generate-ddl: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+
+springdoc:
+  packages-to-scan: com.example.want
+  paths-to-match: /**
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+    groups:
+      enabled: true
+  cache:
+    disabled: true
