@@ -2,14 +2,14 @@ server:
   port: 8080
 
 spring:
-    config:
-        activate:
-        on-profile: local
+  config:
+    activate:
+      on-profile: local
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${dev.dataspurce.url}
-    username: ${dev.dataspurce.username}
-    password: ${dev.dataspurce.password}
+    url: ${local.datasource.url}
+    username: ${local.datasource.username}
+    password: ${local.datasource.password}
   jpa:
     database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
     show-sql: true
