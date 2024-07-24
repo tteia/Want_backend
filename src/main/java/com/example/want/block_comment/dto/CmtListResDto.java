@@ -12,4 +12,6 @@ import lombok.NoArgsConstructor;
 public class CmtListResDto {
     private Long commentId;
     private Long userID;
+
+    // List<Cmt> children
 }

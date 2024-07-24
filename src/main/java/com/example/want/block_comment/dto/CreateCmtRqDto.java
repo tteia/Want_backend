@@ -13,6 +13,8 @@ public class CreateCmtRqDto {
     private Long memberId;
     private String contents;
 
+    // Cmt parent
+
     public Cmt toEntity(){
         return Cmt.builder()
                 .contents(this.contents)
