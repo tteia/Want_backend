@@ -1,4 +1,4 @@
-package com.example.want.block_comment.dto;
+package com.example.want.api.block_comment.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CmtListResDto {
+    private Long blockId;
     private Long commentId;
     private Long userID;
 

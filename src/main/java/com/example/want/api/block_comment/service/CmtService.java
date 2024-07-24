@@ -1,11 +1,14 @@
-package com.example.want.block_comment.service;
+package com.example.want.api.block_comment.service;
 
-import com.example.want.block_comment.dto.CmtListResDto;
-import com.example.want.block_comment.dto.CmtUpdateDto;
-import com.example.want.block_comment.dto.CreateCmtRqDto;
-import com.example.want.block_comment.entity.Cmt;
-import com.example.want.block_comment.repository.CmtRepository;
-import com.example.want.user.repository.MemberRepository;
+import com.example.want.api.block.domain.Block;
+import com.example.want.api.block.repository.BlockRepository;
+import com.example.want.api.block_comment.dto.CreateCmtRqDto;
+import com.example.want.api.block_comment.dto.CmtListResDto;
+import com.example.want.api.block_comment.dto.CmtUpdateDto;
+import com.example.want.api.block_comment.entity.Cmt;
+import com.example.want.api.block_comment.repository.CmtRepository;
+import com.example.want.api.user.domain.Member;
+import com.example.want.api.user.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,11 +22,15 @@ import java.util.List;
 public class CmtService {
 
     private final CmtRepository cmtRepository;
+    private final MemberRepository memberRepository;
+    private final BlockRepository blockRepository;
 
     // Create
     @Transactional
-    public Cmt create(CreateCmtRqDto dto){
-        return cmtRepository.save(dto.toEntity());
+    public Cmt create(CreateCmtRqDto dto, String email, Long blockId){
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("id is not found"));
+        Block block = blockRepository.findById(blockId).orElseThrow(()->new EntityNotFoundException("id is not found"));
+        return cmtRepository.save(dto.toEntity(member, block));
     }
 
     // Read
