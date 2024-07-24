@@ -19,8 +19,8 @@ public class TravelGroup {
     private boolean invitationAccepted;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "travel_id")
-    private Project travel;
+    @JoinColumn(name = "project_id")
+    private Project project;
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id")

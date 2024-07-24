@@ -35,7 +35,7 @@ public class Project {
 
     private Boolean isDeleted = false;
 
-    @OneToMany(mappedBy = "travelGroup", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<TravelGroup> travelGroups;
 
 //    @OneToMany(mappedBy = "block", cascade = CascadeType.ALL)
