@@ -1,6 +1,6 @@
-package com.example.want.block.domain;
+package com.example.want.api.block.domain;
 
-import com.example.want.block.dto.BlockDetailRsDto;
+import com.example.want.api.block.dto.BlockDetailRsDto;
 import com.example.want.common.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

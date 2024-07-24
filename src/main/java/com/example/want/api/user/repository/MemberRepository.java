@@ -1,7 +1,7 @@
-package com.example.want.user.repository;
+package com.example.want.api.user.repository;
 
 
-import com.example.want.user.domain.Member;
+import com.example.want.api.user.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

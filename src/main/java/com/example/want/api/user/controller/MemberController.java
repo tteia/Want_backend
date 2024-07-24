@@ -1,4 +1,4 @@
-package com.example.want.user.controller;
+package com.example.want.api.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

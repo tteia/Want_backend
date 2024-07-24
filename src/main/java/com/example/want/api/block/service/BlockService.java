@@ -1,10 +1,10 @@
-package com.example.want.block.service;
+package com.example.want.api.block.service;
 
-import com.example.want.block.domain.Block;
-import com.example.want.block.dto.BlockActiveListRsDto;
-import com.example.want.block.dto.BlockDetailRsDto;
-import com.example.want.block.dto.CreatBlockRqDto;
-import com.example.want.block.repository.BlockRepository;
+import com.example.want.api.block.domain.Block;
+import com.example.want.api.block.dto.BlockActiveListRsDto;
+import com.example.want.api.block.dto.BlockDetailRsDto;
+import com.example.want.api.block.dto.CreatBlockRqDto;
+import com.example.want.api.block.repository.BlockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

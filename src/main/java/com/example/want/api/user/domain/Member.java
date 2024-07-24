@@ -1,11 +1,9 @@
-package com.example.want.user.domain;
+package com.example.want.api.user.domain;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter

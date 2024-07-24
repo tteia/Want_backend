@@ -1,6 +1,6 @@
-package com.example.want.block.dto;
+package com.example.want.api.block.dto;
 
-import com.example.want.block.domain.Block;
+import com.example.want.api.block.domain.Block;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
