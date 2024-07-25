@@ -1,6 +1,7 @@
 package com.example.want.api.block.domain;
 
 import com.example.want.api.block.dto.BlockDetailRsDto;
+import com.example.want.api.user.domain.Member;
 import com.example.want.common.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,7 +31,7 @@ public class Block extends BaseEntity {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String isActivated;
-    private Long Heart;
+    private Long heartCount;
 
     public BlockDetailRsDto toDetailDto() {
         return BlockDetailRsDto.builder()
@@ -43,7 +44,15 @@ public class Block extends BaseEntity {
                 .startTime(this.startTime.toString())
                 .endTime(this.endTime.toString())
                 .isActivated(this.isActivated)
-                .Heart(this.Heart)
+                .heartCount(this.heartCount)
                 .build();
+    }
+
+    public void incrementHearts() {
+        this.heartCount++;
+    }
+
+    public void decrementHearts() {
+        this.heartCount--;
     }
 }
