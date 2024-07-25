@@ -43,4 +43,17 @@ public class BlockController {
         BlockDetailRsDto block = blockService.getBlockDetail(id);
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", block), HttpStatus.OK);
     }
+
+    //    좋아요수 증가
+    @PostMapping("/{blockId}/heart")
+    public ResponseEntity<Object> addLikeToPost(@PathVariable Long blockId, @RequestBody String memberEmail) {
+        blockService.addLikeToPost(blockId, memberEmail);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{blockId}/hearts")
+    public ResponseEntity<Object> getHeartCount(@PathVariable Long blockId) {
+        Long heartCount = blockService.getLikesCount(blockId);
+        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", heartCount), HttpStatus.OK);
+    }
 }
