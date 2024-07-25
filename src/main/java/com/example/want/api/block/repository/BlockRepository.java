@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BlockRepository extends JpaRepository<Block, Long> {
-
     Page<Block> findAllByIsActivated(String y, Pageable pageable);
+    Page<Block> findAllByHeartDesc(String isActivated, Pageable pageable);
 }

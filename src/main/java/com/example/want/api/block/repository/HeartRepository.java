@@ -1,6 +1,6 @@
-package com.example.want.placeBlock.Repository;
+package com.example.want.api.block.repository;
 
-import com.example.want.placeBlock.domain.Heart;
+import com.example.want.api.block.domain.Heart;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

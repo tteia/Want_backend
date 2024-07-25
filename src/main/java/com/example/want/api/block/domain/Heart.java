@@ -1,4 +1,4 @@
-package com.example.want.placeBlock.domain;
+package com.example.want.api.block.domain;
 
 import javax.persistence.*;
 

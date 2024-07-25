@@ -1,29 +1,26 @@
-package com.example.want.placeBlock.controller;
+package com.example.want.api.block.controller;
 
-import com.example.want.placeBlock.domain.Block;
-import com.example.want.placeBlock.dto.HeartListResDto;
-import com.example.want.placeBlock.service.HeartService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.want.api.block.dto.HeartListResDto;
+import com.example.want.api.block.service.HeartService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@RequestMapping("/heart")
 @RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/heart")
 public class HeartController {
-    @Autowired
-    private HeartService heartService;
+    private final HeartService heartService;
 
     // 좋아요 수에 따라 인기 명소를 반환하는 메서드
     @GetMapping("/popular")
-    public List<Block> popularBlocks(HeartListResDto heartListResDto) {
-        List<Block> blockList = new ArrayList<>();
-        for (Block block : blockList) {
-            heartListResDto.add(block.listFromEntity());
-        }
-        return heartService.sortByPopularAttractions();
+    public ResponseEntity<List<HeartListResDto>> popularBlocks(@PageableDefault(size = 10) Pageable pageable) {
+        List<HeartListResDto> heartList = heartService.sortByPopularAttractions(pageable.getPageNumber(), pageable.getPageSize());
+        return new ResponseEntity<>(heartList, HttpStatus.OK);
     }
 }
