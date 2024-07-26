@@ -3,13 +3,16 @@ package com.example.want.api.block_comment.service;
 import com.example.want.api.block.domain.Block;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.block_comment.dto.CreateCmtRqDto;
-import com.example.want.api.block_comment.dto.CmtResDto;
-import com.example.want.api.block_comment.dto.CmtUpdateDto;
+import com.example.want.api.block_comment.dto.CmtRsDto;
+import com.example.want.api.block_comment.dto.CmtUpdateRqDto;
 import com.example.want.api.block_comment.entity.Cmt;
 import com.example.want.api.block_comment.repository.CmtRepository;
 import com.example.want.api.user.domain.Member;
 import com.example.want.api.user.repository.MemberRepository;
+import com.example.want.common.CommonResDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,19 +37,24 @@ public class CmtService {
     }
 
     // Read
-    public List<CmtResDto> cmtList(){
-        List<Cmt> cmtList = cmtRepository.findAll();
-		List<CmtResDto> cmtListResDtos = new ArrayList<CmtResDto>();
-		for (Cmt c : cmtList) {
-            cmtListResDtos.add(c.listFromEntity());
-		}
-        return cmtListResDtos;
+    public Page<CmtRsDto> cmtList(Pageable pageable, Long blockId){
+//        Block block = cmtRepository.findByBlockId(blockId).orElseThrow(()->new EntityNotFoundException("block is not found"));
+//        List<Cmt> cmtList = ;
+//		List<CmtRsDto> cmtListResDtos = new ArrayList<CmtRsDto>();
+//		for (Cmt c : cmtList) {
+//            cmtListResDtos.add(c.listFromEntity());
+//		}
+//        return cmtListResDtos;
+        Page<Cmt> cmts = cmtRepository.findByBlockId(pageable, blockId);
+        Page<CmtRsDto> dtos = cmts.map(a -> a.listFromEntity());
+        return dtos;
+
     }
 
 
     // Update
     @Transactional
-    public void update(CmtUpdateDto dto){
+    public void update(CmtUpdateRqDto dto){
         Cmt cmt = cmtRepository.findById(dto.getCommentId()).orElseThrow(()->new EntityNotFoundException("존재하지 않는 댓글 아이디입니다."));
         cmt.updateCmt(dto);
     }

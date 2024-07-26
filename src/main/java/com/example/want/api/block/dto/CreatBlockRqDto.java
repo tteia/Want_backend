@@ -26,7 +26,7 @@ public class CreatBlockRqDto {
                 .longitude(longitude)
                 .startTime(startTime)
                 .endTime(endTime)
-                .isActivated("Y")
+                .isActivated("N")
                 .heartCount(0L)
                 .build();
     }

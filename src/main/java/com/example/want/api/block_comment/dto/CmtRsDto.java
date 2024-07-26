@@ -5,13 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CmtResDto {
-    private Long blockId;
+public class CmtRsDto {
     private Long commentId;
-    private Long userID;
+    private Long blockId;
+    private Long memberId;
+    private String contents;
+    private LocalDateTime createdTime;
 
 }

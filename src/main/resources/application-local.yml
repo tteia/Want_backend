@@ -6,11 +6,13 @@ spring:
     activate:
       on-profile: local
   datasource:
+#    driver-class-name: org.postgresql.Driver
     driver-class-name: org.mariadb.jdbc.Driver
     url: ${local.datasource.url}
     username: ${local.datasource.username}
     password: ${local.datasource.password}
   jpa:
+#    database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
     database-platform: org.hibernate.dialect.MariaDBDialect
     show-sql: true
     generate-ddl: true

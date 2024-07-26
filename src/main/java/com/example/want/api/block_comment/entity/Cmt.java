@@ -1,8 +1,8 @@
 package com.example.want.api.block_comment.entity;
 
 import com.example.want.api.block.domain.Block;
-import com.example.want.api.block_comment.dto.CmtResDto;
-import com.example.want.api.block_comment.dto.CmtUpdateDto;
+import com.example.want.api.block_comment.dto.CmtRsDto;
+import com.example.want.api.block_comment.dto.CmtUpdateRqDto;
 import com.example.want.common.BaseEntity;
 import com.example.want.api.user.domain.Member;
 import lombok.AllArgsConstructor;
@@ -44,13 +44,13 @@ public class Cmt extends BaseEntity {
     @Builder.Default
     private String isDeleted = "N";
 
-    public Cmt(Block block, Member member, String contents) {
-        block = this.block;
-        member = this.member;
-        contents = this.contents;
-    }
+//    public Cmt(Block block, Member member, String contents) {
+//        block = this.block;
+//        member = this.member;
+//        contents = this.contents;
+//    }
 
-    public void updateCmt(CmtUpdateDto dto){
+    public void updateCmt(CmtUpdateRqDto dto){
         this.contents = dto.getContents();
     }
 
@@ -58,11 +58,13 @@ public class Cmt extends BaseEntity {
         this.isDeleted = isDeleted;
     }
 
-    public CmtResDto listFromEntity(){
-        return CmtResDto.builder()
-                .blockId(this.block.getId())
-                .userID(this.member.getId())
+    public CmtRsDto listFromEntity(){
+        return CmtRsDto.builder()
                 .commentId(this.commentId)
+                .blockId(this.block.getId())
+                .memberId(this.member.getId())
+                .contents(this.contents)
+                .createdTime(this.getCreatedTime())
                 .build();
     }
 }
