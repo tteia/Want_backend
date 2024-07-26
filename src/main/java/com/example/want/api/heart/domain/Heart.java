@@ -1,7 +1,6 @@
 package com.example.want.api.heart.domain;
 
 import com.example.want.api.block.domain.Block;
-import com.example.want.api.user.controller.MemberController;
 import com.example.want.api.user.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
