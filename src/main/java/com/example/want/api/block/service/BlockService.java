@@ -3,7 +3,7 @@ package com.example.want.api.block.service;
 import com.example.want.api.block.domain.Block;
 import com.example.want.api.block.dto.BlockActiveListRsDto;
 import com.example.want.api.block.dto.BlockDetailRsDto;
-import com.example.want.api.block.dto.CreatBlockRqDto;
+import com.example.want.api.block.dto.CreateBlockRqDto;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.heart.domain.Heart;
 import com.example.want.api.heart.repository.HeartRepository;
@@ -17,9 +17,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class BlockService {
 
 
     @Transactional
-    public Block createBlock(CreatBlockRqDto request) {
+    public Block createBlock(CreateBlockRqDto request) { // Creat 로 오타나있어서 수정했는데 왜 에러가 발생했을까요.. 죄송합니다..
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         LocalDateTime startTime = LocalDateTime.parse(request.getStartTime(), formatter);
         LocalDateTime endTime = LocalDateTime.parse(request.getEndTime(), formatter);
@@ -102,9 +103,6 @@ public class BlockService {
         hashOperations.put(key, hashKey, block.getHeartCount());
     }
 
-
-
-
     public Long getLikesCount(Long blockId) {
         String key = "blockId::" + blockId;
         String hashKey = "heartCount";
@@ -142,7 +140,8 @@ public class BlockService {
         hashOperations.put(key, hashKey, likesCount);
     }
 
-
-
-
+    // Plan 관련
+    public Page<Block> getBlocksByDate(LocalDate date) {
+        return blockRepository.findByDateOrderByStartTimeAsc(date);
+    }
 }

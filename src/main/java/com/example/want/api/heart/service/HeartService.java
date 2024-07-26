@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +18,10 @@ public class HeartService {
     private BlockRepository blockRepository;
 
     // 좋아요 수에 따라 블록을 정렬하여 반환하는 메서드
-    public List<HeartListResDto> blocksByPopular(Pageable pageable) {
+    @Transactional
+    public Page<HeartListResDto> activeBlocksByPopular(Pageable pageable) {
         Page<Block> blocks = blockRepository.findByIsActivatedOrderByHeartCountDesc("Y", pageable);
-        List<HeartListResDto> result = new ArrayList<>();
-        blocks.getContent().forEach(block -> result.add(HeartListResDto.fromEntity(block)));
-        return result;
+        return blocks.map(HeartListResDto::fromEntity);
     }
 
 }
