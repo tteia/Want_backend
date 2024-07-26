@@ -43,7 +43,8 @@ public class CmtController {
     @PatchMapping("/update")
     public ResponseEntity<Object> UpdateComment(@RequestBody CmtUpdateRqDto dto) {
         cmtService.update(dto);
-        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "comment is successfully updated", null), HttpStatus.OK);
+
+        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "comment is successfully updated", "comment id: "+dto.getCommentId()), HttpStatus.OK);
     }
 
     // 댓글 삭제

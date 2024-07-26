@@ -38,13 +38,6 @@ public class CmtService {
 
     // Read
     public Page<CmtRsDto> cmtList(Pageable pageable, Long blockId){
-//        Block block = cmtRepository.findByBlockId(blockId).orElseThrow(()->new EntityNotFoundException("block is not found"));
-//        List<Cmt> cmtList = ;
-//		List<CmtRsDto> cmtListResDtos = new ArrayList<CmtRsDto>();
-//		for (Cmt c : cmtList) {
-//            cmtListResDtos.add(c.listFromEntity());
-//		}
-//        return cmtListResDtos;
         Page<Cmt> cmts = cmtRepository.findByBlockId(pageable, blockId);
         Page<CmtRsDto> dtos = cmts.map(a -> a.listFromEntity());
         return dtos;
@@ -63,7 +56,7 @@ public class CmtService {
     @Transactional
     public void delete(Long id){
         // isDeleted = 1로 변경
-        Cmt cmt = cmtRepository.findById(id).orElseThrow(()->new EntityNotFoundException("없는 아이디입니다."));
+        Cmt cmt = cmtRepository.findById(id).orElseThrow(()->new EntityNotFoundException("존재하지 않는 댓글 아이디입니다."));
         cmt.deleteCmt("Y");
     }
 
