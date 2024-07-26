@@ -41,7 +41,8 @@ public class Cmt extends BaseEntity {
 //    private List<Cmt> children;
 
     // 댓글 삭제 여부
-    private String isDeleted;
+    @Builder.Default
+    private String isDeleted = "N";
 
     public Cmt(Block block, Member member, String contents) {
         block = this.block;

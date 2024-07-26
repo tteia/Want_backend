@@ -28,10 +28,9 @@ public class CmtService {
     // Create
     @Transactional
     public Cmt create(CreateCmtRqDto dto, String email){
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("id is not found"));
-        Block block = blockRepository.findById(dto.getBlockId()).orElseThrow(()->new EntityNotFoundException("블럭이 없습니다."));
-        Cmt cmt = new Cmt(block, member, dto.getContents());
-        return cmtRepository.save(cmt);
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("member is not found"));
+        Block block = blockRepository.findById(dto.getBlockId()).orElseThrow(()->new EntityNotFoundException("block is not found"));
+        return cmtRepository.save( dto.toEntity(member, block));
     }
 
     // Read

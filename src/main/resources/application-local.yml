@@ -17,6 +17,11 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: update
+  data:
+    redis:
+      host: ${local.redis.host}
+      port: ${local.redis.port}
+      timeout: 10
 
 springdoc:
   packages-to-scan: com.example.want
