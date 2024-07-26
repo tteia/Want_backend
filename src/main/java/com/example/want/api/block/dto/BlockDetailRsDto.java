@@ -19,6 +19,6 @@ public class BlockDetailRsDto {
     private String startTime;
     private String endTime;
     private String isActivated;
-    private Long Heart;
+    private Long heartCount;
 
 }

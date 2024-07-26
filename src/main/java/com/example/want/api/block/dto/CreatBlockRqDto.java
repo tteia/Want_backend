@@ -27,7 +27,7 @@ public class CreatBlockRqDto {
                 .startTime(startTime)
                 .endTime(endTime)
                 .isActivated("Y")
-                .Heart(0L)
+                .heartCount(0L)
                 .build();
     }
 }
