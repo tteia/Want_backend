@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CmtRepository extends JpaRepository<Cmt, Long> {
-    Page<Cmt> findByBlockId(Pageable pageable, Long blockId);
+    Page<Cmt> findByBlockId(Pageable pageable, Long blockId, String isDeleted);
 }

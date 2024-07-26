@@ -44,7 +44,7 @@ public class CmtController {
     public ResponseEntity<Object> UpdateComment(@RequestBody CmtUpdateRqDto dto) {
         cmtService.update(dto);
 
-        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "comment is successfully updated", "comment id: "+dto.getCommentId()), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "comment is successfully updated", "comment id: " + dto.getCommentId()), HttpStatus.OK);
     }
 
     // 댓글 삭제
@@ -52,6 +52,6 @@ public class CmtController {
     @GetMapping("/delete/{id}")
     public ResponseEntity<Object> cmtDelete(@PathVariable Long id) {
         cmtService.delete(id);
-        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "comment is successfully deleted", null), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "comment is successfully deleted", "comment id: " + id), HttpStatus.OK);
     }
 }

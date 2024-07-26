@@ -38,7 +38,7 @@ public class CmtService {
 
     // Read
     public Page<CmtRsDto> cmtList(Pageable pageable, Long blockId){
-        Page<Cmt> cmts = cmtRepository.findByBlockId(pageable, blockId);
+        Page<Cmt> cmts = cmtRepository.findByBlockId(pageable, blockId, "N");
         Page<CmtRsDto> dtos = cmts.map(a -> a.listFromEntity());
         return dtos;
 
