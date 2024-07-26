@@ -1,7 +1,9 @@
 package com.example.want.api.project.service;
 
+import com.example.want.api.block.domain.Block;
 import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.dto.ProjectCreateReqDto;
+import com.example.want.api.project.dto.ProjectDetailResDto;
 import com.example.want.api.project.dto.ProjectResDto;
 import com.example.want.api.project.dto.ProjectUpdateDto;
 import com.example.want.api.project.repository.ProjectRepository;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 @Service
 @Transactional
@@ -32,7 +35,7 @@ public class ProjectService {
     }
 
     //    일정 상세 보기
-    public ProjectResDto projectDetail(Long id) {
+    public ProjectDetailResDto projectDetail(Long id) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 일정이 없습니다."));
         return project.detFromEntity();
@@ -57,5 +60,12 @@ public class ProjectService {
         Page<Project> projects = projectRepository.findAll(pageable);
         Page<ProjectResDto> projectResDtos = projects.map(a->a.listFromEntity());
         return projectResDtos;
+    }
+
+//    프로젝트에 속해있는 블럭 가져오기
+    public List<Block> getBlocksByProject(Long id) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Failed"));
+        return project.getBlockList();
     }
 }

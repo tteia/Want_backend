@@ -1,8 +1,12 @@
 package com.example.want.api.project.domain;
 
+import com.example.want.api.block.domain.Block;
+import com.example.want.api.project.dto.ProjectDetailResDto;
 import com.example.want.api.project.dto.ProjectResDto;
 import com.example.want.api.project.dto.ProjectUpdateDto;
-import com.example.want.api.traveluser.domain.TravelGroup;
+import com.example.want.api.traveluser.domain.TravelUser;
+import com.example.want.api.user.domain.Member;
+import com.example.want.common.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Project {
+public class Project extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,17 +33,18 @@ public class Project {
     private LocalDate startTravel;
     private LocalDate endTravel;
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
 
-    private Boolean isDeleted = false;
+    private String isDeleted;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-    private List<TravelGroup> travelGroups;
+    @OneToMany(mappedBy = "project")
+    private List<TravelUser> travelUsers;
 
-//    @OneToMany(mappedBy = "block", cascade = CascadeType.ALL)
-//    private List<Block> blocks;
+    @OneToMany(mappedBy = "project")
+    private List<Block> blockList;
+
+//    @OneToMany(mappedBy = "project")
+//    private List<TravelUser> travelUserList;
 
 //     여행지
 //     @OneToMany(mappedBy = "stateTravel")
@@ -60,19 +65,19 @@ public class Project {
                 .title(this.title)
                 .startTravel(this.startTravel)
                 .endTravel(this.endTravel)
-                .createdAt(this.createdAt)
+//                .createdAt(getCreatedTime())
                 .build();
         return projectResDto;
     }
 
-    public ProjectResDto detFromEntity() {
-        return ProjectResDto.builder()
+    public ProjectDetailResDto detFromEntity() {
+        return ProjectDetailResDto.builder()
                 .id(id)
                 .title(title)
                 .startTravel(startTravel)
                 .endTravel(endTravel)
-                .createdAt(createdAt)
-//                .memberId()
+                .blockList(blockList)
+//                .memberList(memberList)
 //                .stateTravel()
                 .build();
     }

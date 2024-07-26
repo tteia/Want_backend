@@ -10,13 +10,13 @@ import javax.persistence.*;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class TravelGroup {
+public class TravelUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private boolean invitationAccepted;
+    private String invitationAccepted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
@@ -26,6 +26,7 @@ public class TravelGroup {
 //    @JoinColumn(name = "user_id")
 //    private User user;
 
+    @Enumerated(EnumType.STRING)
     private Authority authority;
 
 }
