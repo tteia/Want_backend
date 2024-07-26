@@ -9,10 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CmtListResDto {
+public class CmtResDto {
     private Long blockId;
     private Long commentId;
     private Long userID;
 
-    // List<Cmt> children
 }

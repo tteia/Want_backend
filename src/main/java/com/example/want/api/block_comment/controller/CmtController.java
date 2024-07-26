@@ -1,14 +1,14 @@
 package com.example.want.api.block_comment.controller;
 
-import com.example.want.api.block.domain.Block;
-import com.example.want.api.block.dto.CreatBlockRqDto;
 import com.example.want.api.block_comment.dto.CreateCmtRqDto;
-import com.example.want.api.block_comment.dto.CmtListResDto;
+import com.example.want.api.block_comment.dto.CmtResDto;
 import com.example.want.api.block_comment.dto.CmtUpdateDto;
 import com.example.want.api.block_comment.entity.Cmt;
 import com.example.want.api.block_comment.service.CmtService;
+import com.example.want.api.user.domain.Member;
 import com.example.want.common.CommonResDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,19 +25,17 @@ public class CmtController {
 
     // 댓글 생성
     @PostMapping("/create")
-    public ResponseEntity<Object> createBlockComment(@RequestBody CreateCmtRqDto dto, String email, Long blockId) {
-        Cmt cmt = cmtService.create(dto, email, blockId);
-        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "comment is successfully created", cmt), HttpStatus.OK);
+    public ResponseEntity<Object> createBlockComment(@RequestBody CreateCmtRqDto dto, String email) {
+        Cmt cmt = cmtService.create(dto, email);
+        return new ResponseEntity<>(new CommonResDto(HttpStatus.CREATED, "comment is successfully created", cmt), HttpStatus.CREATED);
     }
-
 
     // 댓글 조회
     @GetMapping("/list")
     public ResponseEntity<Object> cmtList() {
-        List<CmtListResDto> cmtList = cmtService.cmtList();
+        List<CmtResDto> cmtList = cmtService.cmtList();
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", cmtList), HttpStatus.OK);
     }
-
 
     // 댓글 수정
     @GetMapping("/update")
@@ -46,8 +44,8 @@ public class CmtController {
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "comment is successfully updated", null), HttpStatus.OK);
     }
 
-
     // 댓글 삭제
+    // 화면 생성 후 리다이렉트
     @GetMapping("/delete")
     public ResponseEntity<Object> cmtDelete(@RequestBody Long id) {
         cmtService.delete(id);

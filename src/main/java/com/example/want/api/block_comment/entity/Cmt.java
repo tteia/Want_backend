@@ -1,7 +1,7 @@
 package com.example.want.api.block_comment.entity;
 
 import com.example.want.api.block.domain.Block;
-import com.example.want.api.block_comment.dto.CmtListResDto;
+import com.example.want.api.block_comment.dto.CmtResDto;
 import com.example.want.api.block_comment.dto.CmtUpdateDto;
 import com.example.want.common.BaseEntity;
 import com.example.want.api.user.domain.Member;
@@ -43,6 +43,12 @@ public class Cmt extends BaseEntity {
     // 댓글 삭제 여부
     private String isDeleted;
 
+    public Cmt(Block block, Member member, String contents) {
+        block = this.block;
+        member = this.member;
+        contents = this.contents;
+    }
+
     public void updateCmt(CmtUpdateDto dto){
         this.contents = dto.getContents();
     }
@@ -51,8 +57,8 @@ public class Cmt extends BaseEntity {
         this.isDeleted = isDeleted;
     }
 
-    public CmtListResDto listFromEntity(){
-        return CmtListResDto.builder()
+    public CmtResDto listFromEntity(){
+        return CmtResDto.builder()
                 .blockId(this.block.getId())
                 .userID(this.member.getId())
                 .commentId(this.commentId)

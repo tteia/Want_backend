@@ -3,7 +3,7 @@ package com.example.want.api.block_comment.service;
 import com.example.want.api.block.domain.Block;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.block_comment.dto.CreateCmtRqDto;
-import com.example.want.api.block_comment.dto.CmtListResDto;
+import com.example.want.api.block_comment.dto.CmtResDto;
 import com.example.want.api.block_comment.dto.CmtUpdateDto;
 import com.example.want.api.block_comment.entity.Cmt;
 import com.example.want.api.block_comment.repository.CmtRepository;
@@ -27,16 +27,17 @@ public class CmtService {
 
     // Create
     @Transactional
-    public Cmt create(CreateCmtRqDto dto, String email, Long blockId){
+    public Cmt create(CreateCmtRqDto dto, String email){
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("id is not found"));
-        Block block = blockRepository.findById(blockId).orElseThrow(()->new EntityNotFoundException("id is not found"));
-        return cmtRepository.save(dto.toEntity(member, block));
+        Block block = blockRepository.findById(dto.getBlockId()).orElseThrow(()->new EntityNotFoundException("블럭이 없습니다."));
+        Cmt cmt = new Cmt(block, member, dto.getContents());
+        return cmtRepository.save(cmt);
     }
 
     // Read
-    public List<CmtListResDto> cmtList(){
+    public List<CmtResDto> cmtList(){
         List<Cmt> cmtList = cmtRepository.findAll();
-		List<CmtListResDto> cmtListResDtos = new ArrayList<CmtListResDto>();
+		List<CmtResDto> cmtListResDtos = new ArrayList<CmtResDto>();
 		for (Cmt c : cmtList) {
             cmtListResDtos.add(c.listFromEntity());
 		}
