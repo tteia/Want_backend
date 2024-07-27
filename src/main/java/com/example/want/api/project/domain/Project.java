@@ -1,5 +1,6 @@
 package com.example.want.api.project.domain;
 
+import com.example.want.api.project.dto.TravelDatesUpdateDto;
 import com.example.want.api.traveluser.domain.TravelUser;
 import com.example.want.common.BaseEntity;
 import lombok.*;
@@ -28,7 +29,7 @@ public class Project extends BaseEntity {
     private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
 
-    private String isDeleted = "N";
+    private String isDeleted;
 
     @OneToMany(mappedBy = "project")
     @Setter
@@ -39,8 +40,11 @@ public class Project extends BaseEntity {
         this.isDeleted = "Y";
     }
 
-    public void createdTimeSet() {
+//    엔티티가 생성 될 때 마다 실행되어야 하는 로직
+    @PrePersist
+    public void initializeFields() {
         this.createdAt = LocalDateTime.now();
+        this.isDeleted = "N";
     }
 
 }

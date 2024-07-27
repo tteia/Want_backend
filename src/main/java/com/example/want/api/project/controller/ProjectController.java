@@ -3,6 +3,7 @@ package com.example.want.api.project.controller;
 import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.dto.ProjectCreateReqDto;
 import com.example.want.api.project.dto.ProjectUpdateDto;
+import com.example.want.api.project.dto.TravelDatesUpdateDto;
 import com.example.want.api.project.service.ProjectService;
 import com.example.want.api.traveluser.dto.LeaderDto;
 import com.example.want.common.CommonResDto;
@@ -45,19 +46,13 @@ public class ProjectController {
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
-    //  출발 일자 수정
-    @PutMapping("/update/{id}/startTravel")
-    public ResponseEntity<Object> projectStartUpdate(@PathVariable Long id, @RequestBody ProjectUpdateDto dto) {
-        projectService.updateStartTravel(id, dto.getStartTravel());
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "project is found", "new StartTravel is " + dto.getStartTravel());
-        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
-    }
-
-    //  종료 일자 수정
-    @PutMapping("/update/{id}/endTravel")
-    public ResponseEntity<Object> projectEndUpdate(@PathVariable Long id, @RequestBody ProjectUpdateDto dto) {
-        projectService.updateEndTravel(id, dto.getEndTravel());
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "project is found", "new EndTravel is " + dto.getEndTravel());
+    // 기간 수정
+    @PutMapping("/update/{id}/travel-dates")
+    public ResponseEntity<Object> updateTravelDates(
+            @PathVariable Long id,
+            @RequestBody TravelDatesUpdateDto dto) {
+        projectService.updateTravelDates(id, dto);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "project is found", dto.getStartTravel() + " - " + dto.getEndTravel());
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
     
