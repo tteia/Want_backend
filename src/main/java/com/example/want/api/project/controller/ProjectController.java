@@ -1,26 +1,15 @@
 package com.example.want.api.project.controller;
 
-import com.example.want.api.block.domain.Block;
 import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.dto.ProjectCreateReqDto;
-import com.example.want.api.project.dto.ProjectDetailResDto;
-import com.example.want.api.project.dto.ProjectResDto;
 import com.example.want.api.project.dto.ProjectUpdateDto;
-import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.project.service.ProjectService;
+import com.example.want.api.traveluser.dto.LeaderDto;
 import com.example.want.common.CommonResDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/project")
@@ -34,8 +23,15 @@ public class ProjectController {
     }
 
     //    일정 생성
+//    로그인 되어 있는 사용자의 id를 받아서 일정을 생성
+//    이 부분 로그인 기능 이용해서 해야 할거같은데 접근을 어떻게 해야 할지 모르겠어서 일단 이렇게 작성했습니다.
     @PostMapping("/create")
     public ResponseEntity<Object> projectCreate(@RequestBody ProjectCreateReqDto dto) {
+        Long testLeaderId = 1L; // 실제로는 로그인된 사용자 ID를 사용해야 함
+        LeaderDto leaderDto = LeaderDto.builder()
+                .leaderId(testLeaderId)
+                .build();
+        dto.setLeaderDto(leaderDto);
         Project project = projectService.createProject(dto);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.CREATED, "project is successfully created.", "project id is : " +  project.getId());
         return new ResponseEntity<>(commonResDto, HttpStatus.CREATED);
@@ -64,4 +60,6 @@ public class ProjectController {
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "project is found", "new EndTravel is " + dto.getEndTravel());
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
+
+
 }

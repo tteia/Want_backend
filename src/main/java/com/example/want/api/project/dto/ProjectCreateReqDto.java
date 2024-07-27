@@ -1,6 +1,8 @@
 package com.example.want.api.project.dto;
 
+import com.example.want.api.project.domain.Authority;
 import com.example.want.api.project.domain.Project;
+import com.example.want.api.traveluser.dto.LeaderDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +18,7 @@ public class ProjectCreateReqDto {
     private String title;
     private LocalDate startTravel;
     private LocalDate endTravel;
+    private LeaderDto leaderDto;
 //    여행지
 //    private StateTravel stateTravel;
 
