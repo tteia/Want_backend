@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -66,6 +67,7 @@ public class ProjectService {
         }
         project.getTravelUsers().add(savedUser);
 
+        project.createdTimeSet();
         return project;
     }
 
@@ -94,8 +96,34 @@ public class ProjectService {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
         Project updateProject = project.toBuilder()
-                .startTravel(newEndTravel)
+                .endTravel(newEndTravel)
                 .build();
         projectRepository.save(updateProject);
+    }
+
+    // 일정 삭제
+    @Transactional
+    public void deleteProject(Long projectId, Long leaderId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+
+        boolean isLeader = false;
+
+        List<TravelUser> travelUsers = project.getTravelUsers();
+
+        for(TravelUser t : travelUsers) {
+            if(t.getId().equals(leaderId) && t.getAuthority() == Authority.LEADER) {
+                isLeader = true;
+                break;
+            }
+        }
+
+        if (!isLeader) {
+            throw new IllegalArgumentException("리더만 프로젝트를 삭제할 수 있습니다.");
+        }
+
+        project.delete();
+//        이거 더티체킹이라서 save 안 해도 되는건가요 ?
+        projectRepository.save(project);
     }
 }

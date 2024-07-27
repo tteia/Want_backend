@@ -5,6 +5,7 @@ import com.example.want.api.project.domain.Project;
 import com.example.want.api.user.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Data
 public class TravelUser {
 
     @Id

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
@@ -25,12 +25,22 @@ public class Project extends BaseEntity {
     private LocalDate startTravel;
     private LocalDate endTravel;
 
+    private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
 
-    private String isDeleted;
+    private String isDeleted = "N";
 
     @OneToMany(mappedBy = "project")
     @Setter
     private List<TravelUser> travelUsers = new ArrayList<>();
+
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
+        this.isDeleted = "Y";
+    }
+
+    public void createdTimeSet() {
+        this.createdAt = LocalDateTime.now();
+    }
 
 }
