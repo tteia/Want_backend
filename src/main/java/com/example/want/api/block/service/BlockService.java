@@ -10,6 +10,7 @@ import com.example.want.api.heart.repository.HeartRepository;
 import com.example.want.api.member.domain.Member;
 import com.example.want.api.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.HashOperations;
@@ -19,9 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BlockService {
     private final BlockRepository blockRepository;
     private final MemberRepository memberRepository;
@@ -45,8 +50,8 @@ public class BlockService {
     }
 
     public Page<BlockActiveListRsDto> getActiveBlockList(Pageable pageable) {
-        Page<Block> block = blockRepository.findAllByIsActivated("Y", pageable);
-        return block.map(BlockActiveListRsDto::new);
+        Page<Block> blockList = blockRepository.findAllByIsActivatedOrderByStartTimeAsc("Y", pageable);
+        return blockList.map(b -> BlockActiveListRsDto.fromEntity(b));
     }
 
     public BlockDetailRsDto getBlockDetail(Long id) {

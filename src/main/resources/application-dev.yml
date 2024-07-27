@@ -7,9 +7,9 @@ spring:
       on-profile: dev
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${dev.dataspurce.url}
-    username: ${dev.dataspurce.username}
-    password: ${dev.dataspurce.password}
+    url: ${dev.datasource.url}
+    username: ${dev.datasource.username}
+    password: ${dev.datasource.password}
   jpa:
     database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
     show-sql: true
