@@ -30,8 +30,6 @@ public class CreateBlockRqDto {
                 .placeName(this.placeName)
                 .latitude(latitude)
                 .longitude(longitude)
-                .startTime(startTime)
-                .endTime(endTime)
                 .isActivated("N")
                 .heartCount(0L)
                 .build();

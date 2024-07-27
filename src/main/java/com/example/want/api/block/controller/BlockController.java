@@ -1,10 +1,8 @@
 package com.example.want.api.block.controller;
 
 import com.example.want.api.block.domain.Block;
-import com.example.want.api.block.dto.BlockActiveListRsDto;
-import com.example.want.api.block.dto.BlockDetailRsDto;
-import com.example.want.api.block.dto.CreateBlockRqDto;
-import com.example.want.api.block.dto.SetDateBlockRqDto;
+import com.example.want.api.block.domain.Category;
+import com.example.want.api.block.dto.*;
 import com.example.want.api.block.service.BlockService;
 import com.example.want.api.heart.dto.HeartListResDto;
 import com.example.want.common.CommonResDto;
@@ -70,21 +68,26 @@ public class BlockController {
     }
 
     // 날짜별 Block 조회
-    @GetMapping("/{date}")
-    public ResponseEntity<?> getBlocksByDate(@PathVariable String date, @PageableDefault(size = 5) Pageable pageable) {
-        LocalDate localDate = LocalDate.parse(date);
-        Page<Block> blocks = blockService.getBlocksByDate(localDate, pageable);
+    @GetMapping("/date")
+    public ResponseEntity<?> getBlocksByDate(@RequestParam String startTime, @PageableDefault(size = 5) Pageable pageable) {
+        Page<Block> blocks = blockService.getBlocksByDate(startTime, pageable);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", blocks);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
     // Block 일정 등록 -> 끌어다놓기
     @PostMapping("/setDate")
-    public ResponseEntity<CommonResDto> setDateBlock(@RequestBody SetDateBlockRqDto setBlockRqDto) {
+    public ResponseEntity<CommonResDto> setDateBlock(@RequestBody AddDateBlockRqDto setBlockRqDto) {
         Block updatedBlock = blockService.setDateBlock(setBlockRqDto);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", updatedBlock);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
-
+    // 카테고리 별로 Block 조회
+    @GetMapping("/{category}")
+    public ResponseEntity<?> getBlocksByCategory(@RequestBody Category category, @PageableDefault(size = 10) Pageable pageable) {
+        Page<Block> blocks = blockService.getBlocksByCategory(category, pageable);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", blocks);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+    }
 }

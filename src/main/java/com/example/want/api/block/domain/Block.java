@@ -1,7 +1,7 @@
 package com.example.want.api.block.domain;
 
 import com.example.want.api.block.dto.BlockDetailRsDto;
-import com.example.want.api.block.dto.SetDateBlockRqDto;
+import com.example.want.api.block.dto.AddDateBlockRqDto;
 import com.example.want.common.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -37,10 +35,6 @@ public class Block extends BaseEntity {
     private String isActivated;
     private Long heartCount;
 
-    // 선택한 날짜의 일정만 조회할 수 있는 plan 관련 데이터 추가.
-    private LocalDate planDate;
-    private LocalTime planStartTime;
-    private LocalTime planEndTime;
 
     public BlockDetailRsDto toDetailDto() {
         return BlockDetailRsDto.builder()
@@ -66,10 +60,8 @@ public class Block extends BaseEntity {
         this.heartCount--;
     }
 
-    // 등록된 일정을 블럭에 삽입
-    public void updatePlan(SetDateBlockRqDto dto) {
-        this.planDate = dto.getPlanDate();
-        this.planStartTime = dto.getPlanStartTime();
-        this.planEndTime = dto.getPlanEndTime();
+    public void updatePlan(AddDateBlockRqDto setDateRqDto) {
+        this.startTime = setDateRqDto.getStartTime();
+        this.endTime = setDateRqDto.getEndTime();
     }
 }

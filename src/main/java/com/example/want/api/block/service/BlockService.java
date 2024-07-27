@@ -1,10 +1,8 @@
 package com.example.want.api.block.service;
 
 import com.example.want.api.block.domain.Block;
-import com.example.want.api.block.dto.BlockActiveListRsDto;
-import com.example.want.api.block.dto.BlockDetailRsDto;
-import com.example.want.api.block.dto.CreateBlockRqDto;
-import com.example.want.api.block.dto.SetDateBlockRqDto;
+import com.example.want.api.block.domain.Category;
+import com.example.want.api.block.dto.*;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.heart.domain.Heart;
 import com.example.want.api.heart.dto.HeartListResDto;
@@ -22,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -142,24 +139,33 @@ public class BlockService {
         hashOperations.put(key, hashKey, likesCount);
     }
 
-    // 블럭을 끌어다 놓음 -> 블럭에 일정 날짜 등록
+    // Block 을 끌어다 놓음 -> Block 에 일정 날짜 등록
     @Transactional
-    public Block setDateBlock(SetDateBlockRqDto setDateRqDto) {
+    public Block setDateBlock(AddDateBlockRqDto setDateRqDto) {
         Block block = blockRepository.findById(setDateRqDto.getBlockId()).orElseThrow(() -> new IllegalArgumentException("블럭을 찾을 수 없습니다."));
         block.updatePlan(setDateRqDto);
         return blockRepository.save(block);
     }
 
     // 날짜별 Block 조회
-    public Page<Block> getBlocksByDate(LocalDate date, Pageable pageable) {
-        Page<Block> blocks = blockRepository.findByplanDateOrderByStartTimeAsc(date, pageable);
+    public Page<Block> getBlocksByDate(String startTime, Pageable pageable) {// "2024-07-26T09:00" 형식의 문자열
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        LocalDateTime date = LocalDateTime.parse(startTime,formatter);
+        LocalDate startDate = date.toLocalDate();
+        LocalDate endDate = startDate.plusDays(1);
+        Page<Block> blocks = blockRepository.findAllByStartTimeBetweenOrderByStartTimeAsc(startDate.atStartOfDay(),endDate.atStartOfDay(), pageable);
         return blocks;
     }
 
-    // 좋아요 수에 따라 블록을 정렬하여 반환하는 메서드
+    // 좋아요 수에 따라 Block 을 정렬하여 반환하는 메서드
     @Transactional
     public Page<HeartListResDto> activeBlocksByPopular(Pageable pageable) {
         Page<Block> blocks = blockRepository.findByIsActivatedOrderByHeartCountDesc("Y", pageable);
         return blocks.map(HeartListResDto::fromEntity);
+    }
+
+    // 카테고리 별로 Block 조회하기
+    public Page<Block> getBlocksByCategory(Category category, Pageable pageable) {
+        return blockRepository.findByCategory(category, pageable);
     }
 }

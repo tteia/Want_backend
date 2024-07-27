@@ -5,17 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SetDateBlockRqDto {
+public class AddDateBlockRqDto {
     private Long blockId;
-    private LocalDate planDate;
-    private LocalTime planStartTime;
-    private LocalTime planEndTime;
-    private String planDescription;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 }
