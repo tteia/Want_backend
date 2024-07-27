@@ -20,7 +20,4 @@ public class Member{
     private String providerId;
     @Enumerated(EnumType.STRING)
     private Role role;
-
-
-
 }
