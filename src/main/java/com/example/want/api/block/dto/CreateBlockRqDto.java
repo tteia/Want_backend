@@ -23,7 +23,7 @@ public class CreateBlockRqDto {
     private String date;
     private String description;
 
-    public Block toEntity(Double latitude, Double longitude, LocalDateTime startTime, LocalDateTime endTime) {
+    public Block toEntity(Double latitude, Double longitude) {
         return Block.builder()
                 .title(this.title)
                 .content(this.content)
