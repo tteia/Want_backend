@@ -2,7 +2,6 @@ package com.example.want.api.block.domain;
 
 import com.example.want.api.block.dto.BlockDetailRsDto;
 import com.example.want.api.project.domain.Project;
-import com.example.want.api.user.domain.Member;
 import com.example.want.common.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

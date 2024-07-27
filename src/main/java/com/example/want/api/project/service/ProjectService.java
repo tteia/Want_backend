@@ -1,5 +1,7 @@
 package com.example.want.api.project.service;
 
+import com.example.want.api.member.domain.Member;
+import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Authority;
 import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.dto.ProjectCreateReqDto;
@@ -8,14 +10,10 @@ import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.traveluser.Repository.TravelUserRepository;
 import com.example.want.api.traveluser.domain.TravelUser;
 import com.example.want.api.traveluser.dto.LeaderDto;
-import com.example.want.api.user.domain.Member;
-import com.example.want.api.user.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.persistence.EntityNotFoundException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -21,6 +21,18 @@ public class BlockActiveListRsDto {
     private String endTime;
     private String isActivated;
 
+    public BlockActiveListRsDto(Block block) {
+        this.blockId = block.getId();
+        this.title = block.getTitle();
+        this.content = block.getContent();
+        this.placeName = block.getPlaceName();
+        this.latitude = block.getLatitude();
+        this.longitude = block.getLongitude();
+        this.startTime = block.getStartTime().toString();
+        this.endTime = block.getEndTime().toString();
+        this.isActivated = block.getIsActivated();
+    }
+
 
     public static BlockActiveListRsDto fromEntity(Block block) {
         return BlockActiveListRsDto.builder()
