@@ -30,6 +30,6 @@ public class Member{
         this.name = userInfo.getName();
         this.email = userInfo.getEmail();
         this.profileUrl = userInfo.getProfileImageUrl();
-        this.role = Role.USER;
+        this.role = Role.MEMBER;
     }
 }

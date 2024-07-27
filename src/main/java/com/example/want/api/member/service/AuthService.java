@@ -74,7 +74,7 @@ public class AuthService {
     }
 
     private TokenResponse createToken(String email, String name) {
-        return tokenProvider.generateJwtToken(email, name, Role.USER);
+        return tokenProvider.generateJwtToken(email, name, Role.MEMBER);
     }
 
 //    private String randomNickname() {

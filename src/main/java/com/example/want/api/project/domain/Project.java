@@ -1,6 +1,5 @@
 package com.example.want.api.project.domain;
 
-import com.example.want.api.project.dto.TravelDatesUpdateDto;
 import com.example.want.api.traveluser.domain.TravelUser;
 import com.example.want.common.BaseEntity;
 import lombok.*;
