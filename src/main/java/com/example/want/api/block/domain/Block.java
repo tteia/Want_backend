@@ -1,6 +1,7 @@
 package com.example.want.api.block.domain;
 
 import com.example.want.api.block.dto.BlockDetailRsDto;
+import com.example.want.api.block.dto.SetDateBlockRqDto;
 import com.example.want.common.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -61,5 +62,13 @@ public class Block extends BaseEntity {
 
     public void decrementHearts() {
         this.heartCount--;
+    }
+
+    // 등록된 일정을 블럭에 삽입
+    public void updatePlan(SetDateBlockRqDto dto) {
+        this.planDate = dto.getPlanDate();
+        this.planStartTime = dto.getPlanStartTime();
+        this.planEndTime = dto.getPlanEndTime();
+        this.planDescription = dto.getPlanDescription();
     }
 }

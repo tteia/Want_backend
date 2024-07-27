@@ -4,7 +4,9 @@ import com.example.want.api.block.domain.Block;
 import com.example.want.api.block.dto.BlockActiveListRsDto;
 import com.example.want.api.block.dto.BlockDetailRsDto;
 import com.example.want.api.block.dto.CreateBlockRqDto;
+import com.example.want.api.block.dto.SetDateBlockRqDto;
 import com.example.want.api.block.service.BlockService;
+import com.example.want.api.heart.dto.HeartListResDto;
 import com.example.want.common.CommonResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,16 +61,30 @@ public class BlockController {
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", heartCount), HttpStatus.OK);
     }
 
-    // 날짜별 Block 조회
-    @GetMapping("/{date}")
-    public Page<Block> getBlocksByDate(@RequestBody String date) {
-        LocalDate localDate = LocalDate.parse(date);
-        return blockService.getBlocksByDate(localDate);
+    // 좋아요 수를 내림차순으로 조회 (인기 순)
+    @GetMapping("/popular")
+    public ResponseEntity<?> popularBlocks(@PageableDefault(size = 10) Pageable pageable) {
+        Page<HeartListResDto> heartList = blockService.activeBlocksByPopular(pageable);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", heartList);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
-    // 날짜별 Block 생성 -> 끌어다놓기
-    @PostMapping("/{date}")
-    public Block postBlockByDate(@RequestBody CreateBlockRqDto createBlockRqDto) {
-        return blockService.createBlock(createBlockRqDto);
+    // 날짜별 Block 조회
+    @GetMapping("/{date}")
+    public ResponseEntity<?> getBlocksByDate(@PathVariable String date, @PageableDefault(size = 5) Pageable pageable) {
+        LocalDate localDate = LocalDate.parse(date);
+        Page<Block> blocks = blockService.getBlocksByDate(localDate, pageable);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", blocks);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
+
+    // Block 일정 등록 -> 끌어다놓기
+    @PostMapping("/setDate")
+    public ResponseEntity<CommonResDto> setDateBlock(@RequestBody SetDateBlockRqDto setBlockRqDto) {
+        Block updatedBlock = blockService.setDateBlock(setBlockRqDto);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", updatedBlock);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+    }
+
+
 }

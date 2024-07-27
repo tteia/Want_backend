@@ -9,7 +9,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BlockByDateResDto {
+public class BlockByDateRsDto {
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;

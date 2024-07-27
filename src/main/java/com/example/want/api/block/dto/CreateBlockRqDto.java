@@ -1,44 +1,35 @@
 package com.example.want.api.block.dto;
 
 import com.example.want.api.block.domain.Block;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
-@Data
+@Getter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class CreateBlockRqDto {
     private String title;
     private String content;
     private String placeName;
     private Double latitude;
     private Double longitude;
+    private String startTime;
+    private String endTime;
 
     // Plan 관련 필드 추가
-    private LocalDate date;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private String date;
     private String description;
 
-    public Block toBlockEntity() {
-        LocalDateTime startDateTime = LocalDateTime.of(this.date, this.startTime);
-        LocalDateTime endDateTime = LocalDateTime.of(this.date, this.endTime);
-
+    public Block toEntity(Double latitude, Double longitude, LocalDateTime startTime, LocalDateTime endTime) {
         return Block.builder()
                 .title(this.title)
                 .content(this.content)
                 .placeName(this.placeName)
-                .latitude(this.latitude)
-                .longitude(this.longitude)
-                .startTime(startDateTime)
-                .endTime(endDateTime)
+                .latitude(latitude)
+                .longitude(longitude)
+                .startTime(startTime)
+                .endTime(endTime)
                 .isActivated("N")
                 .heartCount(0L)
                 .build();

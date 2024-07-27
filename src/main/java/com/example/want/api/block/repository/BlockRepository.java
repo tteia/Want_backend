@@ -14,5 +14,5 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
     Page<Block> findAllByIsActivated(String y, Pageable pageable);
     Page<Block> findByIsActivatedOrderByHeartCountDesc(String isActivated, Pageable pageable);
     // Plan 관련 메서드
-    Page<Block> findByDateOrderByStartTimeAsc(LocalDate date);
+    Page<Block> findByplanDateOrderByStartTimeAsc(LocalDate planDate, Pageable pageable);
 }

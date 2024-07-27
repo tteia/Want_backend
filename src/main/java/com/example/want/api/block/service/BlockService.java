@@ -4,8 +4,10 @@ import com.example.want.api.block.domain.Block;
 import com.example.want.api.block.dto.BlockActiveListRsDto;
 import com.example.want.api.block.dto.BlockDetailRsDto;
 import com.example.want.api.block.dto.CreateBlockRqDto;
+import com.example.want.api.block.dto.SetDateBlockRqDto;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.heart.domain.Heart;
+import com.example.want.api.heart.dto.HeartListResDto;
 import com.example.want.api.heart.repository.HeartRepository;
 import com.example.want.api.user.domain.Member;
 import com.example.want.api.user.repository.MemberRepository;
@@ -32,7 +34,7 @@ public class BlockService {
 
 
     @Transactional
-    public Block createBlock(CreateBlockRqDto request) { // Creat 로 오타나있어서 수정했는데 왜 에러가 발생했을까요.. 죄송합니다..
+    public Block createBlock(CreateBlockRqDto request) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         LocalDateTime startTime = LocalDateTime.parse(request.getStartTime(), formatter);
         LocalDateTime endTime = LocalDateTime.parse(request.getEndTime(), formatter);
@@ -140,8 +142,24 @@ public class BlockService {
         hashOperations.put(key, hashKey, likesCount);
     }
 
-    // Plan 관련
-    public Page<Block> getBlocksByDate(LocalDate date) {
-        return blockRepository.findByDateOrderByStartTimeAsc(date);
+    // 블럭을 끌어다 놓음 -> 블럭에 일정 날짜 등록
+    @Transactional
+    public Block setDateBlock(SetDateBlockRqDto setDateRqDto) {
+        Block block = blockRepository.findById(setDateRqDto.getBlockId()).orElseThrow(() -> new IllegalArgumentException("블럭을 찾을 수 없습니다."));
+        block.updatePlan(setDateRqDto);
+        return blockRepository.save(block);
+    }
+
+    // 날짜별 Block 조회
+    public Page<Block> getBlocksByDate(LocalDate date, Pageable pageable) {
+        Page<Block> blocks = blockRepository.findByplanDateOrderByStartTimeAsc(date, pageable);
+        return blocks;
+    }
+
+    // 좋아요 수에 따라 블록을 정렬하여 반환하는 메서드
+    @Transactional
+    public Page<HeartListResDto> activeBlocksByPopular(Pageable pageable) {
+        Page<Block> blocks = blockRepository.findByIsActivatedOrderByHeartCountDesc("Y", pageable);
+        return blocks.map(HeartListResDto::fromEntity);
     }
 }
