@@ -10,7 +10,6 @@ java {
     sourceCompatibility = '11'
 }
 
-
 repositories {
     mavenCentral()
 }
@@ -24,8 +23,12 @@ dependencies {
 
 //    postgresql
     runtimeOnly 'org.postgresql:postgresql'
+//    mariadb
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
 //    hibernate spatial
     implementation 'org.hibernate:hibernate-spatial:5.6.11.Final'
+
 //    resdis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
