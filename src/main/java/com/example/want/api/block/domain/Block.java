@@ -26,6 +26,8 @@ public class Block extends BaseEntity {
     private String title;
     private String content;
     private String placeName;
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     private Double latitude;
     private Double longitude;
@@ -39,7 +41,6 @@ public class Block extends BaseEntity {
     private LocalDate planDate;
     private LocalTime planStartTime;
     private LocalTime planEndTime;
-    private String planDescription;
 
     public BlockDetailRsDto toDetailDto() {
         return BlockDetailRsDto.builder()
@@ -47,6 +48,7 @@ public class Block extends BaseEntity {
                 .title(this.title)
                 .content(this.content)
                 .placeName(this.placeName)
+                .category(this.category)
                 .latitude(this.latitude)
                 .longitude(this.longitude)
                 .startTime(this.startTime.toString())
@@ -69,6 +71,5 @@ public class Block extends BaseEntity {
         this.planDate = dto.getPlanDate();
         this.planStartTime = dto.getPlanStartTime();
         this.planEndTime = dto.getPlanEndTime();
-        this.planDescription = dto.getPlanDescription();
     }
 }

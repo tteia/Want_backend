@@ -1,6 +1,7 @@
 package com.example.want.api.block.dto;
 
 import com.example.want.api.block.domain.Block;
+import com.example.want.api.block.domain.Category;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,6 +17,7 @@ public class CreateBlockRqDto {
     private Double longitude;
     private String startTime;
     private String endTime;
+    private Category category;
 
     // Plan 관련 필드 추가
     private String date;
