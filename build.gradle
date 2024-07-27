@@ -26,8 +26,12 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
 //    hibernate spatial
     implementation 'org.hibernate:hibernate-spatial:5.6.11.Final'
+//    resdis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+//    lombok
     annotationProcessor 'org.projectlombok:lombok'
+//    test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
