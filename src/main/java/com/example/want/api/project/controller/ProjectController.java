@@ -27,63 +27,41 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
-    private final ProjectRepository projectRepository;
 
     @Autowired
-    public ProjectController(ProjectService projectService, ProjectRepository projectRepository) {
+    public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
-        this.projectRepository = projectRepository;
-    }
-
-    //    일정 목록
-    @GetMapping("/list")
-    public ResponseEntity<Object> projectList(@PageableDefault(size = 10, sort = "createdTime", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ProjectResDto> projectList = projectService.projectList(pageable);
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "projects are found", projectList);
-        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
-    }
-
-    //    일정 생성 창
-    @GetMapping("/create")
-    public String projectCreateScreen() {
-        return "/project/project_register";
     }
 
     //    일정 생성
     @PostMapping("/create")
     public ResponseEntity<Object> projectCreate(@RequestBody ProjectCreateReqDto dto) {
         Project project = projectService.createProject(dto);
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.CREATED, "project is successfully created", project.getId());
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.CREATED, "project is successfully created.", "project id is : " +  project.getId());
         return new ResponseEntity<>(commonResDto, HttpStatus.CREATED);
     }
 
-    //    일정 상세 보기
-    @GetMapping("/detail/{id}")
-    public ResponseEntity<Object> projectDetail(@PathVariable Long id) {
-        ProjectDetailResDto memberDetailResDto = projectService.projectDetail(id);
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "project is found", memberDetailResDto);
+    //    제목 수정
+    @PutMapping("/update/{id}/title")
+    public ResponseEntity<Object> projectTitleUpdate(@PathVariable Long id, @RequestBody ProjectUpdateDto dto) {
+        projectService.updateTitle(id, dto.getTitle());
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "project is found", "new Title is " + dto.getTitle());
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
-    //    일정 수정
-    @PutMapping("/update/{id}")
-    public String projectUpdate(@PathVariable Long id, @RequestBody ProjectUpdateDto dto) {
-        projectService.update(id, dto);
-        return "redirect:/project/detail/" + id;
+    //  출발 일자 수정
+    @PutMapping("/update/{id}/startTravel")
+    public ResponseEntity<Object> projectStartUpdate(@PathVariable Long id, @RequestBody ProjectUpdateDto dto) {
+        projectService.updateStartTravel(id, dto.getStartTravel());
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "project is found", "new StartTravel is " + dto.getStartTravel());
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
-    //    일정 삭제
-    @DeleteMapping("/delete/{id}")
-    public String projectDelete(@PathVariable Long id) {
-        projectService.deleteProject(id);
-        return "redirect:/project/list";
-    }
-
-    //    프로젝트의 블럭 리스트 보기
-    @GetMapping("/blocks/{id}")
-    public ResponseEntity<Object> getBlocksByProject(@PathVariable Long id) {
-        List<Block> blocks = projectService.getBlocksByProject(id);
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "block list found success", blocks);
+    //  종료 일자 수정
+    @PutMapping("/update/{id}/endTravel")
+    public ResponseEntity<Object> projectEndUpdate(@PathVariable Long id, @RequestBody ProjectUpdateDto dto) {
+        projectService.updateEndTravel(id, dto.getEndTravel());
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "project is found", "new EndTravel is " + dto.getEndTravel());
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 }

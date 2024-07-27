@@ -22,7 +22,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class Project extends BaseEntity {
 
     @Id
@@ -43,42 +43,4 @@ public class Project extends BaseEntity {
     @OneToMany(mappedBy = "project")
     private List<Block> blockList;
 
-//    @OneToMany(mappedBy = "project")
-//    private List<TravelUser> travelUserList;
-
-//     여행지
-//     @OneToMany(mappedBy = "stateTravel")
-//     private StateTravel stateTravel;
-
-    public void updateProject(ProjectUpdateDto dto) {
-        this.title = dto.getTitle();
-        this.startTravel = dto.getStartTravel();
-        this.endTravel = dto.getEndTravel();
-//        그룹을 변경하는 일?
-//        this.stateTravel = dto.getStateTravel();
-//        그룹 및 여행지 업데이트 로직 추가 필요 시 추가
-    }
-
-    public ProjectResDto listFromEntity() {
-        ProjectResDto projectResDto = ProjectResDto.builder()
-                .id(this.id)
-                .title(this.title)
-                .startTravel(this.startTravel)
-                .endTravel(this.endTravel)
-//                .createdAt(getCreatedTime())
-                .build();
-        return projectResDto;
-    }
-
-    public ProjectDetailResDto detFromEntity() {
-        return ProjectDetailResDto.builder()
-                .id(id)
-                .title(title)
-                .startTravel(startTravel)
-                .endTravel(endTravel)
-                .blockList(blockList)
-//                .memberList(memberList)
-//                .stateTravel()
-                .build();
-    }
 }
