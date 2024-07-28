@@ -8,6 +8,7 @@ import com.example.want.api.heart.domain.Heart;
 import com.example.want.api.heart.dto.HeartListResDto;
 import com.example.want.api.heart.repository.HeartRepository;
 import com.example.want.api.member.domain.Member;
+import com.example.want.api.member.login.UserInfo;
 import com.example.want.api.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,11 +37,11 @@ public class BlockService {
 
 
     @Transactional
-    public Block createBlock(CreateBlockRqDto request) {
+    public Block createBlock(CreateBlockRqDto request, UserInfo userInfo) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         LocalDateTime startTime = LocalDateTime.parse(request.getStartTime(), formatter);
         LocalDateTime endTime = LocalDateTime.parse(request.getEndTime(), formatter);
-        return blockRepository.save(request.toEntity(request.getLatitude(), request.getLongitude()));
+        return blockRepository.save(request.toEntity(request.getLatitude(), request.getLongitude(), userInfo.getEmail(), startTime, endTime));
     }
 
     public Page<BlockActiveListRsDto> getNotActiveBlockList(Pageable pageable, String memberEmail) {

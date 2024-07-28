@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class CreateBlockRqDto {
+    private String creator;
     private String title;
     private String content;
     private String placeName;
@@ -21,17 +22,21 @@ public class CreateBlockRqDto {
 
     // Plan 관련 필드 추가
     private String date;
-    private String description;
 
-    public Block toEntity(Double latitude, Double longitude) {
+    public Block toEntity(Double latitude, Double longitude, String creator, LocalDateTime startTime, LocalDateTime endTime) {
         return Block.builder()
+                .creator(creator)
                 .title(this.title)
                 .content(this.content)
                 .placeName(this.placeName)
                 .latitude(latitude)
                 .longitude(longitude)
+                .startTime(startTime)
+                .endTime(endTime)
+                .category(Category.valueOf((this.category).toString()))
                 .isActivated("N")
                 .heartCount(0L)
                 .build();
     }
+
 }
