@@ -1,6 +1,7 @@
 package com.example.want.api.block.domain;
 
 import com.example.want.api.block.dto.BlockDetailRsDto;
+import com.example.want.api.block.dto.AddDateBlockRqDto;
 import com.example.want.api.project.domain.Project;
 import com.example.want.common.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,8 @@ public class Block extends BaseEntity {
     private String title;
     private String content;
     private String placeName;
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     private Double latitude;
     private Double longitude;
@@ -43,6 +46,7 @@ public class Block extends BaseEntity {
                 .title(this.title)
                 .content(this.content)
                 .placeName(this.placeName)
+                .category(this.category)
                 .latitude(this.latitude)
                 .longitude(this.longitude)
                 .startTime(this.startTime.toString())
@@ -58,5 +62,10 @@ public class Block extends BaseEntity {
 
     public void decrementHearts() {
         this.heartCount--;
+    }
+
+    public void updatePlan(AddDateBlockRqDto setDateRqDto) {
+        this.startTime = setDateRqDto.getStartTime();
+        this.endTime = setDateRqDto.getEndTime();
     }
 }

@@ -4,6 +4,7 @@ import com.example.want.api.member.domain.Member;
 import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Authority;
 import com.example.want.api.project.domain.Project;
+import com.example.want.api.project.dto.MyProjectListRsDto;
 import com.example.want.api.project.dto.ProjectCreateReqDto;
 import com.example.want.api.project.dto.TravelDatesUpdateDto;
 import com.example.want.api.project.repository.ProjectRepository;
@@ -11,12 +12,15 @@ import com.example.want.api.traveluser.Repository.TravelUserRepository;
 import com.example.want.api.traveluser.domain.TravelUser;
 import com.example.want.api.traveluser.dto.LeaderDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -121,7 +125,7 @@ public class ProjectService {
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
 //        초대할 member 객체
-        Member member = memberRepository.findMemberByEmail(email);
+        Member member = memberRepository.findMemberByEmail(email).orElseThrow(() -> new EntityNotFoundException("Member not found"));
 
 //        멤버가 이미 팀원목록에 속해 있는지 확인하는 검증코드
         boolean existsMember = travelUserRepository.existsByProjectAndMember(project, member);
@@ -140,5 +144,24 @@ public class ProjectService {
                 .build();
 
         travelUserRepository.save(travelUser);
+    }
+
+    public Page<MyProjectListRsDto> getMyProjectList(Pageable pageable, String email) {
+        Member member = memberRepository.findMemberByEmail(email).orElseThrow(() -> new EntityNotFoundException("Member not found"));
+        Page<MyProjectListRsDto> myProjectListRsDto = travelUserRepository.findActiveProjectByMember(member, pageable)
+                .map(project -> MyProjectListRsDto.builder()
+                        .projectId(project.getId())
+                        .projectTitle(project.getTitle())
+                        .startTravel(project.getStartTravel().toString())
+                        .endTravel(project.getEndTravel().toString())
+                        .travelUsers(project.getTravelUsers().stream()
+                                .map(travelUser -> MyProjectListRsDto.MyProjectMember.builder()
+                                        .userId(travelUser.getMember().getId())
+                                        .userName(travelUser.getMember().getName())
+                                        .userProfile(travelUser.getMember().getProfileUrl())
+                                        .build())
+                                .collect(Collectors.toList()))
+                        .build());
+        return myProjectListRsDto;
     }
 }

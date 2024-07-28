@@ -15,4 +15,4 @@ public abstract class BaseEntity {
     private LocalDateTime createdTime;
     @UpdateTimestamp
     private LocalDateTime updatedTime;
-}
+}// 삭제 필요하면 어노테이션 찾아서 하세여

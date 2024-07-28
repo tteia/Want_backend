@@ -1,11 +1,11 @@
 package com.example.want.api.block.service;
 
 import com.example.want.api.block.domain.Block;
-import com.example.want.api.block.dto.BlockActiveListRsDto;
-import com.example.want.api.block.dto.BlockDetailRsDto;
-import com.example.want.api.block.dto.CreatBlockRqDto;
+import com.example.want.api.block.domain.Category;
+import com.example.want.api.block.dto.*;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.heart.domain.Heart;
+import com.example.want.api.heart.dto.HeartListResDto;
 import com.example.want.api.heart.repository.HeartRepository;
 import com.example.want.api.member.domain.Member;
 import com.example.want.api.member.repository.MemberRepository;
@@ -18,6 +18,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -35,11 +36,11 @@ public class BlockService {
 
 
     @Transactional
-    public Block createBlock(CreatBlockRqDto request) {
+    public Block createBlock(CreateBlockRqDto request) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         LocalDateTime startTime = LocalDateTime.parse(request.getStartTime(), formatter);
         LocalDateTime endTime = LocalDateTime.parse(request.getEndTime(), formatter);
-        return blockRepository.save(request.toEntity(request.getLatitude(), request.getLongitude(), startTime, endTime));
+        return blockRepository.save(request.toEntity(request.getLatitude(), request.getLongitude()));
     }
 
     public Page<BlockActiveListRsDto> getNotActiveBlockList(Pageable pageable, String memberEmail) {
@@ -108,9 +109,6 @@ public class BlockService {
         hashOperations.put(key, hashKey, block.getHeartCount());
     }
 
-
-
-
     public Long getLikesCount(Long blockId) {
         String key = "blockId::" + blockId;
         String hashKey = "heartCount";
@@ -148,7 +146,33 @@ public class BlockService {
         hashOperations.put(key, hashKey, likesCount);
     }
 
+    // Block 을 끌어다 놓음 -> Block 에 일정 날짜 등록
+    @Transactional
+    public Block setDateBlock(AddDateBlockRqDto setDateRqDto) {
+        Block block = blockRepository.findById(setDateRqDto.getBlockId()).orElseThrow(() -> new IllegalArgumentException("블럭을 찾을 수 없습니다."));
+        block.updatePlan(setDateRqDto);
+        return blockRepository.save(block);
+    }
 
+    // 날짜별 Block 조회
+    public Page<Block> getBlocksByDate(String startTime, Pageable pageable) {// "2024-07-26T09:00" 형식의 문자열
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        LocalDateTime date = LocalDateTime.parse(startTime,formatter);
+        LocalDate startDate = date.toLocalDate();
+        LocalDate endDate = startDate.plusDays(1);
+        Page<Block> blocks = blockRepository.findAllByStartTimeBetweenOrderByStartTimeAsc(startDate.atStartOfDay(),endDate.atStartOfDay(), pageable);
+        return blocks;
+    }
 
+    // 좋아요 수에 따라 Block 을 정렬하여 반환하는 메서드
+    @Transactional
+    public Page<HeartListResDto> activeBlocksByPopular(Pageable pageable) {
+        Page<Block> blocks = blockRepository.findByIsActivatedOrderByHeartCountDesc("Y", pageable);
+        return blocks.map(HeartListResDto::fromEntity);
+    }
 
+    // 카테고리 별로 Block 조회하기
+    public Page<Block> getBlocksByCategory(Category category, Pageable pageable) {
+        return blockRepository.findByCategory(category, pageable);
+    }
 }
