@@ -1,8 +1,8 @@
 package com.example.want.api.traveluser.domain;
 
+import com.example.want.api.member.domain.Member;
 import com.example.want.api.project.domain.Authority;
 import com.example.want.api.project.domain.Project;
-import com.example.want.api.user.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +21,10 @@ public class TravelUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 1)
     private String invitationAccepted;
+
+    private String invitationCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,8 +28,8 @@ public class BlockController {
     }
 
     @GetMapping("/dis/active/list")
-    public ResponseEntity<Object> getNotActiveBlockList(@PageableDefault(size = 10) Pageable pageable) {
-        Page<BlockActiveListRsDto> blockList = blockService.getNotActiveBlockList(pageable);
+    public ResponseEntity<Object> getNotActiveBlockList(@PageableDefault(size = 10) Pageable pageable, @AuthenticationPrincipal String memberEmail) {
+        Page<BlockActiveListRsDto> blockList = blockService.getNotActiveBlockList(pageable, memberEmail);
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", blockList), HttpStatus.OK);
     }
 

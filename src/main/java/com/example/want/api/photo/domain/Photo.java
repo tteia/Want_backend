@@ -18,18 +18,15 @@ public class Photo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long photoId;
+    private String title;
     private String photoUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "block_id")
     private Block block;
 
-    public Photo(Long photoId, String photoUrl) {
-        this.photoId = photoId;
+    public Photo(String title, String photoUrl) {
+        this.title = title;
         this.photoUrl = photoUrl;
     }
-
-    //    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "category_id")
-//    private BlockCategory blockCategory;
 }

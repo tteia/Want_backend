@@ -2,7 +2,7 @@ package com.example.want.api.heart.repository;
 
 import com.example.want.api.block.domain.Block;
 import com.example.want.api.heart.domain.Heart;
-import com.example.want.api.user.domain.Member;
+import com.example.want.api.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

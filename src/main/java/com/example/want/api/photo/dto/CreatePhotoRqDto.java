@@ -12,4 +12,5 @@ public class CreatePhotoRqDto {
     private String url;
     private MultipartFile file;
 
+
 }

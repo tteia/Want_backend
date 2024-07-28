@@ -7,8 +7,8 @@ import com.example.want.api.block.dto.CreatBlockRqDto;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.heart.domain.Heart;
 import com.example.want.api.heart.repository.HeartRepository;
-import com.example.want.api.user.domain.Member;
-import com.example.want.api.user.repository.MemberRepository;
+import com.example.want.api.member.domain.Member;
+import com.example.want.api.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -42,9 +42,11 @@ public class BlockService {
         return blockRepository.save(request.toEntity(request.getLatitude(), request.getLongitude(), startTime, endTime));
     }
 
-    public Page<BlockActiveListRsDto> getNotActiveBlockList(Pageable pageable) {
-        Page<Block> block = blockRepository.findAllByIsActivatedOrderByHeartCountDesc("N", pageable);
-        return block.map(b -> BlockActiveListRsDto.fromEntity(b));
+    public Page<BlockActiveListRsDto> getNotActiveBlockList(Pageable pageable, String memberEmail) {
+        memberRepository.findByEmail(memberEmail)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다."));
+        Page<Block> block = blockRepository.findAllByIsActivated("N", pageable);
+        return block.map(BlockActiveListRsDto::new);
     }
 
     public Page<BlockActiveListRsDto> getActiveBlockList(Pageable pageable) {

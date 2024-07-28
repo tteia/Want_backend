@@ -7,6 +7,9 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 @SpringBootApplication
 @ServletComponentScan
 public class WantApplication {
+    static {
+        System.setProperty("com.amazonaws.sdk.disableEc2Metadata", "true");
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(WantApplication.class, args);

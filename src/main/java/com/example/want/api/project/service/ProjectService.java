@@ -1,5 +1,7 @@
 package com.example.want.api.project.service;
 
+import com.example.want.api.member.domain.Member;
+import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Authority;
 import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.dto.ProjectCreateReqDto;
@@ -8,16 +10,13 @@ import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.traveluser.Repository.TravelUserRepository;
 import com.example.want.api.traveluser.domain.TravelUser;
 import com.example.want.api.traveluser.dto.LeaderDto;
-import com.example.want.api.user.domain.Member;
-import com.example.want.api.user.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.persistence.EntityNotFoundException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -120,5 +119,32 @@ public class ProjectService {
         project.delete();
 //        이거 더티체킹이라서 save 안 해도 되는건가요 ?
         projectRepository.save(project);
+    }
+
+//    팀원 초대
+    public void inviteUser (Long id, String email) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+
+//        초대할 member 객체
+        Member member = memberRepository.findMemberByEmail(email);
+
+//        멤버가 이미 팀원목록에 속해 있는지 확인하는 검증코드
+        boolean existsMember = travelUserRepository.existsByProjectAndMember(project, member);
+        if(existsMember) {
+            throw new IllegalArgumentException("Member already exists.");
+        }
+        
+        String invitationCode = UUID.randomUUID().toString();
+
+        TravelUser travelUser = TravelUser.builder()
+                .project(project)
+                .member(member)
+                .authority(Authority.MEMBER)
+                .invitationAccepted("N") // 초대 수락을 하면 "Y"로 변경
+                .invitationCode(invitationCode)
+                .build();
+
+        travelUserRepository.save(travelUser);
     }
 }
