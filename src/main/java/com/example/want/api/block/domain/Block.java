@@ -44,6 +44,7 @@ public class Block extends BaseEntity {
     public BlockDetailRsDto toDetailDto() {
         return BlockDetailRsDto.builder()
                 .blockId(this.id)
+                .creator(this.creator)
                 .title(this.title)
                 .content(this.content)
                 .placeName(this.placeName)

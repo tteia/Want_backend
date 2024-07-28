@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class BlockDetailRsDto {
     private Long blockId;
+    private String creator;
     private String title;
     private String content;
     private String placeName;
