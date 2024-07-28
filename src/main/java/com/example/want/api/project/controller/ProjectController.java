@@ -58,15 +58,13 @@ public class ProjectController {
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "project is found", dto.getStartTravel() + " - " + dto.getEndTravel());
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
-    
-    // 일정 삭제
-    // 삭제도 leader가 탈퇴 or 삭제를 하게 되면 일정이 삭제가 되어야 해서
-    // 지금은 testLeaderId를 설정해서 테스트 진행했습니다.
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProject(@PathVariable Long id) {
-        Long testLeaderId = 1L;
-        projectService.deleteProject(id, testLeaderId);
-        return new ResponseEntity<>("Project has been logically deleted.", HttpStatus.OK);
+
+//    Leader : 탈퇴 시 동시에 프로젝트 삭제
+//    Member : 탈퇴 시 Member 자신만 팀원 목록에서 삭제
+    @DeleteMapping("/{projectId}")
+    public ResponseEntity<String> deleteProject(@PathVariable Long projectId, @AuthenticationPrincipal UserInfo userInfo) {
+        projectService.deleteProject(projectId, userInfo.getEmail());
+        return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 
 //    팀원 초대
