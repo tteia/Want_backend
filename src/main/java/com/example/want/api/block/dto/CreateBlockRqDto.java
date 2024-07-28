@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class CreateBlockRqDto {
+    private String creator;
     private String title;
     private String content;
     private String placeName;
@@ -23,8 +24,9 @@ public class CreateBlockRqDto {
     private String date;
     private String description;
 
-    public Block toEntity(Double latitude, Double longitude) {
+    public Block toEntity(Double latitude, Double longitude, String creator) {
         return Block.builder()
+                .creator(this.creator)
                 .title(this.title)
                 .content(this.content)
                 .placeName(this.placeName)

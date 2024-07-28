@@ -5,6 +5,7 @@ import com.example.want.api.block.domain.Category;
 import com.example.want.api.block.dto.*;
 import com.example.want.api.block.service.BlockService;
 import com.example.want.api.heart.dto.HeartListResDto;
+import com.example.want.api.member.login.UserInfo;
 import com.example.want.common.CommonResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,8 +23,8 @@ public class BlockController {
     private final BlockService blockService;
 
     @PostMapping("/create")
-    public ResponseEntity<Object> createBlock(@RequestBody CreateBlockRqDto request) {
-        Block block = blockService.createBlock(request);
+    public ResponseEntity<Object> createBlock(@AuthenticationPrincipal UserInfo userInfo, @RequestBody CreateBlockRqDto request) {
+        Block block = blockService.createBlock(request, userInfo);
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", block), HttpStatus.OK);
     }
 

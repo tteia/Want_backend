@@ -22,6 +22,7 @@ public class Block extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String creator;
     private String title;
     private String content;
     private String placeName;
