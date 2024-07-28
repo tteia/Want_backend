@@ -6,6 +6,9 @@ import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
+import com.example.want.api.member.domain.Member;
+import com.example.want.api.member.repository.MemberRepository;
+import com.sun.xml.bind.v2.TODO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -21,7 +25,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class S3Uploader {
@@ -31,8 +34,10 @@ public class S3Uploader {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    @Transactional
     public String uploadFile(MultipartFile multipartFile) throws IOException {
-        String fileName = multipartFile.getOriginalFilename();
+        String   = UUID + multipartFile.getOriginalFilename();
+
         //파일 형식 구하기
         String ext = fileName.split("\\.")[1];
         String contentType = "";
@@ -51,14 +56,14 @@ public class S3Uploader {
         case "csv":
             contentType = "text/csv";
             break;
-         }
+
+        }
 
         try {
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(contentType);
-
-        amazonS3.putObject(new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), metadata)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(contentType);
+            amazonS3.putObject(new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), metadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (AmazonServiceException e) {
             e.printStackTrace();
         } catch (SdkClientException e) {

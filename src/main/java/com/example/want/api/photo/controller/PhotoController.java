@@ -24,11 +24,18 @@ public class PhotoController {
     private final S3Uploader s3Uploader;
     private final PhotoService photoService;
 
-    @PostMapping("/upload")
-    public ResponseEntity<Object> uploadFile(CreatePhotoRqDto dto) throws IOException {
-        String url = s3Uploader.uploadFile(dto.getFile());
-        dto.setUrl(url);
-        photoService.save(dto);
-        return new ResponseEntity<>(new CommonResDto(HttpStatus.CREATED, "photo is successfully uploaded", url), HttpStatus.CREATED);
+    @PostMapping(value = "/{blockId}/upload",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String uploadFile(@PathVariable Long blockId, @RequestParam List<MultipartFile> multipartFile) throws IOException {
+
+        String url = s3Uploader.uploadFile(multipartFile);
+        return url;
     }
+
+//    @GetMapping("/api/list")
+//    public String listPage(Model model) {
+//        List<FileEntity> fileList =fileService.getFiles();
+//        model.addAttribute("fileList", fileList);
+//        return "list";
+//    }
+
 }
