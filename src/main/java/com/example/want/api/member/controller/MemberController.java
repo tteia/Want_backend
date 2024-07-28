@@ -7,6 +7,9 @@ import com.example.want.api.member.login.UserInfo;
 import com.example.want.api.member.service.MemberService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,8 +33,9 @@ public class MemberController {
 
 //    초대 요청 목록 확인
     @GetMapping("/invitations")
-    public ResponseEntity<?> getInvitations(@AuthenticationPrincipal UserInfo userInfo) {
-        List<GetInvitationDto> invitations = memberService.getMyInvitations(userInfo.getEmail());
+    public ResponseEntity<?> getInvitations(@AuthenticationPrincipal UserInfo userInfo,
+                                            @PageableDefault(size = 10) Pageable pageable) {
+        Page<GetInvitationDto> invitations = memberService.getMyInvitations(userInfo.getEmail(), pageable);
         return ResponseEntity.ok(invitations);
     }
 
