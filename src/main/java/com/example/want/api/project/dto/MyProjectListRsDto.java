@@ -1,0 +1,32 @@
+package com.example.want.api.project.dto;
+
+import com.example.want.api.traveluser.domain.TravelUser;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class MyProjectListRsDto {
+    private Long projectId;
+    private String projectTitle;
+    private String startTravel;
+    private String endTravel;
+    private List<MyProjectMember> travelUsers;
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class MyProjectMember {
+        private Long userId;
+        private String userName;
+        private String userProfile;
+    }
+}
+
