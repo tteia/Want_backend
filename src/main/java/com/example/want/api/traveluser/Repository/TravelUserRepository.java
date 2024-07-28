@@ -14,4 +14,6 @@ public interface TravelUserRepository extends JpaRepository<TravelUser, Long> {
     Optional<TravelUser> findById(Long id);
 
     boolean existsByProjectAndMember(Project project, Member member);
+
+    Optional<TravelUser> findByProjectAndMember(Project project, Member member);
 }
