@@ -1,6 +1,7 @@
 package com.example.want.api.project.controller;
 
 import com.example.want.api.project.domain.Project;
+import com.example.want.api.project.dto.InvitationDto;
 import com.example.want.api.project.dto.ProjectCreateReqDto;
 import com.example.want.api.project.dto.ProjectUpdateDto;
 import com.example.want.api.project.dto.TravelDatesUpdateDto;
@@ -64,5 +65,13 @@ public class ProjectController {
         Long testLeaderId = 1L;
         projectService.deleteProject(id, testLeaderId);
         return new ResponseEntity<>("Project has been logically deleted.", HttpStatus.OK);
+    }
+
+//    팀원 초대
+    @PostMapping("/invite/{projectId}")
+    public ResponseEntity<Object> inviteUser(@PathVariable Long projectId, @RequestBody InvitationDto dto) {
+        projectService.inviteUser(projectId, dto.getEmail());
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Member invited successfully.", "Member Email : " + dto.getEmail());
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 }

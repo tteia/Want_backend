@@ -21,7 +21,10 @@ public class TravelUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 1)
     private String invitationAccepted;
+
+    private String invitationCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
