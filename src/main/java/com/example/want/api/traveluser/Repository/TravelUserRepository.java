@@ -19,4 +19,6 @@ public interface TravelUserRepository extends JpaRepository<TravelUser, Long> {
     Optional<TravelUser> findByProjectAndMember(Project project, Member member);
 
     List<TravelUser> findByMemberEmail(String email);
+
+    Optional<TravelUser> findByMemberAndProjectId(Member member, Long projectId);
 }

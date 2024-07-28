@@ -1,11 +1,13 @@
 package com.example.want.api.member.controller;
 
 import com.example.want.api.member.domain.Member;
+import com.example.want.api.member.dto.AcceptInvitationDto;
+import com.example.want.api.member.dto.GetInvitationDto;
 import com.example.want.api.member.login.UserInfo;
 import com.example.want.api.member.service.MemberService;
-import com.example.want.api.project.dto.InvitationDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +31,16 @@ public class MemberController {
 //    초대 요청 목록 확인
     @GetMapping("/invitations")
     public ResponseEntity<?> getInvitations(@AuthenticationPrincipal UserInfo userInfo) {
-        List<InvitationDto> invitations = memberService.getMyInvitations(userInfo.getEmail());
+        List<GetInvitationDto> invitations = memberService.getMyInvitations(userInfo.getEmail());
         return ResponseEntity.ok(invitations);
+    }
+
+//    초대 요청 수락
+    @PostMapping("/accept")
+    public ResponseEntity<String> acceptInvitation (@RequestBody AcceptInvitationDto dto,
+                                                    @AuthenticationPrincipal UserInfo userInfo) {
+        String email = userInfo.getEmail();
+        memberService.acceptInvitation(email, dto.getProjectId());
+        return new ResponseEntity<>("Invitation accepted successfully.", HttpStatus.OK);
     }
 }
