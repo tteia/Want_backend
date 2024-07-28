@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface BlockRepository extends JpaRepository<Block, Long> {
-    Page<Block> findAllByIsActivated(String y, Pageable pageable);
     Page<Block> findByIsActivatedOrderByHeartCountDesc(String isActivated, Pageable pageable);
     // 선택한 일자의 일정만 조회
     Page<Block> findAllByStartTimeBetweenOrderByStartTimeAsc(LocalDateTime localDateTime, LocalDateTime localDateTime1, Pageable pageable);
