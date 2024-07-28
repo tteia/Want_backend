@@ -23,4 +23,6 @@ public interface TravelUserRepository extends JpaRepository<TravelUser, Long> {
   
     @Query("SELECT tu.project FROM TravelUser tu WHERE tu.member = :member AND tu.project.isDeleted = 'N'")
     Page<Project> findActiveProjectByMember(@Param("member") Member member, Pageable pageable);
+
+    List<TravelUser> findByProjectId(Long projectId);
 }
