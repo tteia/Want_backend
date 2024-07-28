@@ -2,6 +2,7 @@ package com.example.want.api.block.domain;
 
 import com.example.want.api.block.dto.BlockDetailRsDto;
 import com.example.want.api.block.dto.AddDateBlockRqDto;
+import com.example.want.api.project.domain.Project;
 import com.example.want.common.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,6 +36,9 @@ public class Block extends BaseEntity {
     private String isActivated;
     private Long heartCount;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
 
     public BlockDetailRsDto toDetailDto() {
         return BlockDetailRsDto.builder()

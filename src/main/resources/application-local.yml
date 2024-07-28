@@ -11,8 +11,8 @@ spring:
     username: ${local.datasource.username}
     password: ${local.datasource.password}
   jpa:
-    database: mysql
     database-platform: org.hibernate.dialect.MariaDBDialect
+    database: mysql
     generate-ddl: true
     hibernate:
       ddl-auto: update
@@ -23,19 +23,26 @@ spring:
       host: localhost
       port: 6379
       timeout: 10
+  security:
+    oauth2:
+      client:
+        registration:
+            google:
+                client-id: ${local.oauth2.google.client-id}
+                client-secret: ${local.oauth2.google.client-secret}
+                scope: ${local.oauth2.google.scope}
+
 
 springdoc:
-  packages-to-scan: com.example.want
-  paths-to-match: /**
-  default-consumes-media-type: application/json;charset=UTF-8
-  default-produces-media-type: application/json;charset=UTF-8
-  swagger-ui:
-    path: /swagger-ui.html
-    tags-sorter: alpha
-    operations-sorter: alpha
   api-docs:
-    path: /v3/api-docs
     groups:
       enabled: true
+#    path: /api-docs
   cache:
     disabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    display-request-duration: true
+    groups-order: DESC
+
+

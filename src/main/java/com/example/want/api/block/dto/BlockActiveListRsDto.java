@@ -34,4 +34,17 @@ public class BlockActiveListRsDto {
     }
 
 
+    public static BlockActiveListRsDto fromEntity(Block block) {
+        return BlockActiveListRsDto.builder()
+                .blockId(block.getId())
+                .title(block.getTitle())
+                .content(block.getContent())
+                .placeName(block.getPlaceName())
+                .latitude(block.getLatitude())
+                .longitude(block.getLongitude())
+                .startTime(block.getStartTime().toString())
+                .endTime(block.getEndTime().toString())
+                .isActivated(block.getIsActivated())
+                .build();
+    }
 }
