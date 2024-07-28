@@ -1,28 +1,27 @@
 server:
-  port: 8080
+  port: 8088
 
 spring:
   config:
     activate:
       on-profile: local
   datasource:
-#    driver-class-name: org.postgresql.Driver
     driver-class-name: org.mariadb.jdbc.Driver
     url: ${local.datasource.url}
     username: ${local.datasource.username}
     password: ${local.datasource.password}
   jpa:
-#    database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
     database-platform: org.hibernate.dialect.MariaDBDialect
-    show-sql: true
+    database: mysql
     generate-ddl: true
-    open-in-view: false
     hibernate:
       ddl-auto: update
+    show_sql: true
+
   data:
     redis:
-      host: ${local.redis.host}
-      port: ${local.redis.port}
+      host: localhost
+      port: 6379
       timeout: 10
   security:
     oauth2:
