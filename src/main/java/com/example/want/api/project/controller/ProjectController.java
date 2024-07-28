@@ -1,16 +1,18 @@
 package com.example.want.api.project.controller;
 
+import com.example.want.api.member.login.UserInfo;
 import com.example.want.api.project.domain.Project;
-import com.example.want.api.project.dto.InvitationDto;
-import com.example.want.api.project.dto.ProjectCreateReqDto;
-import com.example.want.api.project.dto.ProjectUpdateDto;
-import com.example.want.api.project.dto.TravelDatesUpdateDto;
+import com.example.want.api.project.dto.*;
 import com.example.want.api.project.service.ProjectService;
 import com.example.want.api.traveluser.dto.LeaderDto;
 import com.example.want.common.CommonResDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -73,5 +75,13 @@ public class ProjectController {
         projectService.inviteUser(projectId, dto.getEmail());
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Member invited successfully.", "Member Email : " + dto.getEmail());
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<?> getProjectList(@PageableDefault Pageable pageable, @AuthenticationPrincipal UserInfo userInfo) {
+        Page<MyProjectListRsDto> myProjectListRsDto = projectService.getMyProjectList(pageable , userInfo.getEmail());
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", myProjectListRsDto);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+
     }
 }
