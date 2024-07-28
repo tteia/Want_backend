@@ -5,11 +5,10 @@ import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.block_comment.dto.CreateCmtRqDto;
 import com.example.want.api.block_comment.dto.CmtRsDto;
 import com.example.want.api.block_comment.dto.CmtUpdateRqDto;
-import com.example.want.api.block_comment.entity.Cmt;
+import com.example.want.api.block_comment.domain.Cmt;
 import com.example.want.api.block_comment.repository.CmtRepository;
 import com.example.want.api.user.domain.Member;
 import com.example.want.api.user.repository.MemberRepository;
-import com.example.want.common.CommonResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
