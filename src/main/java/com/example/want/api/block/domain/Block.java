@@ -22,7 +22,6 @@ public class Block extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String creator;
     private String title;
     private String content;
     private String placeName;
@@ -44,7 +43,6 @@ public class Block extends BaseEntity {
     public BlockDetailRsDto toDetailDto() {
         return BlockDetailRsDto.builder()
                 .blockId(this.id)
-                .creator(this.creator)
                 .title(this.title)
                 .content(this.content)
                 .placeName(this.placeName)
@@ -66,8 +64,35 @@ public class Block extends BaseEntity {
         this.heartCount--;
     }
 
-    public void updatePlan(AddDateBlockRqDto setDateRqDto) {
-        this.startTime = setDateRqDto.getStartTime();
-        this.endTime = setDateRqDto.getEndTime();
+    public void updatePlan(LocalDateTime startTime, LocalDateTime endTime) {
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void updatePlaceName(String placeName) {
+        this.placeName = placeName;
+    }
+
+    public void updateCategory(Category category) {
+        this.category = category;
+    }
+
+    public void changeIsActivated(String isActivated) {
+        this.isActivated = isActivated;
+    }
+
+    public void updatePoint(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+
 }

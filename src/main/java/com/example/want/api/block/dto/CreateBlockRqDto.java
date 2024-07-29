@@ -23,9 +23,8 @@ public class CreateBlockRqDto {
     // Plan 관련 필드 추가
     private String date;
 
-    public Block toEntity(Double latitude, Double longitude, String creator, LocalDateTime startTime, LocalDateTime endTime) {
+    public Block toEntity(Double latitude, Double longitude, LocalDateTime startTime, LocalDateTime endTime) {
         return Block.builder()
-                .creator(creator)
                 .title(this.title)
                 .content(this.content)
                 .placeName(this.placeName)

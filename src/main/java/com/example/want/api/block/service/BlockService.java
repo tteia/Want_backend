@@ -19,12 +19,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +39,7 @@ public class BlockService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         LocalDateTime startTime = LocalDateTime.parse(request.getStartTime(), formatter);
         LocalDateTime endTime = LocalDateTime.parse(request.getEndTime(), formatter);
-        return blockRepository.save(request.toEntity(request.getLatitude(), request.getLongitude(), userInfo.getEmail(), startTime, endTime));
+        return blockRepository.save(request.toEntity(request.getLatitude(), request.getLongitude(),startTime, endTime));
     }
 
     public Page<BlockActiveListRsDto> getNotActiveBlockList(Pageable pageable, String memberEmail) {
@@ -151,7 +149,7 @@ public class BlockService {
     @Transactional
     public Block setDateBlock(AddDateBlockRqDto setDateRqDto) {
         Block block = blockRepository.findById(setDateRqDto.getBlockId()).orElseThrow(() -> new IllegalArgumentException("블럭을 찾을 수 없습니다."));
-        block.updatePlan(setDateRqDto);
+        block.updatePlan(setDateRqDto.getStartTime(), setDateRqDto.getEndTime());
         return blockRepository.save(block);
     }
 
@@ -176,4 +174,94 @@ public class BlockService {
     public Page<Block> getBlocksByCategory(Category category, Pageable pageable) {
         return blockRepository.findByCategory(category, pageable);
     }
+
+//    public BlockDetailRsDto updateBlockTitle(Long id, UpdateBlockRqDto request, UserInfo userInfo) {
+//        Member member = getMemberByEmail(userInfo.getEmail());
+//        Block block = getBlockById(id);
+//        block.updateTitle(request.getTitle());
+//        return block.toDetailDto();
+//    }
+//
+//    public BlockDetailRsDto updateBlockContent(Long id, UpdateBlockRqDto request, UserInfo userInfo) {
+//        Member member = getMemberByEmail(userInfo.getEmail());
+//        Block block = getBlockById(id);
+//        block.updateContent(request.getContent());
+//        return block.toDetailDto();
+//    }
+//
+//    public BlockDetailRsDto updateBlockPlaceName(Long id, UpdateBlockRqDto request, UserInfo userInfo) {
+//        Member member = getMemberByEmail(userInfo.getEmail());
+//        Block block = getBlockById(id);
+//        block.updatePlaceName(request.getPlaceName());
+//        return block.toDetailDto();
+//    }
+//
+//    public BlockDetailRsDto updateBlockCategory(Long id, UpdateBlockRqDto request, UserInfo userInfo) {
+//        Member member = getMemberByEmail(userInfo.getEmail());
+//        Block block = getBlockById(id);
+//        block.updateCategory(request.getCategory());
+//        return block.toDetailDto();
+//    }
+//
+//    public BlockDetailRsDto updateBlockIsActivated(Long id, UpdateBlockRqDto request, UserInfo userInfo) {
+//        Member member = getMemberByEmail(userInfo.getEmail());
+//        Block block = getBlockById(id);
+//        if (request.getIsActivated().equals("Y")) {
+//            block.changeIsActivated("N");
+//        } else {
+//            block.changeIsActivated("Y");
+//        }
+//        block.changeIsActivated(request.getIsActivated());
+//        return block.toDetailDto();
+//    }
+
+//    public BlockDetailRsDto updateBlockTime(Long id, UpdateBlockRqDto request, UserInfo userInfo) {
+//        Member member = getMemberByEmail(userInfo.getEmail());
+//        Block block = getBlockById(id);
+//        LocalDateTime startTime = LocalDateTime.parse(request.getStartTime());
+//        LocalDateTime endTime = LocalDateTime.parse(request.getEndTime());
+//        block.updatePlan(startTime, endTime );
+//        return block.toDetailDto();
+//    }
+
+    @Transactional
+    public BlockDetailRsDto updateBlock(Long id, UpdateBlockRqDto updateBlockRqDto, UserInfo userInfo) {
+
+        Block block = blockRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Block not found"));
+
+        if (updateBlockRqDto.getTitle() != null) {
+            block.updateTitle(updateBlockRqDto.getTitle());
+        }
+        if (updateBlockRqDto.getContent() != null) {
+            block.updateContent(updateBlockRqDto.getContent());
+        }
+        if (updateBlockRqDto.getPlaceName() != null) {
+            block.updatePlaceName(updateBlockRqDto.getPlaceName());
+        }
+        if (updateBlockRqDto.getLatitude() != null && updateBlockRqDto.getLongitude() != null) {
+            block.updatePoint(updateBlockRqDto.getLatitude(), updateBlockRqDto.getLongitude());
+        }
+
+        if (updateBlockRqDto.getStartTime() != null && updateBlockRqDto.getEndTime() != null) {
+            block.updatePlan(updateBlockRqDto.getStartTime(), updateBlockRqDto.getEndTime());
+        }
+        if (updateBlockRqDto.getCategory() != null) {
+            block.updateCategory(updateBlockRqDto.getCategory());
+
+        }
+        if (updateBlockRqDto.getIsActivated() != null) {
+            if(updateBlockRqDto.getIsActivated().equals("Y")){
+                block.changeIsActivated("N");
+            } else {
+                block.changeIsActivated("Y");
+            }
+        }
+    return block.toDetailDto();
+    }
+
+
+
+
+
 }
