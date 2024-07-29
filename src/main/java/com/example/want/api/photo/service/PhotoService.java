@@ -5,15 +5,16 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
-import com.example.want.api.member.repository.MemberRepository;
+import com.example.want.api.photo.domain.Photo;
+import com.example.want.api.photo.dto.CreatePhotoRqDto;
+import com.example.want.api.photo.repository.PhotoRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 
 import java.io.IOException;
 import java.util.List;
@@ -21,19 +22,24 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class S3Uploader {
+@Transactional
+public class PhotoService {
 
     private final AmazonS3 amazonS3;
+    private final PhotoRepository photoRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+//    1. 용량제한, -> 백엔드 코드에서 용량 resize, S3자체에서 용량 resize
+//    4. DB에 URL 저장
+//    5-1.블록이랑 연결.
+
+    // S3 Uploader
     @Transactional
     public String uploadFile(MultipartFile multipartFile) throws IOException {
 
         String inputFileName = multipartFile.getOriginalFilename();
-
-
 
         //파일 형식 구하기
         String ext = inputFileName.substring(inputFileName.lastIndexOf(".") + 1).toLowerCase();
@@ -78,4 +84,11 @@ public class S3Uploader {
         }
         return amazonS3.getUrl(bucket, uuidFileName).toString();
     }
+
+    public List<Photo> getFiles() {
+        List<Photo> all = photoRepository.findAll();
+        return all;
+    }
+
+
 }
