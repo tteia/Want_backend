@@ -14,6 +14,7 @@ import java.util.Optional;
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Long> {
     Page<ProjectMember> findAll(Pageable pageable);
     Optional<ProjectMember> findById(Long id);
+    Optional<ProjectMember> findByMemberEmail(String email);
 
     boolean existsByProjectAndMember(Project project, Member member);
 

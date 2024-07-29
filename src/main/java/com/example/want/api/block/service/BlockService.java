@@ -10,6 +10,8 @@ import com.example.want.api.heart.repository.HeartRepository;
 import com.example.want.api.member.domain.Member;
 import com.example.want.api.member.login.UserInfo;
 import com.example.want.api.member.repository.MemberRepository;
+import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
+import com.example.want.api.projectMember.domain.ProjectMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,14 +34,16 @@ public class BlockService {
     private final MemberRepository memberRepository;
     private final HeartRepository heartRepository;
     private final RedisTemplate<String, Object> redisTemplate;
-
+    private final ProjectMemberRepository projectMemberRepository;
 
     @Transactional
     public Block createBlock(CreateBlockRqDto request, UserInfo userInfo) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         LocalDateTime startTime = LocalDateTime.parse(request.getStartTime(), formatter);
         LocalDateTime endTime = LocalDateTime.parse(request.getEndTime(), formatter);
-        return blockRepository.save(request.toEntity(request.getLatitude(), request.getLongitude(),startTime, endTime));
+        Block createdBlock = blockRepository.save(request.toEntity(request.getLatitude(), request.getLongitude(),startTime, endTime));
+        createdBlock.initializeFields();
+        return createdBlock;
     }
 
     public Page<BlockActiveListRsDto> getNotActiveBlockList(Pageable pageable, String memberEmail) {
@@ -260,6 +264,17 @@ public class BlockService {
     return block.toDetailDto();
     }
 
+    public Block blockDelete(UserInfo userInfo, Long id) {
+        Block block = blockRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        ProjectMember projectMemberByEmail = projectMemberRepository.findByMemberEmail(userInfo.getEmail())
+                .orElseThrow(() -> new EntityNotFoundException("해당 이메일로 멤버를 찾을 수 없습니다."));
+        ProjectMember projectMember = projectMemberRepository.findByProjectAndMember(block.getProject(), projectMemberByEmail.getMember())
+                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 속한 프로젝트의 팀원이 아닙니다."));
+        blockRepository.delete(block);
+        block.delete();
+        return block;
+    }
 
 
 

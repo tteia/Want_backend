@@ -35,6 +35,7 @@ public class Block extends BaseEntity {
     private LocalDateTime endTime;
     private String isActivated;
     private Long heartCount;
+    private String isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
@@ -94,5 +95,13 @@ public class Block extends BaseEntity {
         this.longitude = longitude;
     }
 
+    public void delete(){
+        this.isDeleted = "Y";
+    }
+
+    @PrePersist
+    public void initializeFields() {
+        this.isDeleted = "N";
+    }
 
 }
