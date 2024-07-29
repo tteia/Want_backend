@@ -12,8 +12,8 @@ import com.example.want.api.member.login.UserInfo;
 import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.repository.ProjectRepository;
-import com.example.want.api.traveluser.Repository.TravelUserRepository;
-import com.example.want.api.traveluser.domain.TravelUser;
+import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
+import com.example.want.api.projectMember.domain.ProjectMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,9 +27,6 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +36,7 @@ public class BlockService {
     private final MemberRepository memberRepository;
     private final HeartRepository heartRepository;
     private final ProjectRepository projectRepository;
-    private final TravelUserRepository projectMemberRepository;
+    private final ProjectMemberRepository projectMemberRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
 
@@ -49,7 +46,7 @@ public class BlockService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 프로젝트가 없습니다."));
         Member member = memberRepository.findByEmail(userInfo.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("해당 회원이 없습니다."));
-        TravelUser travelUser = projectMemberRepository.findByProjectAndMember(project, member)
+        ProjectMember projectMember = projectMemberRepository.findByProjectAndMember(project, member)
                 .orElseThrow(() -> new EntityNotFoundException("해당 회원은 프로젝트에 속해있지 않습니다."));
         Block block = request.toEntity(request.getCategory(), project);
         return blockRepository.save(block);
@@ -162,9 +159,9 @@ public class BlockService {
 
     // Block 을 끌어다 놓음 -> Block 에 일정 날짜 등록
     @Transactional
-    public Block setDateBlock(AddDateBlockRqDto setDateRqDto) {
-        Block block = blockRepository.findById(setDateRqDto.getBlockId()).orElseThrow(() -> new IllegalArgumentException("블럭을 찾을 수 없습니다."));
-        block.updatePlan(setDateRqDto);
+    public Block addDateBlock(AddDateBlockRqDto addDateRqDto) {
+        Block block = blockRepository.findById(addDateRqDto.getBlockId()).orElseThrow(() -> new IllegalArgumentException("블럭을 찾을 수 없습니다."));
+        block.updatePlan(addDateRqDto.getStartTime(), addDateRqDto.getEndTime());
         return blockRepository.save(block);
     }
 
@@ -189,4 +186,94 @@ public class BlockService {
     public Page<Block> getBlocksByCategory(Category category, Pageable pageable) {
         return blockRepository.findByCategory(category, pageable);
     }
+
+//    public BlockDetailRsDto updateBlockTitle(Long id, UpdateBlockRqDto request, UserInfo userInfo) {
+//        Member member = getMemberByEmail(userInfo.getEmail());
+//        Block block = getBlockById(id);
+//        block.updateTitle(request.getTitle());
+//        return block.toDetailDto();
+//    }
+//
+//    public BlockDetailRsDto updateBlockContent(Long id, UpdateBlockRqDto request, UserInfo userInfo) {
+//        Member member = getMemberByEmail(userInfo.getEmail());
+//        Block block = getBlockById(id);
+//        block.updateContent(request.getContent());
+//        return block.toDetailDto();
+//    }
+//
+//    public BlockDetailRsDto updateBlockPlaceName(Long id, UpdateBlockRqDto request, UserInfo userInfo) {
+//        Member member = getMemberByEmail(userInfo.getEmail());
+//        Block block = getBlockById(id);
+//        block.updatePlaceName(request.getPlaceName());
+//        return block.toDetailDto();
+//    }
+//
+//    public BlockDetailRsDto updateBlockCategory(Long id, UpdateBlockRqDto request, UserInfo userInfo) {
+//        Member member = getMemberByEmail(userInfo.getEmail());
+//        Block block = getBlockById(id);
+//        block.updateCategory(request.getCategory());
+//        return block.toDetailDto();
+//    }
+//
+//    public BlockDetailRsDto updateBlockIsActivated(Long id, UpdateBlockRqDto request, UserInfo userInfo) {
+//        Member member = getMemberByEmail(userInfo.getEmail());
+//        Block block = getBlockById(id);
+//        if (request.getIsActivated().equals("Y")) {
+//            block.changeIsActivated("N");
+//        } else {
+//            block.changeIsActivated("Y");
+//        }
+//        block.changeIsActivated(request.getIsActivated());
+//        return block.toDetailDto();
+//    }
+
+//    public BlockDetailRsDto updateBlockTime(Long id, UpdateBlockRqDto request, UserInfo userInfo) {
+//        Member member = getMemberByEmail(userInfo.getEmail());
+//        Block block = getBlockById(id);
+//        LocalDateTime startTime = LocalDateTime.parse(request.getStartTime());
+//        LocalDateTime endTime = LocalDateTime.parse(request.getEndTime());
+//        block.updatePlan(startTime, endTime );
+//        return block.toDetailDto();
+//    }
+
+    @Transactional
+    public BlockDetailRsDto updateBlock(Long id, UpdateBlockRqDto updateBlockRqDto, UserInfo userInfo) {
+
+        Block block = blockRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Block not found"));
+
+        if (updateBlockRqDto.getTitle() != null) {
+            block.updateTitle(updateBlockRqDto.getTitle());
+        }
+        if (updateBlockRqDto.getContent() != null) {
+            block.updateContent(updateBlockRqDto.getContent());
+        }
+        if (updateBlockRqDto.getPlaceName() != null) {
+            block.updatePlaceName(updateBlockRqDto.getPlaceName());
+        }
+        if (updateBlockRqDto.getLatitude() != null && updateBlockRqDto.getLongitude() != null) {
+            block.updatePoint(updateBlockRqDto.getLatitude(), updateBlockRqDto.getLongitude());
+        }
+
+        if (updateBlockRqDto.getStartTime() != null && updateBlockRqDto.getEndTime() != null) {
+            block.updatePlan(updateBlockRqDto.getStartTime(), updateBlockRqDto.getEndTime());
+        }
+        if (updateBlockRqDto.getCategory() != null) {
+            block.updateCategory(updateBlockRqDto.getCategory());
+
+        }
+        if (updateBlockRqDto.getIsActivated() != null) {
+            if(updateBlockRqDto.getIsActivated().equals("Y")){
+                block.changeIsActivated("N");
+            } else {
+                block.changeIsActivated("Y");
+            }
+        }
+    return block.toDetailDto();
+    }
+
+
+
+
+
 }
