@@ -10,6 +10,10 @@ import com.example.want.api.heart.repository.HeartRepository;
 import com.example.want.api.member.domain.Member;
 import com.example.want.api.member.login.UserInfo;
 import com.example.want.api.member.repository.MemberRepository;
+import com.example.want.api.project.domain.Project;
+import com.example.want.api.project.repository.ProjectRepository;
+import com.example.want.api.traveluser.Repository.TravelUserRepository;
+import com.example.want.api.traveluser.domain.TravelUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,6 +23,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,18 +38,26 @@ public class BlockService {
     private final BlockRepository blockRepository;
     private final MemberRepository memberRepository;
     private final HeartRepository heartRepository;
+    private final ProjectRepository projectRepository;
+    private final TravelUserRepository projectMemberRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
 
     @Transactional
     public Block createBlock(CreateBlockRqDto request, UserInfo userInfo) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-        LocalDateTime startTime = LocalDateTime.parse(request.getStartTime(), formatter);
-        LocalDateTime endTime = LocalDateTime.parse(request.getEndTime(), formatter);
-        return blockRepository.save(request.toEntity(request.getLatitude(), request.getLongitude(), userInfo.getEmail(), startTime, endTime));
+        Project project = projectRepository.findById(request.getProjectId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 프로젝트가 없습니다."));
+        Member member = memberRepository.findByEmail(userInfo.getEmail())
+                .orElseThrow(() -> new EntityNotFoundException("해당 회원이 없습니다."));
+        TravelUser travelUser = projectMemberRepository.findByProjectAndMember(project, member)
+                .orElseThrow(() -> new EntityNotFoundException("해당 회원은 프로젝트에 속해있지 않습니다."));
+        Block block = request.toEntity(request.getCategory(), project);
+        return blockRepository.save(block);
+
     }
 
     public Page<BlockActiveListRsDto> getNotActiveBlockList(Pageable pageable, String memberEmail) {
+        System.out.println(memberEmail);
         memberRepository.findByEmail(memberEmail)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다."));
         Page<Block> block = blockRepository.findAllByIsActivated("N", pageable);

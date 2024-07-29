@@ -25,12 +25,13 @@ public class BlockController {
     @PostMapping("/create")
     public ResponseEntity<Object> createBlock(@AuthenticationPrincipal UserInfo userInfo, @RequestBody CreateBlockRqDto request) {
         Block block = blockService.createBlock(request, userInfo);
-        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", block), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", block.getId()), HttpStatus.OK);
     }
 
+    // TODO: 7/29/24 request에 project id를 받아서 해당 프로젝트의 block을 조회하는 기능 추가
     @GetMapping("/dis/active/list")
-    public ResponseEntity<Object> getNotActiveBlockList(@PageableDefault(size = 10) Pageable pageable, @AuthenticationPrincipal String memberEmail) {
-        Page<BlockActiveListRsDto> blockList = blockService.getNotActiveBlockList(pageable, memberEmail);
+    public ResponseEntity<Object> getNotActiveBlockList(@PageableDefault(size = 10) Pageable pageable, @AuthenticationPrincipal UserInfo userInfo) {
+        Page<BlockActiveListRsDto> blockList = blockService.getNotActiveBlockList(pageable, userInfo.getEmail());
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", blockList), HttpStatus.OK);
     }
 
