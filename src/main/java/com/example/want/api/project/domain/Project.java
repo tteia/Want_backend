@@ -1,6 +1,6 @@
 package com.example.want.api.project.domain;
 
-import com.example.want.api.traveluser.domain.TravelUser;
+import com.example.want.api.projectMember.domain.ProjectMember;
 import com.example.want.common.BaseEntity;
 import lombok.*;
 
@@ -30,9 +30,9 @@ public class Project extends BaseEntity {
 
     private String isDeleted;
 
-    @OneToMany(mappedBy = "project")
-    @Setter
-    private List<TravelUser> travelUsers = new ArrayList<>();
+    @OneToMany(mappedBy = "project", cascade = CascadeType.PERSIST)
+    @Builder.Default
+    private List<ProjectMember> projectMembers = new ArrayList<>();
 
     public void delete() {
         this.deletedAt = LocalDateTime.now();
