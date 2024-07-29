@@ -11,8 +11,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class S3UploadService {
+    //    todo : 용량제한 설정하기 추가
     private final PhotoRepository photoRepository;
-
 
     public void save(CreatePhotoRqDto createPhotoRqDto) {
         Photo photo = new Photo(createPhotoRqDto.getTitle(), createPhotoRqDto.getUrl());

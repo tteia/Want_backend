@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -36,33 +37,38 @@ public class S3Uploader {
 
     @Transactional
     public String uploadFile(MultipartFile multipartFile) throws IOException {
-        String   = UUID + multipartFile.getOriginalFilename();
+
+        String inputFileName = multipartFile.getOriginalFilename();
+
+
 
         //파일 형식 구하기
-        String ext = fileName.split("\\.")[1];
-        String contentType = "";
+        String ext = inputFileName.substring(inputFileName.lastIndexOf(".") + 1).toLowerCase();
+        String contentType;
 
         //content type을 지정해서 올려주지 않으면 자동으로 "application/octet-stream"으로 고정이 되서 링크 클릭시 웹에서 열리는게 아니라 자동 다운이 시작됨.
         switch (ext) {
-        case "jpeg":
-            contentType = "image/jpeg";
-            break;
-        case "png":
-            contentType = "image/png";
-            break;
-        case "txt":
-            contentType = "text/plain";
-            break;
-        case "csv":
-            contentType = "text/csv";
-            break;
-
+            case "jpeg":
+                contentType = "image/jpeg";
+                break;
+            case "png":
+                contentType = "image/png";
+                break;
+            case "jpg":
+                contentType = "image/jpg";
+                break;
+            default:
+                throw new IllegalArgumentException("Only image files (jpeg, png, jpg) are allowed.");   // 안뜸
         }
 
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(contentType);
+        System.out.println("metadata:" + metadata.getContentType());
+
+        String uuidFileName = UUID.randomUUID().toString() + "." + ext;
+
         try {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(contentType);
-            amazonS3.putObject(new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), metadata)
+            amazonS3.putObject(new PutObjectRequest(bucket, uuidFileName, multipartFile.getInputStream(), metadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (AmazonServiceException e) {
             e.printStackTrace();
@@ -77,6 +83,6 @@ public class S3Uploader {
         for (S3ObjectSummary object: objectSummaries) {
             System.out.println("object = " + object.toString());
         }
-        return amazonS3.getUrl(bucket, fileName).toString();
+        return amazonS3.getUrl(bucket, uuidFileName).toString();
     }
 }

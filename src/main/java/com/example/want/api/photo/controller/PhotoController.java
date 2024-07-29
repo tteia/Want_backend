@@ -1,7 +1,7 @@
 package com.example.want.api.photo.controller;
 
 import com.example.want.api.photo.dto.CreatePhotoRqDto;
-import com.example.want.api.photo.service.PhotoService;
+
 import com.example.want.api.photo.service.S3Uploader;
 import com.example.want.common.CommonResDto;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +22,12 @@ import java.io.IOException;
 public class PhotoController {
 
     private final S3Uploader s3Uploader;
-    private final PhotoService photoService;
+    private final S3UploadService s3UploadService;
 
     @PostMapping(value = "/{blockId}/upload",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String uploadFile(@PathVariable Long blockId, @RequestParam List<MultipartFile> multipartFile) throws IOException {
-
+    public String uploadFile(@PathVariable Long blockId, @RequestParam MultipartFile multipartFile) throws IOException {
         String url = s3Uploader.uploadFile(multipartFile);
+
         return url;
     }
 
