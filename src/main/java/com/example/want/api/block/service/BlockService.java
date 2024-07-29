@@ -41,7 +41,7 @@ public class BlockService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         LocalDateTime startTime = LocalDateTime.parse(request.getStartTime(), formatter);
         LocalDateTime endTime = LocalDateTime.parse(request.getEndTime(), formatter);
-        return blockRepository.save(request.toEntity(request.getLatitude(), request.getLongitude(), userInfo.getEmail(), startTime, endTime));
+        return blockRepository.save(request.toEntity(request.getLatitude(), request.getLongitude(),startTime, endTime));
     }
 
     public Page<BlockActiveListRsDto> getNotActiveBlockList(Pageable pageable, String memberEmail) {
