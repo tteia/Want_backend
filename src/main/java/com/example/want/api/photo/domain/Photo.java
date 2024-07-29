@@ -1,7 +1,6 @@
 package com.example.want.api.photo.domain;
 
 import com.example.want.api.block.domain.Block;
-import com.example.want.api.block_comment.dto.CmtRsDto;
 import com.example.want.api.photo.dto.PhotoRsDto;
 import com.example.want.common.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -16,7 +15,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Photo {
+public class Photo extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long photoId;
