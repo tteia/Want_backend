@@ -95,13 +95,14 @@ public class Block extends BaseEntity {
         this.longitude = longitude;
     }
 
-    public void delete(){
-        this.isDeleted = "Y";
-    }
+
 
     @PrePersist
     public void initializeFields() {
         this.isDeleted = "N";
     }
 
+    public void changeIsDelete() {
+        this.isDeleted = "Y";
+    }
 }

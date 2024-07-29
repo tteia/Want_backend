@@ -264,15 +264,15 @@ public class BlockService {
     return block.toDetailDto();
     }
 
+    @Transactional
     public Block blockDelete(UserInfo userInfo, Long id) {
         Block block = blockRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-        ProjectMember projectMemberByEmail = projectMemberRepository.findByMemberEmail(userInfo.getEmail())
-                .orElseThrow(() -> new EntityNotFoundException("해당 이메일로 멤버를 찾을 수 없습니다."));
-        ProjectMember projectMember = projectMemberRepository.findByProjectAndMember(block.getProject(), projectMemberByEmail.getMember())
-                .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 속한 프로젝트의 팀원이 아닙니다."));
-        blockRepository.delete(block);
-        block.delete();
+        block.getProject().getProjectMembers().stream()
+                .filter(projectMember -> projectMember.getMember().getEmail().equals(userInfo.getEmail()))
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 속한 프로젝트의 팀원이 아닙니다."));
+        block.changeIsDelete();
         return block;
     }
 
