@@ -1,6 +1,7 @@
 package com.example.want.api.block.dto;
 
 import com.example.want.api.block.domain.Block;
+import com.example.want.api.block.domain.Category;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,7 +9,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class CreatBlockRqDto {
+public class CreateBlockRqDto {
+    private String creator;
     private String title;
     private String content;
     private String placeName;
@@ -16,6 +18,10 @@ public class CreatBlockRqDto {
     private Double longitude;
     private String startTime;
     private String endTime;
+    private Category category;
+
+    // Plan 관련 필드 추가
+    private String date;
 
     public Block toEntity(Double latitude, Double longitude, LocalDateTime startTime, LocalDateTime endTime) {
         return Block.builder()
@@ -26,8 +32,10 @@ public class CreatBlockRqDto {
                 .longitude(longitude)
                 .startTime(startTime)
                 .endTime(endTime)
+                .category(Category.valueOf((this.category).toString()))
                 .isActivated("N")
                 .heartCount(0L)
                 .build();
     }
+
 }

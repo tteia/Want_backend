@@ -1,10 +1,11 @@
 package com.example.want.api.block.controller;
 
 import com.example.want.api.block.domain.Block;
-import com.example.want.api.block.dto.BlockActiveListRsDto;
-import com.example.want.api.block.dto.BlockDetailRsDto;
-import com.example.want.api.block.dto.CreatBlockRqDto;
+import com.example.want.api.block.domain.Category;
+import com.example.want.api.block.dto.*;
 import com.example.want.api.block.service.BlockService;
+import com.example.want.api.heart.dto.HeartListResDto;
+import com.example.want.api.member.login.UserInfo;
 import com.example.want.common.CommonResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,8 +23,8 @@ public class BlockController {
     private final BlockService blockService;
 
     @PostMapping("/create")
-    public ResponseEntity<Object> createBlock(@RequestBody CreatBlockRqDto request) {
-        Block block = blockService.createBlock(request);
+    public ResponseEntity<Object> createBlock(@AuthenticationPrincipal UserInfo userInfo, @RequestBody CreateBlockRqDto request) {
+        Block block = blockService.createBlock(request, userInfo);
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", block), HttpStatus.OK);
     }
 
@@ -45,7 +46,7 @@ public class BlockController {
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", block), HttpStatus.OK);
     }
 
-    //    좋아요수 증가
+    // 좋아요수 증가
     @PostMapping("/{blockId}/heart")
     public ResponseEntity<Object> addLikeToPost(@PathVariable Long blockId, @RequestBody String memberEmail) {
         blockService.addLikeToPost(blockId, memberEmail);
@@ -57,4 +58,45 @@ public class BlockController {
         Long heartCount = blockService.getLikesCount(blockId);
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", heartCount), HttpStatus.OK);
     }
+
+    // 좋아요 수를 내림차순으로 조회 (인기 순)
+    @GetMapping("/popular")
+    public ResponseEntity<?> popularBlocks(@PageableDefault(size = 10) Pageable pageable) {
+        Page<HeartListResDto> heartList = blockService.activeBlocksByPopular(pageable);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", heartList);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+    }
+
+    // 날짜별 Block 조회
+    @GetMapping("/date")
+    public ResponseEntity<?> getBlocksByDate(@RequestParam String startTime, @PageableDefault(size = 5) Pageable pageable) {
+        Page<Block> blocks = blockService.getBlocksByDate(startTime, pageable);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", blocks);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+    }
+
+    // Block 일정 등록 -> 끌어다놓기
+    @PostMapping("/setDate")
+    public ResponseEntity<CommonResDto> setDateBlock(@RequestBody AddDateBlockRqDto setBlockRqDto) {
+        Block updatedBlock = blockService.setDateBlock(setBlockRqDto);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", updatedBlock);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+    }
+
+    // 카테고리 별로 Block 조회
+    @GetMapping("/{category}")
+    public ResponseEntity<?> getBlocksByCategory(@RequestBody Category category, @PageableDefault(size = 10) Pageable pageable) {
+        Page<Block> blocks = blockService.getBlocksByCategory(category, pageable);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", blocks);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+    }
+
+//    블록들 업데이트
+    @PatchMapping("/update/{id}")
+    public ResponseEntity<Object> updateBlock(@PathVariable Long id, @RequestBody UpdateBlockRqDto request, @AuthenticationPrincipal UserInfo userInfo) {
+        BlockDetailRsDto blockDetailRsDto = blockService.updateBlock(id, request, userInfo);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", blockDetailRsDto);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+    }
+
 }

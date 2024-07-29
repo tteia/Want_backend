@@ -6,22 +6,29 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BlockDetailRsDto {
-    private Long blockId;
-    private String creator;
+public class UpdateBlockRqDto {
+
     private String title;
+
     private String content;
+
     private String placeName;
-    private Category category;
     private Double latitude;
     private Double longitude;
-    private String startTime;
-    private String endTime;
+
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+
+    private Category category;
+
     private String isActivated;
-    private Long heartCount;
+
 
 }
