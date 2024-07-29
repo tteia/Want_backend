@@ -5,6 +5,8 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
+import com.example.want.api.block.domain.Block;
+import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.photo.domain.Photo;
 import com.example.want.api.photo.dto.CreatePhotoRqDto;
 import com.example.want.api.photo.repository.PhotoRepository;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -27,17 +30,17 @@ public class PhotoService {
 
     private final AmazonS3 amazonS3;
     private final PhotoRepository photoRepository;
+    private final BlockRepository blockRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
 //    1. 용량제한, -> 백엔드 코드에서 용량 resize, S3자체에서 용량 resize
-//    4. DB에 URL 저장
-//    5-1.블록이랑 연결.
+//    4-1.블록이랑 연결.
 
     // S3 Uploader
     @Transactional
-    public String uploadFile(MultipartFile multipartFile) throws IOException {
+    public void uploadFile(Long blockId, MultipartFile multipartFile) throws IOException {
 
         String inputFileName = multipartFile.getOriginalFilename();
 
@@ -82,7 +85,14 @@ public class PhotoService {
         for (S3ObjectSummary object: objectSummaries) {
             System.out.println("object = " + object.toString());
         }
-        return amazonS3.getUrl(bucket, uuidFileName).toString();
+
+        String url = amazonS3.getUrl(bucket, uuidFileName).toString();
+        Block block = blockRepository.findById(blockId).orElseThrow(()->new EntityNotFoundException("block id is not found"));
+        Photo photo = Photo.builder()
+                .photoUrl(url)
+                .block(block)
+                .build();
+        photoRepository.save(photo);
     }
 
     public List<Photo> getFiles() {
