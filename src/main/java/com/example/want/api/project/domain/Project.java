@@ -28,7 +28,11 @@ public class Project extends BaseEntity {
     private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
 
+//    일정 삭제 여부
     private String isDeleted;
+    
+//    일정 종료 여부
+    private String isDone;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.PERSIST)
     @Builder.Default
@@ -44,6 +48,10 @@ public class Project extends BaseEntity {
     public void initializeFields() {
         this.createdAt = LocalDateTime.now();
         this.isDeleted = "N";
+    }
+
+    public void updateIsDone(String isDone) {
+        this.isDone = isDone;
     }
 
 }
