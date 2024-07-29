@@ -1,4 +1,4 @@
-package com.example.want.api.project.dto;
+package com.example.want.api.member.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class InvitationDto {
+public class GetInvitationDto {
     private Long projectId;
     private String projectTitle;
-    private String email;
     private String invitationAccepted;
 }

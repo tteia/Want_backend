@@ -22,4 +22,8 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Lo
   
     @Query("SELECT tu.project FROM ProjectMember tu WHERE tu.member = :member AND tu.project.isDeleted = 'N'")
     Page<Project> findActiveProjectByMember(@Param("member") Member member, Pageable pageable);
+
+    Page<ProjectMember> findByMemberEmail(String email, Pageable pageable);
+
+    Optional<ProjectMember> findByMemberAndProjectId(Member member, Long projectId);
 }
