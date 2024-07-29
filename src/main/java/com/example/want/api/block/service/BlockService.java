@@ -147,9 +147,9 @@ public class BlockService {
 
     // Block 을 끌어다 놓음 -> Block 에 일정 날짜 등록
     @Transactional
-    public Block setDateBlock(AddDateBlockRqDto setDateRqDto) {
-        Block block = blockRepository.findById(setDateRqDto.getBlockId()).orElseThrow(() -> new IllegalArgumentException("블럭을 찾을 수 없습니다."));
-        block.updatePlan(setDateRqDto.getStartTime(), setDateRqDto.getEndTime());
+    public Block addDateBlock(AddDateBlockRqDto addDateRqDto) {
+        Block block = blockRepository.findById(addDateRqDto.getBlockId()).orElseThrow(() -> new IllegalArgumentException("블럭을 찾을 수 없습니다."));
+        block.updatePlan(addDateRqDto.getStartTime(), addDateRqDto.getEndTime());
         return blockRepository.save(block);
     }
 
