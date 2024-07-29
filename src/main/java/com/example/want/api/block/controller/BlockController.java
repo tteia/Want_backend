@@ -18,50 +18,50 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/block")
+@RequestMapping("/api/v1/")
 public class BlockController {
     private final BlockService blockService;
 
-    @PostMapping("/create")
+    @PostMapping("/block/create")
     public ResponseEntity<Object> createBlock(@AuthenticationPrincipal UserInfo userInfo, @RequestBody CreateBlockRqDto request) {
         Block block = blockService.createBlock(request, userInfo);
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", block.getId()), HttpStatus.OK);
     }
 
     // TODO: 7/29/24 request에 project id를 받아서 해당 프로젝트의 block을 조회하는 기능 추가
-    @GetMapping("/dis/active/list")
-    public ResponseEntity<Object> getNotActiveBlockList(@PageableDefault(size = 10) Pageable pageable, @AuthenticationPrincipal UserInfo userInfo) {
-        Page<BlockActiveListRsDto> blockList = blockService.getNotActiveBlockList(pageable, userInfo.getEmail());
+    @GetMapping("/project/{projectId}/not/active/block/list")
+    public ResponseEntity<Object> getNotActiveBlockList(@PathVariable Long projectId  , @PageableDefault(size = 10) Pageable pageable, @AuthenticationPrincipal UserInfo userInfo) {
+        Page<BlockActiveListRsDto> blockList = blockService.getNotActiveBlockList(projectId,pageable, userInfo.getEmail());
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", blockList), HttpStatus.OK);
     }
 
-    @GetMapping("/active/list")
-    public ResponseEntity<Object> getBlockList(@PageableDefault(size = 10) Pageable pageable) {
-        Page<BlockActiveListRsDto> blockList = blockService.getActiveBlockList(pageable);
+    @GetMapping("/project/{projectId}/active/block/list")
+    public ResponseEntity<Object> getBlockList(@PathVariable Long projectId , @AuthenticationPrincipal UserInfo userInfo , @PageableDefault(size = 10) Pageable pageable) {
+        Page<BlockActiveListRsDto> blockList = blockService.getActiveBlockList(projectId, userInfo.getEmail(), pageable);
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", blockList), HttpStatus.OK);
     }
 
-    @GetMapping("/detail/{id}")
+    @GetMapping("/block/detail/{id}")
     public ResponseEntity<Object> getBlock(@PathVariable Long id) {
         BlockDetailRsDto block = blockService.getBlockDetail(id);
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", block), HttpStatus.OK);
     }
 
     // 좋아요수 증가
-    @PostMapping("/{blockId}/heart")
-    public ResponseEntity<Object> addLikeToPost(@PathVariable Long blockId, @RequestBody String memberEmail) {
+    @PostMapping("/block/{blockId}/heart")
+    public ResponseEntity<Object> addLikeToPost(@PathVariable Long blockId, @AuthenticationPrincipal String memberEmail) {
         blockService.addLikeToPost(blockId, memberEmail);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{blockId}/hearts")
+    @GetMapping("/block/{blockId}/hearts")
     public ResponseEntity<Object> getHeartCount(@PathVariable Long blockId) {
         Long heartCount = blockService.getLikesCount(blockId);
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", heartCount), HttpStatus.OK);
     }
 
     // 좋아요 수를 내림차순으로 조회 (인기 순)
-    @GetMapping("/popular")
+    @GetMapping("/block/popular")
     public ResponseEntity<?> popularBlocks(@PageableDefault(size = 10) Pageable pageable) {
         Page<HeartListResDto> heartList = blockService.activeBlocksByPopular(pageable);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", heartList);
@@ -69,15 +69,15 @@ public class BlockController {
     }
 
     // 날짜별 Block 조회
-    @GetMapping("/date")
-    public ResponseEntity<?> getBlocksByDate(@RequestParam String startTime, @PageableDefault(size = 5) Pageable pageable) {
-        Page<Block> blocks = blockService.getBlocksByDate(startTime, pageable);
+    @GetMapping("/project/{projectId}/block/list/date")
+    public ResponseEntity<?> getBlocksByDate(@PathVariable Long projectId ,@RequestParam String startTime, @PageableDefault(size = 5) Pageable pageable, @AuthenticationPrincipal UserInfo userInfo) {
+        Page<Block> blocks = blockService.getBlocksByDate(projectId,startTime, pageable, userInfo.getEmail());
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", blocks);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
     // Block 일정 등록 -> 끌어다놓기
-    @PostMapping("/addDate")
+    @PatchMapping("/block/addDate")
     public ResponseEntity<CommonResDto> addDateBlock(@RequestBody AddDateBlockRqDto setBlockRqDto) {
         Block updatedBlock = blockService.addDateBlock(setBlockRqDto);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", updatedBlock);
@@ -85,9 +85,9 @@ public class BlockController {
     }
 
     // 카테고리 별로 Block 조회
-    @GetMapping("/{category}")
-    public ResponseEntity<?> getBlocksByCategory(@RequestBody Category category, @PageableDefault(size = 10) Pageable pageable) {
-        Page<Block> blocks = blockService.getBlocksByCategory(category, pageable);
+    @GetMapping("/block/category/list")
+    public ResponseEntity<?> getBlocksByCategory(@RequestBody BlockCategoryListRqDto request,@AuthenticationPrincipal UserInfo userInfo , @PageableDefault(size = 10) Pageable pageable) {
+        Page<Block> blocks = blockService.getBlocksByCategory(request, userInfo.getEmail() ,pageable);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", blocks);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }

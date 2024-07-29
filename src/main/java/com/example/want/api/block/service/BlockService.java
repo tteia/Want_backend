@@ -13,7 +13,6 @@ import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
-import com.example.want.api.projectMember.domain.ProjectMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -42,27 +41,31 @@ public class BlockService {
 
     @Transactional
     public Block createBlock(CreateBlockRqDto request, UserInfo userInfo) {
-        Project project = projectRepository.findById(request.getProjectId())
-                .orElseThrow(() -> new EntityNotFoundException("해당 프로젝트가 없습니다."));
-        Member member = memberRepository.findByEmail(userInfo.getEmail())
-                .orElseThrow(() -> new EntityNotFoundException("해당 회원이 없습니다."));
-        ProjectMember projectMember = projectMemberRepository.findByProjectAndMember(project, member)
-                .orElseThrow(() -> new EntityNotFoundException("해당 회원은 프로젝트에 속해있지 않습니다."));
+        Project project = validateProjectMember(request.getProjectId(), userInfo.getEmail());
         Block block = request.toEntity(request.getCategory(), project);
         return blockRepository.save(block);
 
     }
-
-    public Page<BlockActiveListRsDto> getNotActiveBlockList(Pageable pageable, String memberEmail) {
-        System.out.println(memberEmail);
-        memberRepository.findByEmail(memberEmail)
+    private Project validateProjectMember(Long projectId, String memberEmail) {
+        Member member = memberRepository.findByEmail(memberEmail)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다."));
-        Page<Block> block = blockRepository.findAllByIsActivated("N", pageable);
-        return block.map(BlockActiveListRsDto::new);
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트가 없습니다."));
+        if (!projectMemberRepository.existsByProjectAndMember(project, member)) {
+            throw new IllegalArgumentException("해당 프로젝트의 멤버가 아닙니다.");
+        }
+        return project;
     }
 
-    public Page<BlockActiveListRsDto> getActiveBlockList(Pageable pageable) {
-        Page<Block> blockList = blockRepository.findAllByIsActivatedOrderByStartTimeAsc("Y", pageable);
+    public Page<BlockActiveListRsDto> getNotActiveBlockList(Long projectId, Pageable pageable, String memberEmail) {
+        Project project = validateProjectMember(projectId, memberEmail);
+        Page<Block> blocks = blockRepository.findAllByProjectAndIsActivated(project, "N", pageable);
+        return blocks.map(BlockActiveListRsDto::new);
+    }
+
+    public Page<BlockActiveListRsDto> getActiveBlockList(Long projectId, String memberEmail , Pageable pageable) {
+        Project project = validateProjectMember(projectId, memberEmail);
+        Page<Block> blockList = blockRepository.findAllByProjectAndIsActivatedOrderByStartTimeAsc(project ,"Y", pageable);
         return blockList.map(b -> BlockActiveListRsDto.fromEntity(b));
     }
 
@@ -166,12 +169,13 @@ public class BlockService {
     }
 
     // 날짜별 Block 조회
-    public Page<Block> getBlocksByDate(String startTime, Pageable pageable) {// "2024-07-26T09:00" 형식의 문자열
+    public Page<Block> getBlocksByDate(Long projectId , String startTime, Pageable pageable, String memberEmail ) {// "2024-07-26T09:00" 형식의 문자열
+        Project project = validateProjectMember(projectId, memberEmail);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         LocalDateTime date = LocalDateTime.parse(startTime,formatter);
         LocalDate startDate = date.toLocalDate();
         LocalDate endDate = startDate.plusDays(1);
-        Page<Block> blocks = blockRepository.findAllByStartTimeBetweenOrderByStartTimeAsc(startDate.atStartOfDay(),endDate.atStartOfDay(), pageable);
+        Page<Block> blocks = blockRepository.findAllByProjectAndStartTimeBetweenOrderByStartTimeAsc(project,startDate.atStartOfDay(),endDate.atStartOfDay(), pageable);
         return blocks;
     }
 
@@ -183,8 +187,11 @@ public class BlockService {
     }
 
     // 카테고리 별로 Block 조회하기
-    public Page<Block> getBlocksByCategory(Category category, Pageable pageable) {
-        return blockRepository.findByCategory(category, pageable);
+    public Page<Block> getBlocksByCategory(BlockCategoryListRqDto request, String email , Pageable pageable) {
+        Project project = validateProjectMember(request.getProductId(), email);
+        Category category = Category.valueOf(request.getCategory());
+        Page<Block> blocks = blockRepository.findByProjectAndCategory(project,category, pageable);
+        return blocks;
     }
 
 //    public BlockDetailRsDto updateBlockTitle(Long id, UpdateBlockRqDto request, UserInfo userInfo) {
