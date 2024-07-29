@@ -31,4 +31,5 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
     Page<Block> findAllByProjectAndStartTimeBetweenOrderByStartTimeAsc(Project project, LocalDateTime atStartOfDay, LocalDateTime atStartOfDay1, Pageable pageable);
 
     Page<Block> findByProjectAndCategory(Project project, Category category, Pageable pageable);
+
 }
