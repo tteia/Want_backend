@@ -8,12 +8,9 @@ import com.amazonaws.services.s3.model.*;
 import com.example.want.api.block.domain.Block;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.photo.domain.Photo;
-import com.example.want.api.photo.dto.CreatePhotoRqDto;
 import com.example.want.api.photo.repository.PhotoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -65,7 +62,6 @@ public class PhotoService {
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(contentType);
-        System.out.println("metadata:" + metadata.getContentType());
 
         String uuidFileName = UUID.randomUUID().toString() + "." + ext;
 
