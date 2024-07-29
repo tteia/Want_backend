@@ -76,9 +76,9 @@ public class BlockController {
     }
 
     // Block 일정 등록 -> 끌어다놓기
-    @PostMapping("/setDate")
-    public ResponseEntity<CommonResDto> setDateBlock(@RequestBody AddDateBlockRqDto setBlockRqDto) {
-        Block updatedBlock = blockService.setDateBlock(setBlockRqDto);
+    @PostMapping("/addDate")
+    public ResponseEntity<CommonResDto> addDateBlock(@RequestBody AddDateBlockRqDto setBlockRqDto) {
+        Block updatedBlock = blockService.addDateBlock(setBlockRqDto);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", updatedBlock);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
