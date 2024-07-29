@@ -38,7 +38,7 @@ public class BlockService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final RedisTemplate<String, Object> redisTemplate;
-
+    private final ProjectMemberRepository projectMemberRepository;
 
     @Transactional
     public Block createBlock(CreateBlockRqDto request, UserInfo userInfo) {
@@ -50,7 +50,6 @@ public class BlockService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 회원은 프로젝트에 속해있지 않습니다."));
         Block block = request.toEntity(request.getCategory(), project);
         return blockRepository.save(block);
-
     }
 
     public Page<BlockActiveListRsDto> getNotActiveBlockList(Pageable pageable, String memberEmail) {
@@ -272,6 +271,17 @@ public class BlockService {
     return block.toDetailDto();
     }
 
+    @Transactional
+    public Block blockDelete(UserInfo userInfo, Long id) {
+        Block block = blockRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        block.getProject().getProjectMembers().stream()
+                .filter(projectMember -> projectMember.getMember().getEmail().equals(userInfo.getEmail()))
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 속한 프로젝트의 팀원이 아닙니다."));
+        block.changeIsDelete();
+        return block;
+    }
 
 
 

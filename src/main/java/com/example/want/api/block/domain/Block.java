@@ -36,6 +36,7 @@ public class Block extends BaseEntity {
     private LocalDateTime endTime;
     private String isActivated;
     private Long heartCount;
+    private String isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
@@ -97,4 +98,13 @@ public class Block extends BaseEntity {
     }
 
 
+
+    @PrePersist
+    public void initializeFields() {
+        this.isDeleted = "N";
+    }
+
+    public void changeIsDelete() {
+        this.isDeleted = "Y";
+    }
 }
