@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.model.*;
 import com.example.want.api.block.domain.Block;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.photo.domain.Photo;
+import com.example.want.api.photo.dto.PhotoRsDto;
 import com.example.want.api.photo.repository.PhotoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,9 +63,9 @@ public class PhotoService {
         }
 
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(contentType);
+        metadata.setContentType(contentType);   // ObjectMetadata에 contentType 입력
 
-        String uuidFileName = UUID.randomUUID().toString() + "." + ext;
+        String uuidFileName = UUID.randomUUID().toString() + "." + ext; // 파일명 UUID로 변환 후 파일 타입 붙여주기
 
         try {
             amazonS3.putObject(new PutObjectRequest(bucket, uuidFileName, multipartFile.getInputStream(), metadata)
@@ -78,6 +80,7 @@ public class PhotoService {
         ListObjectsV2Result listObjectsV2Result = amazonS3.listObjectsV2(bucket);
         List<S3ObjectSummary> objectSummaries = listObjectsV2Result.getObjectSummaries();
 
+        // object 정보 출력
         for (S3ObjectSummary object: objectSummaries) {
             System.out.println("object = " + object.toString());
         }
@@ -91,9 +94,13 @@ public class PhotoService {
         photoRepository.save(photo);
     }
 
-    public List<Photo> getFiles() {
-        List<Photo> all = photoRepository.findAll();
-        return all;
+    public List<PhotoRsDto> photoList(Long blockId) {
+        List<Photo> photos = photoRepository.findByBlockId(blockId);
+        List<PhotoRsDto> dtos = new ArrayList<>();
+        for (Photo p : photos){
+            dtos.add(p.listFromEntity(blockId));
+        }
+        return dtos;
     }
 
 
