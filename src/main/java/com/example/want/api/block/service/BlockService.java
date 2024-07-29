@@ -151,7 +151,7 @@ public class BlockService {
     @Transactional
     public Block setDateBlock(AddDateBlockRqDto setDateRqDto) {
         Block block = blockRepository.findById(setDateRqDto.getBlockId()).orElseThrow(() -> new IllegalArgumentException("블럭을 찾을 수 없습니다."));
-        block.updatePlan(setDateRqDto);
+        block.updatePlan(setDateRqDto.getStartTime(), setDateRqDto.getEndTime());
         return blockRepository.save(block);
     }
 

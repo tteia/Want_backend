@@ -22,7 +22,6 @@ public class Block extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String creator;
     private String title;
     private String content;
     private String placeName;
@@ -66,8 +65,8 @@ public class Block extends BaseEntity {
         this.heartCount--;
     }
 
-    public void updatePlan(AddDateBlockRqDto setDateRqDto) {
-        this.startTime = setDateRqDto.getStartTime();
-        this.endTime = setDateRqDto.getEndTime();
+    public void updatePlan(LocalDateTime startTime, LocalDateTime endTime) {
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 }
