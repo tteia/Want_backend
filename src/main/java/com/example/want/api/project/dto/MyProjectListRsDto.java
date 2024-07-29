@@ -1,6 +1,5 @@
 package com.example.want.api.project.dto;
 
-import com.example.want.api.traveluser.domain.TravelUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

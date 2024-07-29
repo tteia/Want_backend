@@ -1,4 +1,4 @@
-package com.example.want.api.traveluser.domain;
+package com.example.want.api.projectMember.domain;
 
 import com.example.want.api.member.domain.Member;
 import com.example.want.api.project.domain.Authority;
@@ -15,7 +15,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Data
-public class TravelUser {
+public class ProjectMember {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
