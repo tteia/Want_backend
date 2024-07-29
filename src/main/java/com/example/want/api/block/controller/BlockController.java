@@ -90,4 +90,13 @@ public class BlockController {
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", blocks);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
+
+//    블록들 업데이트
+    @PatchMapping("/update/{id}")
+    public ResponseEntity<Object> updateBlock(@PathVariable Long id, @RequestBody UpdateBlockRqDto request, @AuthenticationPrincipal UserInfo userInfo) {
+        BlockDetailRsDto blockDetailRsDto = blockService.updateBlock(id, request, userInfo);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", blockDetailRsDto);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+    }
+
 }
