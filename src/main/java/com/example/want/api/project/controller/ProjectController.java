@@ -74,6 +74,5 @@ public class ProjectController {
         Page<MyProjectListRsDto> myProjectListRsDto = projectService.getMyProjectList(pageable , userInfo.getEmail());
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", myProjectListRsDto);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
-
     }
 }
