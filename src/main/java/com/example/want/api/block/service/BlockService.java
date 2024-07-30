@@ -183,9 +183,10 @@ public class BlockService {
     }
 
     // 좋아요 수에 따라 Block 을 정렬하여 반환하는 메서드
+    // 프로젝트별로 조회할 수 있도록 추가.
     @Transactional
-    public Page<BlockActiveListRsDto> activeBlocksByPopular(Pageable pageable) {
-        Page<Block> blocks = blockRepository.findByIsActivatedOrderByHeartCountDesc("Y", pageable);
+    public Page<BlockActiveListRsDto> activeBlocksByPopular(Long projectId, Pageable pageable) {
+        Page<Block> blocks = blockRepository.findByProjectIdAndIsActivatedOrderByHeartCountDesc(projectId, "Y", pageable);
         return blocks.map(BlockActiveListRsDto::fromEntity);
     }
 

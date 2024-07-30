@@ -56,7 +56,6 @@ public class BlockController {
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", block), HttpStatus.OK);
     }
 
-
     // 좋아요수 증가
     @Operation(summary = "블록 좋아요 추가 (완)")
     @PostMapping("/block/{blockId}/heart")
@@ -74,10 +73,10 @@ public class BlockController {
     }
 
     // 좋아요 수를 내림차순으로 조회 (활성화된 블록 기준, 인기 순)
-    @Operation(summary = "블록 좋아요 수 내림차순 조회 - 활성화된 블록기준 인기순(완)")
-    @GetMapping("/block/popular")
-    public ResponseEntity<?> popularBlocks(@PageableDefault(size = 10) Pageable pageable) {
-        Page<BlockActiveListRsDto> heartList = blockService.activeBlocksByPopular(pageable);
+    @Operation(summary = "블록 좋아요 수 내림차순 조회 - 활성화된 블록기준 인기순_수정")
+    @GetMapping("/project/{projectId}/block/popular")
+    public ResponseEntity<?> popularBlocks(@PathVariable Long projectId, @PageableDefault(size = 10) Pageable pageable) {
+        Page<BlockActiveListRsDto> heartList = blockService.activeBlocksByPopular(projectId, pageable);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", heartList);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
@@ -132,7 +131,7 @@ public class BlockController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<CommonResDto> deleteBlock(@AuthenticationPrincipal UserInfo userInfo, @PathVariable Long id) {
         Block deletedBlock = blockService.blockDelete(userInfo, id);
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", deletedBlock);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", deletedBlock.getIsDeleted());
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 }
