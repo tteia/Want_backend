@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Long> {
@@ -27,4 +28,6 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Lo
     Page<ProjectMember> findByMemberEmail(String email, Pageable pageable);
 
     Optional<ProjectMember> findByMemberAndProjectId(Member member, Long projectId);
+
+    List<ProjectMember> findByProject(Project project);
 }

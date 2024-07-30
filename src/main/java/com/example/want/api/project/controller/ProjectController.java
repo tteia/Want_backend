@@ -53,7 +53,7 @@ public class ProjectController {
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
-//    Leader : 탈퇴 시 동시에 프로젝트 삭제
+//    Leader : 탈퇴 시 동시에 프로젝트 삭제 및 팀원들도 삭제
 //    Member : 탈퇴 시 Member 자신만 팀원 목록에서 삭제
     @DeleteMapping("/{projectId}")
     public ResponseEntity<String> deleteProject(@PathVariable Long projectId, @AuthenticationPrincipal UserInfo userInfo) {
