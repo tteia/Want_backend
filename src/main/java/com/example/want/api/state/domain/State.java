@@ -16,12 +16,7 @@ public class State {
     @Id
     private Long id;
 
-    private String name;
-
-    private Double Latitude;
-
-    private Double Longitude;
-
-    private Long useCount;
+    private String country;
+    private String city;
 
 }
