@@ -14,14 +14,10 @@ import javax.persistence.*;
 @Getter
 public class State {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
-    private Double Latitude;
-
-    private Double Longitude;
-
-    private Long useCount;
+    private String country;
+    private String city;
 
 }
