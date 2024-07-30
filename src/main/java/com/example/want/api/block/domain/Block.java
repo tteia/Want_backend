@@ -52,8 +52,8 @@ public class Block extends BaseEntity {
                 .category(this.category)
                 .latitude(this.latitude)
                 .longitude(this.longitude)
-                .startTime(this.startTime.toString())
-                .endTime(this.endTime.toString())
+                .startTime(this.startTime != null ? this.startTime.toString() : null)
+                .endTime(this.endTime != null ? this.endTime.toString() : null)
                 .isActivated(this.isActivated)
                 .heartCount(this.heartCount)
                 .build();
@@ -70,6 +70,7 @@ public class Block extends BaseEntity {
     public void updatePlan(LocalDateTime startTime, LocalDateTime endTime) {
         this.startTime = startTime;
         this.endTime = endTime;
+        isActivated = "Y";
     }
 
     public void updateTitle(String title) {

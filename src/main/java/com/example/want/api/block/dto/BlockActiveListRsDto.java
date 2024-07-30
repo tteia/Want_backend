@@ -1,6 +1,7 @@
 package com.example.want.api.block.dto;
 
 import com.example.want.api.block.domain.Block;
+import com.example.want.api.block.domain.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,31 +20,23 @@ public class BlockActiveListRsDto {
     private Double longitude;
     private String startTime;
     private String endTime;
+    private Long heartCount;
+    private Category category;
     private String isActivated;
-
-    public BlockActiveListRsDto(Block block) {
-        this.blockId = block.getId();
-        this.title = block.getTitle();
-        this.content = block.getContent();
-        this.placeName = block.getPlaceName();
-        this.latitude = block.getLatitude();
-        this.longitude = block.getLongitude();
-        this.startTime = block.getStartTime().toString();
-        this.endTime = block.getEndTime().toString();
-        this.isActivated = block.getIsActivated();
-    }
 
 
     public static BlockActiveListRsDto fromEntity(Block block) {
         return BlockActiveListRsDto.builder()
                 .blockId(block.getId())
+                .category(block.getCategory())
                 .title(block.getTitle())
                 .content(block.getContent())
                 .placeName(block.getPlaceName())
                 .latitude(block.getLatitude())
                 .longitude(block.getLongitude())
-                .startTime(block.getStartTime().toString())
-                .endTime(block.getEndTime().toString())
+                .startTime(block.getStartTime() != null ? block.getStartTime().toString() : null)
+                .endTime(block.getEndTime() != null ? block.getEndTime().toString() : null)
+                .heartCount(block.getHeartCount())
                 .isActivated(block.getIsActivated())
                 .build();
     }

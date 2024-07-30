@@ -1,6 +1,7 @@
 package com.example.want.api.block.repository;
 import com.example.want.api.block.domain.Block;
 import com.example.want.api.block.domain.Category;
+import com.example.want.api.project.domain.Project;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,4 +24,12 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
     Page<Block> findAllByIsActivatedOrderByHeartCountDesc (@Param("isActivated") String N, Pageable pageable);
 
     Page<Block> findAllByIsActivated(String n, Pageable pageable);
+
+    Page<Block> findAllByProjectAndIsActivated(Project project, String n, Pageable pageable);
+    Page<Block> findAllByProjectAndIsActivatedOrderByStartTimeAsc(Project project, String n, Pageable pageable);
+
+    Page<Block> findAllByProjectAndStartTimeBetweenOrderByStartTimeAsc(Project project, LocalDateTime atStartOfDay, LocalDateTime atStartOfDay1, Pageable pageable);
+
+    Page<Block> findByProjectAndCategory(Project project, Category category, Pageable pageable);
+
 }
