@@ -1,6 +1,7 @@
 package com.example.want.api.project.domain;
 
 import com.example.want.api.projectMember.domain.ProjectMember;
+import com.example.want.api.state.domain.ProjectState;
 import com.example.want.common.BaseEntity;
 import lombok.*;
 
@@ -37,6 +38,10 @@ public class Project extends BaseEntity {
     @OneToMany(mappedBy = "project", cascade = CascadeType.PERSIST)
     @Builder.Default
     private List<ProjectMember> projectMembers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.PERSIST)
+    @Builder.Default
+    private List<ProjectState> projectStates = new ArrayList<>();
 
     public void delete() {
         this.deletedAt = LocalDateTime.now();

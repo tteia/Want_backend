@@ -37,8 +37,8 @@ public class ProjectController {
 
     //    제목 수정
     @PutMapping("/update/{id}/title")
-    public ResponseEntity<Object> projectTitleUpdate(@PathVariable Long id, @RequestBody ProjectUpdateDto dto) {
-        projectService.updateTitle(id, dto.getTitle());
+    public ResponseEntity<Object> projectTitleUpdate(@PathVariable Long id, @RequestBody ProjectUpdateDto dto, @AuthenticationPrincipal UserInfo userInfo) {
+        projectService.updateTitle(id, dto.getTitle(), userInfo.getEmail());
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "project is found", "new Title is " + dto.getTitle());
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
@@ -47,8 +47,9 @@ public class ProjectController {
     @PutMapping("/update/{id}/travel-dates")
     public ResponseEntity<Object> updateTravelDates(
             @PathVariable Long id,
-            @RequestBody TravelDatesUpdateDto dto) {
-        projectService.updateTravelDates(id, dto);
+            @RequestBody TravelDatesUpdateDto dto,
+            @AuthenticationPrincipal UserInfo userInfo) {
+        projectService.updateTravelDates(id, dto, userInfo.getEmail());
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "project is found", dto.getStartTravel() + " - " + dto.getEndTravel());
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
@@ -73,6 +74,13 @@ public class ProjectController {
     public ResponseEntity<?> getProjectList(@PageableDefault Pageable pageable, @AuthenticationPrincipal UserInfo userInfo) {
         Page<MyProjectListRsDto> myProjectListRsDto = projectService.getMyProjectList(pageable , userInfo.getEmail());
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", myProjectListRsDto);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/detail/{projectId}")
+    public ResponseEntity<?> getProjectDetail(@PathVariable Long projectId, @AuthenticationPrincipal UserInfo userInfo) {
+        ProjectDetailRsDto projectDetailRsDto = projectService.getProjectDetail(projectId, userInfo.getEmail());
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", projectDetailRsDto);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 }
