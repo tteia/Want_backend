@@ -1,7 +1,7 @@
 package com.example.want.api.photo.domain;
 
 import com.example.want.api.block.domain.Block;
-import com.example.want.api.photo.dto.PhotoRsDto;
+import com.example.want.api.photo.dto.PhotoListRsDto;
 import com.example.want.common.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,11 +25,10 @@ public class Photo extends BaseEntity {
     @JoinColumn(name = "block_id")
     private Block block;
 
-    public PhotoRsDto listFromEntity(Long blockId) {
-        return PhotoRsDto.builder()
-                .photoId(this.photoId)
-                .photoUrl(this.photoUrl)
-                .blockId(blockId)
+    public PhotoListRsDto.PhotoInfoDto FromEntity() {
+        return PhotoListRsDto.PhotoInfoDto.builder()
+                .id(this.photoId)
+                .url(this.photoUrl)
                 .build();
     }
 }

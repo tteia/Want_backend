@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.model.*;
 import com.example.want.api.block.domain.Block;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.photo.domain.Photo;
-import com.example.want.api.photo.dto.PhotoRsDto;
+import com.example.want.api.photo.dto.PhotoListRsDto;
 import com.example.want.api.photo.repository.PhotoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,12 +34,10 @@ public class PhotoService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-//    1. 용량제한, -> 백엔드 코드에서 용량 resize, S3자체에서 용량 resize
-//    4-1.블록이랑 연결.
 
     // S3 Uploader
     @Transactional
-    public void uploadFile(Long blockId, MultipartFile multipartFile) throws IOException {
+    public PhotoListRsDto.PhotoInfoDto uploadFile(Long blockId, MultipartFile multipartFile) throws IOException {
         // todo ) 각 기능별로 메서드 분해하기 -> s3 업로드, 레포지토리 save
         String inputFileName = multipartFile.getOriginalFilename();
 
@@ -88,23 +86,47 @@ public class PhotoService {
 //        }
 
         String url = amazonS3.getUrl(bucket, uuidFileName).toString();
+
         Block block = blockRepository.findById(blockId).orElseThrow(()->new EntityNotFoundException("block id is not found"));
+
+        // Photo 저장
         Photo photo = Photo.builder()
                 .photoUrl(url)
                 .block(block)
                 .build();
         photoRepository.save(photo);
+
+        // dto에 담기
+        PhotoListRsDto.PhotoInfoDto photoInfoDto = PhotoListRsDto.PhotoInfoDto.builder()
+                .id(photo.getPhotoId())
+                .url(url)
+                .build();
+
+        return photoInfoDto;
     }
 
     // 사진 리스트
-    public List<PhotoRsDto> photoList(Long blockId) {
+    public PhotoListRsDto photoList(Long blockId) {
         List<Photo> photos = photoRepository.findByBlockId(blockId);
-        List<PhotoRsDto> dtos = new ArrayList<>();
+        List<PhotoListRsDto.PhotoInfoDto> infoDtos = new ArrayList<>();
         for (Photo p : photos){
-            dtos.add(p.listFromEntity(blockId));
+            infoDtos.add(p.FromEntity());
         }
-        return dtos;
+        PhotoListRsDto photoListRsDto = PhotoListRsDto.builder()
+                .blockId(blockId)
+                .photoList(infoDtos)
+                .build();
+        return photoListRsDto;
     }
+
+    // 사진 업데이트
+//    public void updateFile(Long blockId, MultipartFile multipartFile){
+//
+//
+//    }
+    // 사진 삭제
+
+
 
 
 }

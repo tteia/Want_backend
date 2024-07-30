@@ -36,6 +36,7 @@ public class PhotoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         try {
+            List<PhotoListRsDto.PhotoInfoDto> infoDtos = new ArrayList<>();
             for (MultipartFile file : files){
                  photoService.uploadFile(file);
             }
