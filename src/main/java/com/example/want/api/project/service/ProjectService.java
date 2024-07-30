@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -95,9 +96,16 @@ public class ProjectService {
 
         if (projectMember.getAuthority() == Authority.LEADER) {
             project.delete();
+
+            List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
+            for (ProjectMember pm : projectMembers) {
+                pm.updateIsExist("N");
+            }
             projectRepository.save(project);
+
         } else {
-            projectMemberRepository.delete(projectMember);
+            projectMember.updateIsExist("N");
+            projectMemberRepository.save(projectMember);
         }
     }
 

@@ -47,11 +47,15 @@ public class Project extends BaseEntity {
     @PrePersist
     public void initializeFields() {
         this.createdAt = LocalDateTime.now();
-        this.isDeleted = "N";
+        if(this.isDeleted == null) {
+            this.isDeleted = "N";
+        }
+        if(this.isDone == null) {
+            this.isDone = "N";
+        }
     }
 
     public void updateIsDone(String isDone) {
         this.isDone = isDone;
     }
-
 }

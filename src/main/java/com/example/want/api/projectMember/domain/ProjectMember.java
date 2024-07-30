@@ -26,6 +26,8 @@ public class ProjectMember {
 
     private String invitationCode;
 
+    private String isExist;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
@@ -37,4 +39,8 @@ public class ProjectMember {
 
     @Enumerated(EnumType.STRING)
     private Authority authority;
+
+    public void updateIsExist(String isExist) {
+        this.isExist = isExist;
+    }
 }
