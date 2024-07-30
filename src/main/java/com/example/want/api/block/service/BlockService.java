@@ -37,7 +37,6 @@ public class BlockService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ProjectMemberRepository projectMemberRepository;
 
     @Transactional
     public Block createBlock(CreateBlockRqDto request, UserInfo userInfo) {
