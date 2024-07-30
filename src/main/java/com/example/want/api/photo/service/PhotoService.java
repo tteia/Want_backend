@@ -40,7 +40,7 @@ public class PhotoService {
     // S3 Uploader
     @Transactional
     public void uploadFile(Long blockId, MultipartFile multipartFile) throws IOException {
-
+        // todo ) 각 기능별로 메서드 분해하기 -> s3 업로드, 레포지토리 save
         String inputFileName = multipartFile.getOriginalFilename();
 
         //파일 형식 구하기
@@ -62,10 +62,12 @@ public class PhotoService {
                 throw new IllegalArgumentException("Only image files (jpeg, png, jpg) are allowed.");   // 안뜸
         }
 
+
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(contentType);   // ObjectMetadata에 contentType 입력
 
         String uuidFileName = UUID.randomUUID().toString() + "." + ext; // 파일명 UUID로 변환 후 파일 타입 붙여주기
+
 
         try {
             amazonS3.putObject(new PutObjectRequest(bucket, uuidFileName, multipartFile.getInputStream(), metadata)
@@ -76,14 +78,14 @@ public class PhotoService {
             e.printStackTrace();
         }
 
-        //object 정보 가져오기
-        ListObjectsV2Result listObjectsV2Result = amazonS3.listObjectsV2(bucket);
-        List<S3ObjectSummary> objectSummaries = listObjectsV2Result.getObjectSummaries();
-
-        // object 정보 출력
-        for (S3ObjectSummary object: objectSummaries) {
-            System.out.println("object = " + object.toString());
-        }
+//        //object 정보 가져오기
+//        ListObjectsV2Result listObjectsV2Result = amazonS3.listObjectsV2(bucket);
+//        List<S3ObjectSummary> objectSummaries = listObjectsV2Result.getObjectSummaries();
+//
+//        // object 정보 출력
+//        for (S3ObjectSummary object: objectSummaries) {
+//            System.out.println("object = " + object.toString());
+//        }
 
         String url = amazonS3.getUrl(bucket, uuidFileName).toString();
         Block block = blockRepository.findById(blockId).orElseThrow(()->new EntityNotFoundException("block id is not found"));
@@ -94,6 +96,7 @@ public class PhotoService {
         photoRepository.save(photo);
     }
 
+    // 사진 리스트
     public List<PhotoRsDto> photoList(Long blockId) {
         List<Photo> photos = photoRepository.findByBlockId(blockId);
         List<PhotoRsDto> dtos = new ArrayList<>();
