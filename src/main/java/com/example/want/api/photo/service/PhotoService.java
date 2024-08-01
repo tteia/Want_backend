@@ -71,19 +71,11 @@ public class PhotoService {
             amazonS3.putObject(new PutObjectRequest(bucket, uuidFileName, multipartFile.getInputStream(), metadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (AmazonServiceException e) {
-            e.printStackTrace();
+            throw new AmazonServiceException("AmazonServiceException");
         } catch (SdkClientException e) {
-            e.printStackTrace();
+            throw new SdkClientException("SdkClientException");
         }
 
-//        //object 정보 가져오기
-//        ListObjectsV2Result listObjectsV2Result = amazonS3.listObjectsV2(bucket);
-//        List<S3ObjectSummary> objectSummaries = listObjectsV2Result.getObjectSummaries();
-//
-//        // object 정보 출력
-//        for (S3ObjectSummary object: objectSummaries) {
-//            System.out.println("object = " + object.toString());
-//        }
 
         String url = amazonS3.getUrl(bucket, uuidFileName).toString();
 
@@ -118,13 +110,6 @@ public class PhotoService {
                 .build();
         return photoListRsDto;
     }
-
-    // 사진 업데이트
-//    public void updateFile(Long blockId, MultipartFile multipartFile){
-//
-//
-//    }
-    // 사진 삭제
 
 
 
