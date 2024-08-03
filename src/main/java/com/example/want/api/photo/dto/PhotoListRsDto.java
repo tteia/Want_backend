@@ -21,11 +21,5 @@ public class PhotoListRsDto {
         private Long id;
         private String url;
 
-        public PhotoRsDto fromDto(){
-            return PhotoRsDto.builder()
-                    .url(this.url)
-                    .build();
-        }
-
     }
 }
