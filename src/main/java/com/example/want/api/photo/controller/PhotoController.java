@@ -5,10 +5,7 @@ import com.example.want.api.photo.dto.CreatePhotoRqDto;
 import com.example.want.api.photo.domain.Photo;
 import com.example.want.api.photo.service.PhotoService;
 import com.example.want.common.CommonResDto;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.geolatte.geom.M;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +56,9 @@ public class PhotoController {
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Files are successfully found.", dto), HttpStatus.OK);
     }
 
+    // 사진 업데이트
+    // 1 ) 해당 block에 저장되어 있던 파일명들을 리스트로 받아와 bucket에서 삭제 + photo 데이터 전체 삭제
+    // 2 ) newFiles 업로드 및 저장
     @PutMapping("/update")
     public ResponseEntity<?> updatePhotos(@RequestParam Long blockId,
                                           @RequestParam("oldFiles") List<String> oldFileNames,
@@ -69,7 +69,6 @@ public class PhotoController {
             return new ResponseEntity<>(new CommonResDto(HttpStatus.BAD_REQUEST, "There are too many files to upload", null), HttpStatus.BAD_REQUEST);
         }
         try {
-            System.out.println(oldFileNames);
             PhotoListRsDto photoListRsDto = photoService.updateFiles(blockId, oldFileNames, newFiles);
             return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Successfully uploaded " + newFiles.size() + " files.", photoListRsDto), HttpStatus.OK);
 
