@@ -11,4 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AcceptInvitationDto {
     private Long projectId;
+    private String action;  // "Y" or "N"
+    private String invitationCode;
 }

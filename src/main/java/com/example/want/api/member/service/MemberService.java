@@ -1,6 +1,7 @@
 package com.example.want.api.member.service;
 
 import com.example.want.api.member.domain.Member;
+import com.example.want.api.member.dto.AcceptInvitationDto;
 import com.example.want.api.member.dto.GetInvitationDto;
 import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Project;
@@ -57,21 +58,27 @@ public class MemberService {
 
 //    초대 요청 수락
     @Transactional
-    public void acceptInvitation(String email, Long projectId) {
+    public void invitationAcceptOrReject(String email, AcceptInvitationDto dto) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Member Not found"));
-        // TODO: 7/29/24  프로젝트 검증 하기
-
-//        member 객체를 먼저 찾은 후 member 객체와 projectId를 통해 ProjectMember 리턴
-        ProjectMember projectMember = projectMemberRepository.findByMemberAndProjectId(member, projectId)
+        ProjectMember projectMember = projectMemberRepository.findByMemberAndProjectId(member, dto.getProjectId())
                 .orElseThrow(() -> new IllegalArgumentException("ProjectMember Not found"));
 
-//        이미 초대 수락을 했으면
-        if (projectMember.getInvitationAccepted().equals("Y")) {
-            throw new IllegalArgumentException("Invitation already accepted");
+//        초대 코드 검증
+        if (!projectMember.getInvitationCode().equals(dto.getInvitationCode())) {
+            throw new IllegalArgumentException("Uncorrected invitation code");
         }
 
-        projectMember.setInvitationAccepted("Y");
-        projectMemberRepository.save(projectMember);
+        if (dto.getAction().equals("accept")) {
+            if (projectMember.getInvitationAccepted().equals("Y")) {
+                throw new IllegalArgumentException("Invitation already accepted");
+            }
+            projectMember.setInvitationAccepted("Y");
+            projectMemberRepository.save(projectMember);
+        } else if ("reject".equals(dto.getAction())) {
+            projectMemberRepository.delete(projectMember);
+        } else {
+            throw new IllegalArgumentException("Invalid action");
+        }
     }
 }

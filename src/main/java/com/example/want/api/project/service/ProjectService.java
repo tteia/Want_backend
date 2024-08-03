@@ -219,6 +219,4 @@ public class ProjectService {
         return projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Project not found"));
     }
-
-
 }

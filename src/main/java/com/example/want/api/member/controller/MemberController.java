@@ -5,6 +5,7 @@ import com.example.want.api.member.dto.AcceptInvitationDto;
 import com.example.want.api.member.dto.GetInvitationDto;
 import com.example.want.api.member.login.UserInfo;
 import com.example.want.api.member.service.MemberService;
+import com.example.want.common.CommonResDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 
 @Tag(name = "예제 API", description = "Swagger 테스트용 API")
 @RestController
@@ -38,12 +38,14 @@ public class MemberController {
         return ResponseEntity.ok(invitations);
     }
 
-//    초대 요청 수락
-    @PostMapping("/accept")
-    public ResponseEntity<String> acceptInvitation (@RequestBody AcceptInvitationDto dto,
-                                                    @AuthenticationPrincipal UserInfo userInfo) {
+    //    초대 요청 처리 (수락, 거절)
+    @PostMapping("/invitations/response")
+    public ResponseEntity<?> responseInvitation(@RequestBody AcceptInvitationDto dto, @AuthenticationPrincipal UserInfo userInfo, @PageableDefault(size = 10) Pageable pageable) {
         String email = userInfo.getEmail();
-        memberService.acceptInvitation(email, dto.getProjectId());
-        return new ResponseEntity<>("Invitation accepted successfully.", HttpStatus.OK);
+        memberService.invitationAcceptOrReject(email, dto);
+//        잔여 초대 목록을 확인하기 위함.
+        Page<GetInvitationDto> updatedInvitations = memberService.getMyInvitations(email, pageable);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Member response successfully.", updatedInvitations);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 }
