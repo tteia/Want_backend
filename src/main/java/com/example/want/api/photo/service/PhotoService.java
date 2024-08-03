@@ -144,18 +144,25 @@ public class PhotoService {
 
     // 파일 업데이트
     public PhotoListRsDto updateFiles(Long blockId,
-                            List<String> oldFileNames,
+                            List<String> oldFileUrls,
                             List<MultipartFile> newFiles) throws IOException {
+
+        // url에서 file 이름 추출
+        List<String> oldFileNames = new ArrayList<>();
+        for (String ordFileUrl : oldFileUrls){
+            oldFileNames.add(extractFilename(ordFileUrl));
+        }
+
         List<String> updatedFileUrls = new ArrayList<>();
+
         // 기존 파일 삭제
         for (String oldFileName : oldFileNames) {
             deleteFile(blockId, oldFileName);
         }
-
         // 새 파일 업로드
         List<PhotoListRsDto.PhotoInfoDto> infoDtos = new ArrayList<>();
         for (MultipartFile newFile : newFiles){
-            PhotoListRsDto.PhotoInfoDto photoInfoDto = uploadFile(blockId, newFile);  // 이미지 파일 id, url
+            PhotoListRsDto.PhotoInfoDto photoInfoDto = uploadFile(blockId, newFile);
             infoDtos.add(photoInfoDto);
         }
         PhotoListRsDto photoListRsDto = PhotoListRsDto.builder()
@@ -166,4 +173,15 @@ public class PhotoService {
         return photoListRsDto;
     }
 
+    // url에서 file 이름 추출
+    public String extractFilename(String url) {
+        // URL에서 마지막 '/' 이후의 문자열을 추출
+        int lastSlashIndex = url.lastIndexOf('/');
+        if (lastSlashIndex != -1) {
+            return url.substring(lastSlashIndex + 1);
+        }
+        System.out.println("url :" + url);
+        // '/'가 없으면 URL이 잘못된 경우로 처리
+        return null;
+    }
 }
