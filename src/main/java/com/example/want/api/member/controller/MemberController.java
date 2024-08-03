@@ -2,7 +2,7 @@ package com.example.want.api.member.controller;
 
 import com.example.want.api.member.domain.Member;
 import com.example.want.api.member.dto.AcceptInvitationDto;
-import com.example.want.api.member.dto.GetInvitationDto;
+import com.example.want.api.member.dto.InvitationResDto;
 import com.example.want.api.member.login.UserInfo;
 import com.example.want.api.member.service.MemberService;
 import com.example.want.common.CommonResDto;
@@ -34,7 +34,7 @@ public class MemberController {
     @GetMapping("/invitations")
     public ResponseEntity<?> getInvitations(@AuthenticationPrincipal UserInfo userInfo,
                                             @PageableDefault(size = 10) Pageable pageable) {
-        Page<GetInvitationDto> invitations = memberService.getMyInvitations(userInfo.getEmail(), pageable);
+        Page<InvitationResDto> invitations = memberService.getMyInvitations(userInfo.getEmail(), pageable);
         return ResponseEntity.ok(invitations);
     }
 
@@ -44,7 +44,7 @@ public class MemberController {
         String email = userInfo.getEmail();
         memberService.invitationAcceptOrReject(email, dto);
 //        잔여 초대 목록을 확인하기 위함.
-        Page<GetInvitationDto> updatedInvitations = memberService.getMyInvitations(email, pageable);
+        Page<InvitationResDto> updatedInvitations = memberService.getMyInvitations(email, pageable);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Member response successfully.", updatedInvitations);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
