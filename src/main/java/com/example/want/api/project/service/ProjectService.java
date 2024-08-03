@@ -4,10 +4,7 @@ import com.example.want.api.member.domain.Member;
 import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Authority;
 import com.example.want.api.project.domain.Project;
-import com.example.want.api.project.dto.MyProjectListRsDto;
-import com.example.want.api.project.dto.ProjectCreateReqDto;
-import com.example.want.api.project.dto.ProjectDetailRsDto;
-import com.example.want.api.project.dto.TravelDatesUpdateDto;
+import com.example.want.api.project.dto.*;
 import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
 import com.example.want.api.projectMember.domain.ProjectMember;
@@ -15,7 +12,6 @@ import com.example.want.api.state.domain.ProjectState;
 import com.example.want.api.state.domain.State;
 import com.example.want.api.state.repository.StateRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -38,7 +34,7 @@ public class ProjectService {
 
     //    일정 생성, 팀원 목록 생성 (일정 생성자가 리더가 됨)
     @Transactional
-    public Project createProject(ProjectCreateReqDto dto, String email) {
+    public ProjectCreateResDto createProject(ProjectCreateReqDto dto, String email) {
         Member member = findMemberByEmail(email);
 //        일정 생성
         Project project = dto.toEntity();
@@ -46,15 +42,20 @@ public class ProjectService {
 //        리더 생성
         ProjectMember projectMember = createProjectLeader(member, project);
 //        지역 생성
-        Project finalProject = project;
-        List<ProjectState> projectStates = createProjectStates(dto.getStateList(), finalProject);
-        project.getProjectStates().addAll(projectStates);
+        State state = stateRepository.findByCountryAndCity(dto.getState().getCountry(), dto.getState().getCity())
+                        .orElseGet(() -> stateRepository.save(State.builder()
+                                .country(dto.getState().getCountry())
+                                .city(dto.getState().getCity())
+                                .build()));
+        ProjectState projectState = ProjectState.builder()
+                .state(state)
+                .project(project)
+                .build();
+        project.getProjectStates().add(projectState);
 
-//        프로젝트의 팀원 목록 리스트에 travelUser(리더)를 add
-//        검증 코드 없이는 계속 null 에러 나서 넣었더니 됐습니다
         project.getProjectMembers().add(projectMember);
         project.initializeFields();
-        return project;
+        return ProjectCreateResDto.fromEntity(project, state);
     }
     private ProjectMember createProjectLeader(Member member, Project project) {
         return ProjectMember.builder()
@@ -65,18 +66,6 @@ public class ProjectService {
                 .build();
     }
 
-    private List<ProjectState> createProjectStates(List<ProjectCreateReqDto.StateListDto> stateListDtos, Project project) {
-        return stateListDtos.stream()
-                .map(stateDto -> {
-                    State state = stateRepository.findById(stateDto.getStateId())
-                            .orElseThrow(() -> new EntityNotFoundException("State not found"));
-                    return ProjectState.builder()
-                            .state(state)
-                            .project(project)
-                            .build();
-                })
-                .collect(Collectors.toList());
-    }
 
     // 일정 수정
     @Transactional

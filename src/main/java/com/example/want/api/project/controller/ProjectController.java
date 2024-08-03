@@ -1,7 +1,6 @@
 package com.example.want.api.project.controller;
 
 import com.example.want.api.member.login.UserInfo;
-import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.dto.*;
 import com.example.want.api.project.service.ProjectService;
 import com.example.want.common.CommonResDto;
@@ -30,8 +29,8 @@ public class ProjectController {
     //    이 부분 로그인 기능 이용해서 해야 할거같은데 접근을 어떻게 해야 할지 모르겠어서 일단 이렇게 작성했습니다.
     @PostMapping("/create")
     public ResponseEntity<Object> projectCreate(@RequestBody ProjectCreateReqDto dto, @AuthenticationPrincipal UserInfo userInfo ) {
-        Project project = projectService.createProject(dto, userInfo.getEmail());
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.CREATED, "project is successfully created.", "project id is : " +  project.getId());
+        ProjectCreateResDto projectCreateResDto = projectService.createProject(dto, userInfo.getEmail());
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.CREATED, "project is successfully created.", projectCreateResDto);
         return new ResponseEntity<>(commonResDto, HttpStatus.CREATED);
     }
 
