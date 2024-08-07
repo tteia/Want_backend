@@ -1,7 +1,8 @@
 package com.example.want.api.member.service;
 
 import com.example.want.api.member.domain.Member;
-import com.example.want.api.member.dto.GetInvitationDto;
+import com.example.want.api.member.dto.AcceptInvitationDto;
+import com.example.want.api.member.dto.InvitationResDto;
 import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.repository.ProjectRepository;
@@ -33,10 +34,10 @@ public class MemberService {
 
     // TODO: 7/29/24 is done 이런거 확인
 //    초대 요청 목록 조회
-    public Page<GetInvitationDto> getMyInvitations(String email, Pageable pageable) {
+    public Page<InvitationResDto> getMyInvitations(String email, Pageable pageable) {
 //        사용자의 email을 이용하여 projectMember에서 List를 가져옴
         Page<ProjectMember> projectMembers = projectMemberRepository.findByMemberEmail(email, pageable);
-        List<GetInvitationDto> getInvitationDtos = new ArrayList<>();
+        List<InvitationResDto> invitationResDtos = new ArrayList<>();
 
 //        Page 객체는 페이징 정보를 포함하고 있으므로, 실제 순수 데이터를 리스트로 가져오려면
 //        getContent() 메서드를 사용해야함
@@ -44,34 +45,40 @@ public class MemberService {
             Project project = projectRepository.findById(projectMember.getProject().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Project Not found"));
 
-            GetInvitationDto getInvitationDto = GetInvitationDto.builder()
+            InvitationResDto invitationResDto = InvitationResDto.builder()
                     .projectId(project.getId())
                     .projectTitle(project.getTitle())
                     .invitationAccepted(projectMember.getInvitationAccepted())
                     .build();
-            getInvitationDtos.add(getInvitationDto);
+            invitationResDtos.add(invitationResDto);
         }
 //        PageImpl(List<T> content, Pageable pageable, long total)
-        return new PageImpl<>(getInvitationDtos, pageable, projectMembers.getTotalElements());
+        return new PageImpl<>(invitationResDtos, pageable, projectMembers.getTotalElements());
     }
 
 //    초대 요청 수락
     @Transactional
-    public void acceptInvitation(String email, Long projectId) {
+    public void invitationAcceptOrReject(String email, AcceptInvitationDto dto) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Member Not found"));
-        // TODO: 7/29/24  프로젝트 검증 하기
-
-//        member 객체를 먼저 찾은 후 member 객체와 projectId를 통해 ProjectMember 리턴
-        ProjectMember projectMember = projectMemberRepository.findByMemberAndProjectId(member, projectId)
+        ProjectMember projectMember = projectMemberRepository.findByMemberAndProjectId(member, dto.getProjectId())
                 .orElseThrow(() -> new IllegalArgumentException("ProjectMember Not found"));
 
-//        이미 초대 수락을 했으면
-        if (projectMember.getInvitationAccepted().equals("Y")) {
-            throw new IllegalArgumentException("Invitation already accepted");
+//        초대 코드 검증
+        if (!projectMember.getInvitationCode().equals(dto.getInvitationCode())) {
+            throw new IllegalArgumentException("Uncorrected invitation code");
         }
 
-        projectMember.setInvitationAccepted("Y");
-        projectMemberRepository.save(projectMember);
+        if (dto.getAction().equals("accept")) {
+            if (projectMember.getInvitationAccepted().equals("Y")) {
+                throw new IllegalArgumentException("Invitation already accepted");
+            }
+            projectMember.setInvitationAccepted("Y");
+            projectMemberRepository.save(projectMember);
+        } else if ("reject".equals(dto.getAction())) {
+            projectMemberRepository.delete(projectMember);
+        } else {
+            throw new IllegalArgumentException("Invalid action");
+        }
     }
 }

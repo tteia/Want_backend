@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GetInvitationDto {
+public class InvitationResDto {
     private Long projectId;
     private String projectTitle;
     private String invitationAccepted;

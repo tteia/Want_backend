@@ -28,9 +28,6 @@ public class Member{
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "member")
-    private List<ProjectMember> projectMembers = new ArrayList<>();
-
     public Member(GoogleOAuth2UserInfo userInfo) {
         this.name = userInfo.getName();
         this.email = userInfo.getEmail();
