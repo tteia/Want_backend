@@ -38,9 +38,7 @@ public class CmtService {
         Page<Cmt> cmts = cmtRepository.findByBlockIdAndIsDeleted(pageable, blockId, "N");
         Page<CmtRsDto> dtos = cmts.map(a -> a.listFromEntity());
         return dtos;
-
     }
-
 
     // Update
     @Transactional

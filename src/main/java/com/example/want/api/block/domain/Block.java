@@ -1,6 +1,7 @@
 package com.example.want.api.block.domain;
 
 import com.example.want.api.block.dto.BlockDetailRsDto;
+import com.example.want.api.photo.domain.Photo;
 import com.example.want.api.project.domain.Project;
 import com.example.want.common.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -36,6 +39,7 @@ public class Block extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
+
 
     public BlockDetailRsDto toDetailDto() {
         return BlockDetailRsDto.builder()
