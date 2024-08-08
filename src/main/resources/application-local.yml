@@ -31,6 +31,11 @@ spring:
                 client-id: ${local.oauth2.google.client-id}
                 client-secret: ${local.oauth2.google.client-secret}
                 scope: ${local.oauth2.google.scope}
+  servlet:
+    multipart:
+      max-file-size: 5MB #파일의 용량 제한
+      max-request-size: 10MB #전체 최대 크기 용량 제한
+      resolve-lazily: true
 
 
 springdoc:
@@ -45,4 +50,21 @@ springdoc:
     display-request-duration: true
     groups-order: DESC
 
-
+cloud:
+  aws:
+    credentials:
+      access-key: ${cloud.aws.credentials.access-key}
+      secret-key: ${cloud.aws.credentials.secret-key}
+    s3:
+      bucket: ${cloud.aws.s3.bucket}
+    region:
+      static: ${cloud.aws.region.static}
+      auto: false
+    stack:
+      auto: false
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error

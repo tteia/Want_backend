@@ -1,6 +1,6 @@
 package com.example.want.api.block_comment.repository;
 
-import com.example.want.api.block_comment.entity.Cmt;
+import com.example.want.api.block_comment.domain.Cmt;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -3,7 +3,7 @@ package com.example.want.api.block_comment.controller;
 import com.example.want.api.block_comment.dto.CreateCmtRqDto;
 import com.example.want.api.block_comment.dto.CmtRsDto;
 import com.example.want.api.block_comment.dto.CmtUpdateRqDto;
-import com.example.want.api.block_comment.entity.Cmt;
+import com.example.want.api.block_comment.domain.Cmt;
 import com.example.want.api.block_comment.service.CmtService;
 import com.example.want.common.CommonResDto;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 @RestController

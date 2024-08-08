@@ -1,4 +1,4 @@
-package com.example.want.api.block_comment.entity;
+package com.example.want.api.block_comment.domain;
 
 import com.example.want.api.block.domain.Block;
 import com.example.want.api.block_comment.dto.CmtRsDto;
