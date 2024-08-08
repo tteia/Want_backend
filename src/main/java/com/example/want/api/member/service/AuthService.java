@@ -47,12 +47,13 @@ public class AuthService {
 
                 // 이미 가입된 회원인지 확인
 //                가입 안되어있으면 가입
+                Member member = null;
                 if (!memberRepository.existsByEmail(userInfo.getEmail())) {
 //                    Member member = new Member(userInfo, randomNickname());
-                    Member member = new Member(userInfo);
+                    member = new Member(userInfo);
                     memberRepository.save(member);
                 } else { // 가입되어있으면 닉네임이 있는지 확인
-                    Member member = memberRepository.findByEmail(email).orElseThrow(() ->
+                     member = memberRepository.findByEmail(email).orElseThrow(() ->
                             new EntityNotFoundException("가입되어있지 않은 회원입니다."));
 //                    랜덤 닉네임 생성
 //                    if (member.getNickname() == null) {
@@ -60,7 +61,7 @@ public class AuthService {
 //                        userRepository.save(userEntity);
 //                    }
                 }
-                return sendGenerateJwtToken(userInfo.getEmail(), userInfo.getName());
+                return sendGenerateJwtToken(userInfo.getEmail(), userInfo.getName(), member.getProfileUrl());
             }
         }catch (InternalAuthenticationServiceException e) {
             throw e;
@@ -69,12 +70,12 @@ public class AuthService {
         }
     }
 
-    private TokenResponse sendGenerateJwtToken(String email, String name ) {
-        return createToken(email, name );
+    private TokenResponse sendGenerateJwtToken(String email, String name, String profileUrl) {
+        return createToken(email, name, profileUrl);
     }
 
-    private TokenResponse createToken(String email, String name) {
-        return tokenProvider.generateJwtToken(email, name, Role.MEMBER);
+    private TokenResponse createToken(String email, String name, String profileUrl) {
+        return tokenProvider.generateJwtToken(email, name, profileUrl , Role.MEMBER);
     }
 
 //    private String randomNickname() {
