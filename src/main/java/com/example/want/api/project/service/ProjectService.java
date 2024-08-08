@@ -4,78 +4,77 @@ import com.example.want.api.member.domain.Member;
 import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Authority;
 import com.example.want.api.project.domain.Project;
-import com.example.want.api.project.dto.ProjectCreateReqDto;
-import com.example.want.api.project.dto.TravelDatesUpdateDto;
+import com.example.want.api.project.dto.*;
 import com.example.want.api.project.repository.ProjectRepository;
-import com.example.want.api.traveluser.Repository.TravelUserRepository;
-import com.example.want.api.traveluser.domain.TravelUser;
-import com.example.want.api.traveluser.dto.LeaderDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
+import com.example.want.api.projectMember.domain.ProjectMember;
+import com.example.want.api.state.domain.ProjectState;
+import com.example.want.api.state.domain.State;
+import com.example.want.api.state.repository.StateRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
-    private final TravelUserRepository travelUserRepository;
+    private final ProjectMemberRepository projectMemberRepository;
     private final MemberRepository memberRepository;
+    private final StateRepository stateRepository;
 
-    @Autowired
-    public ProjectService(ProjectRepository projectRepository, TravelUserRepository travelUserRepository, MemberRepository memberRepository) {
-        this.projectRepository = projectRepository;
-        this.travelUserRepository = travelUserRepository;
-        this.memberRepository = memberRepository;
-    }
 
     //    일정 생성, 팀원 목록 생성 (일정 생성자가 리더가 됨)
     @Transactional
-    public Project createProject(ProjectCreateReqDto dto) {
+    public ProjectCreateResDto createProject(ProjectCreateReqDto dto, String email) {
+        Member member = findMemberByEmail(email);
 //        일정 생성
         Project project = dto.toEntity();
         project = projectRepository.save(project);
+//        리더 생성
+        ProjectMember projectMember = createProjectLeader(member, project);
+//        지역 생성
+        State state = stateRepository.findByCountryAndCity(dto.getState().getCountry(), dto.getState().getCity())
+                        .orElseGet(() -> stateRepository.save(State.builder()
+                                .country(dto.getState().getCountry())
+                                .city(dto.getState().getCity())
+                                .build()));
+        ProjectState projectState = ProjectState.builder()
+                .state(state)
+                .project(project)
+                .build();
+        project.getProjectStates().add(projectState);
 
-//        리더 : 프로젝트 생성, 프로젝트 삭제를 할 수 있는 역할 
-//        따로 Dto를 만들었는데 혹시 다른 방법 있으면 말씀 해주시면 감사합니다.
-//        프로젝트 생성 할 때 로그인 되어 있는 사용자의 아이디를 LeaderDto 객체에 저장
-        LeaderDto leaderDto = dto.getLeaderDto();
-        Long leaderId = leaderDto.getLeaderId();
-
-//        리더 생성 -> leaderDto에서 받은 id로 member 객체를 찾아서 반환
-        Member leader = memberRepository.findById(leaderId)
-                .orElseThrow(() -> new EntityNotFoundException("Member not Found"));
-
-//        TravelUser 생성
-        TravelUser travelUser = TravelUser.builder()
-                .member(leader)
+        project.getProjectMembers().add(projectMember);
+        project.initializeFields();
+        return ProjectCreateResDto.fromEntity(project, state);
+    }
+    private ProjectMember createProjectLeader(Member member, Project project) {
+        return ProjectMember.builder()
+                .member(member)
                 .authority(Authority.LEADER)
                 .invitationAccepted("Y")
                 .project(project)
                 .build();
-        TravelUser savedUser = travelUserRepository.save(travelUser);
-
-
-//        프로젝트의 팀원 목록 리스트에 travelUser(리더)를 add
-//        검증 코드 없이는 계속 null 에러 나서 넣었더니 됐습니다
-        if(project.getTravelUsers() == null || project.getTravelUsers().isEmpty()) {
-            project.setTravelUsers(new ArrayList<>());
-        }
-        project.getTravelUsers().add(savedUser);
-
-        project.initializeFields();
-        return project;
     }
+
 
     // 일정 수정
     @Transactional
-    public void updateTravelDates(Long projectId, TravelDatesUpdateDto travelDatesUpdateDto) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+    public void updateTravelDates(Long projectId, TravelDatesUpdateDto travelDatesUpdateDto, String email) {
+        Member member = findMemberByEmail(email);
+        Project project = findProjectById(projectId);
+        if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
+            throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
+        }
 
         Project updatedProject = project.toBuilder()
                 .startTravel(travelDatesUpdateDto.getStartTravel())
@@ -86,9 +85,13 @@ public class ProjectService {
     }
 
     // 제목 수정
-    public void updateTitle(Long id, String newTitle) {
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+    public void updateTitle(Long projectId, String newTitle, String email) {
+        Member member = findMemberByEmail(email);
+        Project project = findProjectById(projectId);
+        if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
+            throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
+        }
+
         Project updateProject = project.toBuilder()
                 .title(newTitle)
                 .build();
@@ -97,47 +100,46 @@ public class ProjectService {
 
     // 일정 삭제
     @Transactional
-    public void deleteProject(Long projectId, Long leaderId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+    public void deleteProject(Long projectId, String email) {
+        Project project = findProjectById(projectId);
+        Member member = findMemberByEmail(email);
 
-        boolean isLeader = false;
+        ProjectMember projectMember = projectMemberRepository.findByProjectAndMember(project, member)
+                .orElseThrow(() -> new EntityNotFoundException("TravelUser not found"));
 
-        List<TravelUser> travelUsers = project.getTravelUsers();
+        if (projectMember.getAuthority() == Authority.LEADER) {
+            project.delete();
 
-        for(TravelUser t : travelUsers) {
-            if(t.getId().equals(leaderId) && t.getAuthority() == Authority.LEADER) {
-                isLeader = true;
-                break;
+            List<ProjectMember> projectMembers = projectMemberRepository.findByProject(project);
+            for (ProjectMember pm : projectMembers) {
+                pm.updateIsExist("N");
             }
-        }
+            projectRepository.save(project);
 
-        if (!isLeader) {
-            throw new IllegalArgumentException("리더만 프로젝트를 삭제할 수 있습니다.");
+        } else {
+            projectMember.updateIsExist("N");
+            projectMemberRepository.save(projectMember);
         }
-
-        project.delete();
-//        이거 더티체킹이라서 save 안 해도 되는건가요 ?
-        projectRepository.save(project);
     }
 
 //    팀원 초대
-    public void inviteUser (Long id, String email) {
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
-
+    public void inviteUser (Long projectId, String email) {
 //        초대할 member 객체
-        Member member = memberRepository.findMemberByEmail(email);
+        Member member = findMemberByEmail(email);
+        Project project = findProjectById(projectId);
+        if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
+            throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
+        }
 
 //        멤버가 이미 팀원목록에 속해 있는지 확인하는 검증코드
-        boolean existsMember = travelUserRepository.existsByProjectAndMember(project, member);
+        boolean existsMember = projectMemberRepository.existsByProjectAndMember(project, member);
         if(existsMember) {
             throw new IllegalArgumentException("Member already exists.");
         }
         
         String invitationCode = UUID.randomUUID().toString();
 
-        TravelUser travelUser = TravelUser.builder()
+        ProjectMember projectMember = ProjectMember.builder()
                 .project(project)
                 .member(member)
                 .authority(Authority.MEMBER)
@@ -145,6 +147,65 @@ public class ProjectService {
                 .invitationCode(invitationCode)
                 .build();
 
-        travelUserRepository.save(travelUser);
+        projectMemberRepository.save(projectMember);
+    }
+
+    public Page<MyProjectListRsDto> getMyProjectList(Pageable pageable, String email) {
+        Member member = findMemberByEmail(email);
+        Page<MyProjectListRsDto> myProjectListRsDto = projectMemberRepository.findActiveProjectByMember(member, pageable)
+                .map(project -> MyProjectListRsDto.builder()
+                        .projectId(project.getId())
+                        .projectTitle(project.getTitle())
+                        .startTravel(project.getStartTravel().toString())
+                        .endTravel(project.getEndTravel().toString())
+                        .travelUsers(project.getProjectMembers().stream()
+                                .map(projectMember -> MyProjectListRsDto.MyProjectMember.builder()
+                                        .userId(projectMember.getMember().getId())
+                                        .userName(projectMember.getMember().getName())
+                                        .userProfile(projectMember.getMember().getProfileUrl())
+                                        .build())
+                                .collect(Collectors.toList()))
+                        .build());
+        return myProjectListRsDto;
+    }
+
+    public ProjectDetailRsDto getProjectDetail(Long projectId, String email) {
+        Member member = findMemberByEmail(email);
+        Project project =  findProjectById(projectId);
+        if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
+            throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
+        }
+
+        return ProjectDetailRsDto.builder()
+                .projectId(project.getId())
+                .projectTitle(project.getTitle())
+                .startTravel(project.getStartTravel())
+                .endTravel(project.getEndTravel())
+                .projectMembers(project.getProjectMembers().stream()
+                        .map(projectMember -> ProjectDetailRsDto.ProjectMemberList.builder()
+                                .userId(projectMember.getMember().getId())
+                                .userName(projectMember.getMember().getName())
+                                .userProfile(projectMember.getMember().getProfileUrl())
+                                .build())
+                        .collect(Collectors.toList()))
+                .projectStates(project.getProjectStates().stream()
+                        .map(projectState -> ProjectDetailRsDto.ProjectStateList.builder()
+                                .stateId(projectState.getState().getId())
+                                .country(projectState.getState().getCountry())
+                                .city(projectState.getState().getCity())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+
+
+    private Member findMemberByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Member not found"));
+    }
+    private Project findProjectById(Long id) {
+        return projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
     }
 }

@@ -1,6 +1,7 @@
 package com.example.want.api.project.domain;
 
-import com.example.want.api.traveluser.domain.TravelUser;
+import com.example.want.api.projectMember.domain.ProjectMember;
+import com.example.want.api.state.domain.ProjectState;
 import com.example.want.common.BaseEntity;
 import lombok.*;
 
@@ -28,11 +29,19 @@ public class Project extends BaseEntity {
     private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
 
+//    일정 삭제 여부
     private String isDeleted;
+    
+//    일정 종료 여부
+    private String isDone;
 
-    @OneToMany(mappedBy = "project")
-    @Setter
-    private List<TravelUser> travelUsers = new ArrayList<>();
+    @OneToMany(mappedBy = "project", cascade = CascadeType.PERSIST)
+    @Builder.Default
+    private List<ProjectMember> projectMembers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.PERSIST)
+    @Builder.Default
+    private List<ProjectState> projectStates = new ArrayList<>();
 
     public void delete() {
         this.deletedAt = LocalDateTime.now();
@@ -43,7 +52,15 @@ public class Project extends BaseEntity {
     @PrePersist
     public void initializeFields() {
         this.createdAt = LocalDateTime.now();
-        this.isDeleted = "N";
+        if(this.isDeleted == null) {
+            this.isDeleted = "N";
+        }
+        if(this.isDone == null) {
+            this.isDone = "N";
+        }
     }
 
+    public void updateIsDone(String isDone) {
+        this.isDone = isDone;
+    }
 }
