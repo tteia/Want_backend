@@ -41,12 +41,13 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public  TokenResponse generateJwtToken(String email, String name, Role role) {
+    public  TokenResponse generateJwtToken(String email, String name, String profileUrl, Role role) {
         long now = (new Date()).getTime();
 
         Map<String, Object> payloads = Map.of(
                 "email", email,
                 "name", name,
+                "profileUrl", profileUrl,
                 AUTHORITIES_KEY, role);
 
 
