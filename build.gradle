@@ -22,7 +22,8 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-security:1.7.0'
 
     compileOnly 'org.projectlombok:lombok'
-
+// mariaDB
+    implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.2'
 //    postgresql
     runtimeOnly 'org.postgresql:postgresql'
 //    mariadb

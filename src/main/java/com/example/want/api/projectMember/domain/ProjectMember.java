@@ -1,4 +1,4 @@
-package com.example.want.api.traveluser.domain;
+package com.example.want.api.projectMember.domain;
 
 import com.example.want.api.member.domain.Member;
 import com.example.want.api.project.domain.Authority;
@@ -15,7 +15,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Data
-public class TravelUser {
+public class ProjectMember {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,10 +26,11 @@ public class TravelUser {
 
     private String invitationCode;
 
+    private String isExist;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -37,4 +38,8 @@ public class TravelUser {
 
     @Enumerated(EnumType.STRING)
     private Authority authority;
+
+    public void updateIsExist(String isExist) {
+        this.isExist = isExist;
+    }
 }
