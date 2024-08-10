@@ -21,6 +21,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -85,9 +86,9 @@ public class BlockController {
     @Operation(summary = "날짜별 블록 조회(완)")
     @GetMapping("/project/{projectId}/block/list/date")
     public ResponseEntity<?> getBlocksByDate(@PathVariable Long projectId,
-                                             @Schema(description = "날짜", example = "2021-08-01") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                                             @PageableDefault(size = 5) Pageable pageable, @AuthenticationPrincipal UserInfo userInfo) {
-        Page<BlockActiveListRsDto> blocks = blockService.getBlocksByDate(projectId, date, pageable, userInfo.getEmail());
+                                             @Schema(description = "날짜", example = "2024-08-01") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                             @AuthenticationPrincipal UserInfo userInfo) {
+        List<BlockActiveListRsDto> blocks = blockService.getBlocksByDate(projectId, date, userInfo.getEmail());
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", blocks);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
