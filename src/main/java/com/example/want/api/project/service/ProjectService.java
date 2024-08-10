@@ -158,6 +158,7 @@ public class ProjectService {
                         .projectTitle(project.getTitle())
                         .startTravel(project.getStartTravel().toString())
                         .endTravel(project.getEndTravel().toString())
+                        .createdTime(project.getCreatedTime().toString())
                         .travelUsers(project.getProjectMembers().stream()
                                 .map(projectMember -> MyProjectListRsDto.MyProjectMember.builder()
                                         .userId(projectMember.getMember().getId())
