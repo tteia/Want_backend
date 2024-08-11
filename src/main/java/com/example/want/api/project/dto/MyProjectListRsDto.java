@@ -17,6 +17,7 @@ public class MyProjectListRsDto {
     private String startTravel;
     private String endTravel;
     private String createdTime;
+    private String isDone;
     private List<MyProjectMember> travelUsers;
 
     @Data
