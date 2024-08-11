@@ -25,7 +25,7 @@ public class ProjectScheduler {
     public void projectSchedule() {
         List<Project> projects = projectRepository.findByIsDeleted("N");
         for (Project p : projects) {
-            if (p.getEndTravel().isAfter(LocalDate.now()) && p.getIsDone().equals("N")) {
+            if (p.getEndTravel().isBefore(LocalDate.now()) && p.getIsDone().equals("N")) {
                 p.updateIsDone("Y");
             }
         }

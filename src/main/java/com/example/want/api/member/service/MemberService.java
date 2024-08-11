@@ -69,7 +69,7 @@ public class MemberService {
             throw new IllegalArgumentException("Uncorrected invitation code");
         }
 
-        if (dto.getAction().equals("accept")) {
+        if (dto.getAction().equals("Y")) {
             if (projectMember.getInvitationAccepted().equals("Y")) {
                 throw new IllegalArgumentException("Invitation already accepted");
             }
