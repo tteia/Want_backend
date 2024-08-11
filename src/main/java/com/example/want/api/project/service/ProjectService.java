@@ -75,17 +75,12 @@ public class ProjectService {
         if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
             throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
         }
-
-        Project updatedProject = project.toBuilder()
-                .startTravel(projectDatesUpdateRqDto.getStartTravel())
-                .endTravel(projectDatesUpdateRqDto.getEndTravel())
-                .build();
+        project.updateTravelDates(projectDatesUpdateRqDto.getStartTravel(), projectDatesUpdateRqDto.getEndTravel());
 
         return ProjectDatesUpdateRsDto.builder()
-                .projectId(updatedProject.getId())
-                .title(updatedProject.getTitle())
-                .startTravel(updatedProject.getStartTravel().toString())
-                .endTravel(updatedProject.getEndTravel().toString())
+                .projectId(project.getId())
+                .startTravel(project.getStartTravel())
+                .endTravel(project.getEndTravel())
                 .build();
     }
 
@@ -97,15 +92,13 @@ public class ProjectService {
         if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
             throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
         }
-
-        Project updateProject = project.toBuilder()
-                .title(newTitle)
-                .build();
+        project.updateTitle(newTitle);
 
         return ProjectTitleUpdateRsDto.builder()
-                .id(updateProject.getId())
-                .title(updateProject.getTitle())
+                .id(project.getId())
+                .title(project.getTitle())
                 .build();
+
     }
 
     // 일정 삭제
