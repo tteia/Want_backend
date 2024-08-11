@@ -76,7 +76,7 @@ public class ProjectController {
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
-    @GetMapping("/detail/{projectId}")
+    @GetMapping("/{projectId}/detail")
     public ResponseEntity<?> getProjectDetail(@PathVariable Long projectId, @AuthenticationPrincipal UserInfo userInfo) {
         ProjectDetailRsDto projectDetailRsDto = projectService.getProjectDetail(projectId, userInfo.getEmail());
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", projectDetailRsDto);
