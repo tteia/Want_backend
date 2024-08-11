@@ -69,33 +69,36 @@ public class ProjectService {
 
     // 일정 수정
     @Transactional
-    public void updateTravelDates(Long projectId, TravelDatesUpdateDto travelDatesUpdateDto, String email) {
+    public ProjectDatesUpdateRsDto updateTravelDates(Long projectId, ProjectDatesUpdateRqDto projectDatesUpdateRqDto, String email) {
         Member member = findMemberByEmail(email);
         Project project = findProjectById(projectId);
         if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
             throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
         }
+        project.updateTravelDates(projectDatesUpdateRqDto.getStartTravel(), projectDatesUpdateRqDto.getEndTravel());
 
-        Project updatedProject = project.toBuilder()
-                .startTravel(travelDatesUpdateDto.getStartTravel())
-                .endTravel(travelDatesUpdateDto.getEndTravel())
+        return ProjectDatesUpdateRsDto.builder()
+                .projectId(project.getId())
+                .startTravel(project.getStartTravel())
+                .endTravel(project.getEndTravel())
                 .build();
-
-        projectRepository.save(updatedProject);
     }
 
+    @Transactional
     // 제목 수정
-    public void updateTitle(Long projectId, String newTitle, String email) {
+    public ProjectTitleUpdateRsDto updateTitle(Long projectId, String newTitle, String email) {
         Member member = findMemberByEmail(email);
         Project project = findProjectById(projectId);
         if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
             throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
         }
+        project.updateTitle(newTitle);
 
-        Project updateProject = project.toBuilder()
-                .title(newTitle)
+        return ProjectTitleUpdateRsDto.builder()
+                .id(project.getId())
+                .title(project.getTitle())
                 .build();
-        projectRepository.save(updateProject);
+
     }
 
     // 일정 삭제

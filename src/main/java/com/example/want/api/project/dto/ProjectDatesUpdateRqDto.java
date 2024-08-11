@@ -1,6 +1,5 @@
 package com.example.want.api.project.dto;
 
-import com.example.want.api.project.domain.Project;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TravelDatesUpdateDto {
+public class ProjectDatesUpdateRqDto {
     private LocalDate startTravel;
     private LocalDate endTravel;
 }
