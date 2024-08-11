@@ -127,7 +127,7 @@ public class ProjectService {
 //        초대할 member 객체
         Member member = findMemberByEmail(email);
         Project project = findProjectById(projectId);
-        if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
+        if (!project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
             throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
         }
 
