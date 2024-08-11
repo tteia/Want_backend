@@ -23,7 +23,7 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok'
 // mariaDB
-    implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.2'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.0'
 //    postgresql
     runtimeOnly 'org.postgresql:postgresql'
 //    mariadb
@@ -32,7 +32,7 @@ dependencies {
 //    hibernate spatial
     implementation 'org.hibernate:hibernate-spatial:5.6.11.Final'
 
-//    resdis
+//    redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 //    security

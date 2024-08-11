@@ -130,7 +130,7 @@ public class ProjectService {
 //        초대할 member 객체
         Member member = findMemberByEmail(email);
         Project project = findProjectById(projectId);
-        if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
+        if (!project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
             throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
         }
 
@@ -147,7 +147,6 @@ public class ProjectService {
                 .member(member)
                 .authority(Authority.MEMBER)
                 .invitationAccepted("N") // 초대 수락을 하면 "Y"로 변경
-                .invitationCode(invitationCode)
                 .build();
 
         projectMemberRepository.save(projectMember);
@@ -161,6 +160,8 @@ public class ProjectService {
                         .projectTitle(project.getTitle())
                         .startTravel(project.getStartTravel().toString())
                         .endTravel(project.getEndTravel().toString())
+                        .createdTime(project.getCreatedTime().toString())
+                        .isDone(project.getIsDone())
                         .travelUsers(project.getProjectMembers().stream()
                                 .map(projectMember -> MyProjectListRsDto.MyProjectMember.builder()
                                         .userId(projectMember.getMember().getId())

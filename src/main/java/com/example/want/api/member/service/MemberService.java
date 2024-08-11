@@ -64,10 +64,10 @@ public class MemberService {
         ProjectMember projectMember = projectMemberRepository.findByMemberAndProjectId(member, dto.getProjectId())
                 .orElseThrow(() -> new IllegalArgumentException("ProjectMember Not found"));
 
-//        초대 코드 검증
-        if (!projectMember.getInvitationCode().equals(dto.getInvitationCode())) {
-            throw new IllegalArgumentException("Uncorrected invitation code");
-        }
+////        초대 코드 검증
+//        if (!projectMember.getInvitationCode().equals(dto.getInvitationCode())) {
+//            throw new IllegalArgumentException("Uncorrected invitation code");
+//        }
 
         if (dto.getAction().equals("accept")) {
             if (projectMember.getInvitationAccepted().equals("Y")) {

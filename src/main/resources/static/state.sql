@@ -8,7 +8,7 @@ INSERT INTO state (id, country, city) VALUES (7, '한국', '대전');
 INSERT INTO state (id, country, city) VALUES (8, '한국', '울산');
 INSERT INTO state (id, country, city) VALUES (9, '한국', '세종');
 
-INSERT INTO state (id, country, city) VALUES (10, '일본', '도쿄');
+INSERT INTO state (id, country) VALUES (10, '일본');
 INSERT INTO state (id, country, city) VALUES (11, '일본', '도쿄');
 INSERT INTO state (id, country, city) VALUES (12, '일본', '오사카');
 INSERT INTO state (id, country, city) VALUES (13, '일본', '나고야');
