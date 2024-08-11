@@ -5,7 +5,6 @@ import com.example.want.api.block.domain.Category;
 import com.example.want.api.block.dto.*;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.heart.domain.Heart;
-import com.example.want.api.heart.dto.HeartListResDto;
 import com.example.want.api.heart.repository.HeartRepository;
 import com.example.want.api.member.domain.Member;
 import com.example.want.api.member.login.UserInfo;
@@ -25,7 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -174,12 +174,15 @@ public class BlockService {
     }
 
     // 날짜별 Block 조회
-    public Page<BlockActiveListRsDto> getBlocksByDate(Long projectId , LocalDate date, Pageable pageable, String memberEmail ) {// "2024-07-26T09:00" 형식의 문자열
+    public List<BlockActiveListRsDto> getBlocksByDate(Long projectId , LocalDate date, String memberEmail ) {// "2024-07-26T09:00" 형식의 문자열
         Project project = validateProjectMember(projectId, memberEmail);
         LocalDateTime startDate = date.atStartOfDay();
         LocalDateTime endDate = date.atStartOfDay().plusDays(1);
-        Page<Block> blocks = blockRepository.findAllByProjectAndStartTimeBetweenOrderByStartTimeAsc(project, startDate, endDate, pageable);
-        return blocks.map(BlockActiveListRsDto::fromEntity);
+        List<Block> blocks = blockRepository.findAllByProjectAndStartTimeBetweenOrderByEndTimeAsc(project, startDate, endDate);
+        List<BlockActiveListRsDto> blockActiveListRsDtos = blocks.stream()
+                .map(BlockActiveListRsDto::fromEntity)
+                .collect(Collectors.toList());
+        return blockActiveListRsDtos;
     }
 
     // 좋아요 수에 따라 Block 을 정렬하여 반환하는 메서드
