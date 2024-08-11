@@ -144,7 +144,6 @@ public class ProjectService {
                 .member(member)
                 .authority(Authority.MEMBER)
                 .invitationAccepted("N") // 초대 수락을 하면 "Y"로 변경
-                .invitationCode(invitationCode)
                 .build();
 
         projectMemberRepository.save(projectMember);

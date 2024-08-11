@@ -24,7 +24,6 @@ public class ProjectMember {
     @Column(length = 1)
     private String invitationAccepted;
 
-    private String invitationCode;
 
     private String isExist;
 
