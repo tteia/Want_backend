@@ -69,7 +69,7 @@ public class ProjectService {
 
     // 일정 수정
     @Transactional
-    public void updateTravelDates(Long projectId, TravelDatesUpdateDto travelDatesUpdateDto, String email) {
+    public ProjectDatesUpdateRsDto updateTravelDates(Long projectId, ProjectDatesUpdateRqDto projectDatesUpdateRqDto, String email) {
         Member member = findMemberByEmail(email);
         Project project = findProjectById(projectId);
         if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
@@ -77,15 +77,21 @@ public class ProjectService {
         }
 
         Project updatedProject = project.toBuilder()
-                .startTravel(travelDatesUpdateDto.getStartTravel())
-                .endTravel(travelDatesUpdateDto.getEndTravel())
+                .startTravel(projectDatesUpdateRqDto.getStartTravel())
+                .endTravel(projectDatesUpdateRqDto.getEndTravel())
                 .build();
 
-        projectRepository.save(updatedProject);
+        return ProjectDatesUpdateRsDto.builder()
+                .projectId(updatedProject.getId())
+                .title(updatedProject.getTitle())
+                .startTravel(updatedProject.getStartTravel().toString())
+                .endTravel(updatedProject.getEndTravel().toString())
+                .build();
     }
 
+    @Transactional
     // 제목 수정
-    public void updateTitle(Long projectId, String newTitle, String email) {
+    public ProjectTitleUpdateRsDto updateTitle(Long projectId, String newTitle, String email) {
         Member member = findMemberByEmail(email);
         Project project = findProjectById(projectId);
         if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
@@ -95,7 +101,11 @@ public class ProjectService {
         Project updateProject = project.toBuilder()
                 .title(newTitle)
                 .build();
-        projectRepository.save(updateProject);
+
+        return ProjectTitleUpdateRsDto.builder()
+                .id(updateProject.getId())
+                .title(updateProject.getTitle())
+                .build();
     }
 
     // 일정 삭제
