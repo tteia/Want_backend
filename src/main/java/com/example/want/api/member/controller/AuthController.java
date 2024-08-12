@@ -1,5 +1,6 @@
 package com.example.want.api.member.controller;
 
+import com.example.want.api.member.dto.RefreshDto;
 import com.example.want.api.member.login.dto.GoogleLoginRqDto;
 import com.example.want.api.member.service.AuthService;
 import com.example.want.api.member.login.jwt.TokenResponse;
@@ -9,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Tag(name = "소셜 로그인 API", description = "소셯 로그인 API")
@@ -22,6 +26,15 @@ public class AuthController {
     public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRqDto token) throws Exception {
         TokenResponse tokenResponse = authService.googleLogin(token);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK , "Success", tokenResponse);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshDto dto) {
+        String newAt = authService.refreshToken(dto);
+        Map<String, Object> info = new HashMap<>();
+        info.put("token", newAt);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", info);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
