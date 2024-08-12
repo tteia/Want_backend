@@ -74,6 +74,7 @@ public class MemberService {
                 throw new IllegalArgumentException("Invitation already accepted");
             }
             projectMember.setInvitationAccepted("Y");
+            projectMember.setIsExist("Y");  // 초대 수락시 isExist = 'Y'로 변경
             projectMemberRepository.save(projectMember);
         } else if ("reject".equals(dto.getAction())) {
             projectMemberRepository.delete(projectMember);
