@@ -126,16 +126,20 @@ public class ProjectService {
     }
 
 //    팀원 초대
-    public void inviteUser (Long projectId, String email) {
+    @Transactional
+    public void inviteUser (Long projectId, String otherMemberEmail, String email) {
 //        초대할 member 객체
         Member member = findMemberByEmail(email);
+        Member otherMember = memberRepository.findByEmail(otherMemberEmail)
+                .orElseThrow(() -> new EntityNotFoundException("초대하려는 멤버 이메일이 없습니다."));
         Project project = findProjectById(projectId);
-        if (!project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
+        if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
             throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
         }
 
+        System.out.println("tqqqqqqqqqqqqqqqqqqqqqq");
 //        멤버가 이미 팀원목록에 속해 있는지 확인하는 검증코드
-        boolean existsMember = projectMemberRepository.existsByProjectAndMember(project, member);
+        boolean existsMember = projectMemberRepository.existsByProjectAndMember(project, otherMember);
         if(existsMember) {
             throw new IllegalArgumentException("Member already exists.");
         }
@@ -144,7 +148,7 @@ public class ProjectService {
 
         ProjectMember projectMember = ProjectMember.builder()
                 .project(project)
-                .member(member)
+                .member(otherMember)
                 .authority(Authority.MEMBER)
                 .invitationAccepted("N") // 초대 수락을 하면 "Y"로 변경
                 .build();

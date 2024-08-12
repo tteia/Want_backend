@@ -62,9 +62,9 @@ public class ProjectController {
     }
 
 //    팀원 초대
-    @PostMapping("/invite/{projectId}")
-    public ResponseEntity<Object> inviteUser(@PathVariable Long projectId, @RequestBody InvitationDto dto) {
-        projectService.inviteUser(projectId, dto.getEmail());
+    @PostMapping("/invite")
+    public ResponseEntity<Object> inviteUser(@RequestBody InvitationDto dto, @AuthenticationPrincipal UserInfo userInfo) {
+        projectService.inviteUser(dto.getProjectId(), dto.getEmail() , userInfo.getEmail());
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Member invited successfully.", "Member Email : " + dto.getEmail());
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }

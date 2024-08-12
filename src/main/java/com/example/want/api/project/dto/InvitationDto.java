@@ -11,7 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class InvitationDto {
     private Long projectId;
-    private String projectTitle;
     private String email;
-    private String invitationAccepted;
 }
