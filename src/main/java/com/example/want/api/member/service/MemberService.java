@@ -36,7 +36,7 @@ public class MemberService {
 //    초대 요청 목록 조회
     public Page<InvitationResDto> getMyInvitations(String email, Pageable pageable) {
 //        사용자의 email을 이용하여 projectMember에서 List를 가져옴
-        Page<ProjectMember> projectMembers = projectMemberRepository.findByMemberEmail(email, pageable);
+        Page<ProjectMember> projectMembers = projectMemberRepository.findByMemberEmailAndInvitationAccepted(email, pageable,"N");
         List<InvitationResDto> invitationResDtos = new ArrayList<>();
 
 //        Page 객체는 페이징 정보를 포함하고 있으므로, 실제 순수 데이터를 리스트로 가져오려면
