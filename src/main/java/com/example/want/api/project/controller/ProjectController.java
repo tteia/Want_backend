@@ -35,21 +35,21 @@ public class ProjectController {
     }
 
     //    제목 수정
-    @PutMapping("/update/{id}/title")
-    public ResponseEntity<Object> projectTitleUpdate(@PathVariable Long id, @RequestBody ProjectUpdateDto dto, @AuthenticationPrincipal UserInfo userInfo) {
-        projectService.updateTitle(id, dto.getTitle(), userInfo.getEmail());
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "project is found", "new Title is " + dto.getTitle());
+    @PatchMapping("/{projectId}/update/title")
+    public ResponseEntity<Object> projectTitleUpdate(@PathVariable Long projectId, @RequestBody ProjectTitleUpdateRqDto dto, @AuthenticationPrincipal UserInfo userInfo) {
+        ProjectTitleUpdateRsDto response = projectService.updateTitle(projectId, dto.getTitle(), userInfo.getEmail());
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Project title is successfully updated.", response);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
     // 기간 수정
-    @PutMapping("/update/{id}/travel-dates")
+    @PatchMapping("/{projectId}/update/travel-dates")
     public ResponseEntity<Object> updateTravelDates(
-            @PathVariable Long id,
-            @RequestBody TravelDatesUpdateDto dto,
+            @PathVariable Long projectId,
+            @RequestBody ProjectDatesUpdateRqDto dto,
             @AuthenticationPrincipal UserInfo userInfo) {
-        projectService.updateTravelDates(id, dto, userInfo.getEmail());
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "project is found", dto.getStartTravel() + " - " + dto.getEndTravel());
+        ProjectDatesUpdateRsDto response = projectService.updateTravelDates(projectId, dto, userInfo.getEmail());
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Project travel dates are successfully updated.", response);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
@@ -76,7 +76,7 @@ public class ProjectController {
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
-    @GetMapping("/detail/{projectId}")
+    @GetMapping("/{projectId}/detail")
     public ResponseEntity<?> getProjectDetail(@PathVariable Long projectId, @AuthenticationPrincipal UserInfo userInfo) {
         ProjectDetailRsDto projectDetailRsDto = projectService.getProjectDetail(projectId, userInfo.getEmail());
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", projectDetailRsDto);

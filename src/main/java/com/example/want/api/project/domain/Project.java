@@ -63,4 +63,13 @@ public class Project extends BaseEntity {
     public void updateIsDone(String isDone) {
         this.isDone = isDone;
     }
+
+    public void updateTitle(String newTitle) {
+        this.title = newTitle;
+    }
+
+    public void updateTravelDates(LocalDate startTravel, LocalDate endTravel) {
+        this.startTravel = startTravel;
+        this.endTravel = endTravel;
+    }
 }

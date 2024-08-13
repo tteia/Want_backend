@@ -28,8 +28,9 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
     Page<Block> findAllByProjectAndIsActivated(Project project, String n, Pageable pageable);
     Page<Block> findAllByProjectAndIsActivatedOrderByStartTimeAsc(Project project, String n, Pageable pageable);
 
-    Page<Block> findAllByProjectAndStartTimeBetweenOrderByStartTimeAsc(Project project, LocalDateTime atStartOfDay, LocalDateTime atStartOfDay1, Pageable pageable);
+    Page<Block> findAllByProjectAndStartTimeBetweenOrderByStartTimeAsc(Project project, LocalDateTime atStartOfDay, LocalDateTime atStartOfdawdaDay1, Pageable pageable);
 
     Page<Block> findByProjectAndCategory(Project project, Category category, Pageable pageable);
 
+    List<Block> findAllByProjectAndStartTimeBetweenOrderByEndTimeAsc(Project project, LocalDateTime startDate, LocalDateTime endDate);
 }
