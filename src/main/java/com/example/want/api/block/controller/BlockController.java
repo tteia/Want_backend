@@ -51,7 +51,7 @@ public class BlockController {
     }
 
     @Operation(summary = "블록 상세조회 (완료)")
-    @GetMapping("/block/detail/{id}")
+    @GetMapping("/block/{id}/detail")
     public ResponseEntity<Object> getBlock(@PathVariable Long id) {
         BlockDetailRsDto block = blockService.getBlockDetail(id);
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", block), HttpStatus.OK);
@@ -122,7 +122,7 @@ public class BlockController {
 
 //    블록들 업데이트
     @Operation(summary = "블록 업데이트-프론트 입맛대로, 넣고싶은거맛넣고 나머진 다지우기 (완)")
-    @PatchMapping("/update/{id}")
+    @PatchMapping("/block/{id}/update")
     public ResponseEntity<Object> updateBlock(@PathVariable Long id, @RequestBody UpdateBlockRqDto request, @AuthenticationPrincipal UserInfo userInfo) {
         BlockDetailRsDto blockDetailRsDto = blockService.updateBlock(id, request, userInfo);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", blockDetailRsDto);
