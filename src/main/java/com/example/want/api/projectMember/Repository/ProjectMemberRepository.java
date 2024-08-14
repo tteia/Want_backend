@@ -22,7 +22,7 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Lo
 
     Optional<ProjectMember> findByProjectAndMember(Project project, Member member);
   
-    @Query("SELECT tu.project FROM ProjectMember tu WHERE tu.member = :member AND tu.project.isDeleted = 'N' AND tu.invitationAccepted='Y'")
+    @Query("SELECT tu.project FROM ProjectMember tu WHERE tu.member = :member AND tu.project.isDeleted = 'N' AND tu.invitationAccepted='Y' AND tu.isExist!='N'")
     Page<Project> findActiveProjectByMember(@Param("member") Member member, Pageable pageable);
 
     Page<ProjectMember> findByMemberEmail(String email, Pageable pageable);
@@ -30,4 +30,6 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Lo
     Optional<ProjectMember> findByMemberAndProjectId(Member member, Long projectId);
 
     List<ProjectMember> findByProject(Project project);
+
+    Page<ProjectMember> findByMemberEmailAndInvitationAccepted(String email, Pageable pageable, String n);
 }

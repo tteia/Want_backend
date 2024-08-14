@@ -41,6 +41,7 @@ public class ProjectService {
         project = projectRepository.save(project);
 //        리더 생성
         ProjectMember projectMember = createProjectLeader(member, project);
+        projectMember.setIsExist("Y");
 //        지역 생성
         State state = stateRepository.findByCountryAndCity(dto.getState().getCountry(), dto.getState().getCity())
                         .orElseGet(() -> stateRepository.save(State.builder()
