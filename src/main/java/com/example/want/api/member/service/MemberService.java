@@ -5,6 +5,7 @@ import com.example.want.api.member.dto.AcceptInvitationDto;
 import com.example.want.api.member.dto.InvitationResDto;
 import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Project;
+import com.example.want.api.project.dto.ProjectDetailRsDto;
 import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
 import com.example.want.api.projectMember.domain.ProjectMember;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +51,17 @@ public class MemberService {
                     .projectId(project.getId())
                     .projectTitle(project.getTitle())
                     .invitationAccepted(projectMember.getInvitationAccepted())
+                    .createdTime(projectMember.getCreatedTime())
+                    .startTravel(project.getStartTravel().toString())
+                    .endTravel(project.getEndTravel().toString())
+                    // todo 여행 장소 추가
+                    .projectStates(project.getProjectStates().stream()
+                            .map(projectState -> ProjectDetailRsDto.ProjectStateList.builder()
+                                    .stateId(projectState.getState().getId())
+                                    .country(projectState.getState().getCountry())
+                                    .city(projectState.getState().getCity())
+                                    .build())
+                            .collect(Collectors.toList()))
                     .build();
             invitationResDtos.add(invitationResDto);
         }
