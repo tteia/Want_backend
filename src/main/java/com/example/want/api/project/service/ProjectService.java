@@ -179,8 +179,24 @@ public class ProjectService {
     }
 
     public ProjectDetailRsDto getProjectDetail(Long projectId, String email) {
+
+        if (projectId == null) {
+            System.out.println("projectId가 null입니다.");
+        }
+        if (email == null) {
+            System.out.println("email이 null입니다.");
+        }
+
         Member member = findMemberByEmail(email);
-        Project project =  findProjectById(projectId);
+        if (member == null) {
+            System.out.println("member가 null입니다.");
+        }
+
+        Project project = findProjectById(projectId);
+        if (project == null) {
+            System.out.println("project가 null입니다.");
+        }
+
         if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
             throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
         }

@@ -26,6 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -169,12 +172,25 @@ public class BlockService {
     public BlockDetailRsDto addDateBlock(AddDateBlockRqDto addDateRqDto, String memberEmail) {
         Block block = getBlockById(addDateRqDto.getBlockId());
         Member member = getMemberByEmail(memberEmail);
+        String startTime = addDateRqDto.getStartTime();
+        String endTime = addDateRqDto.getEndTime();
+        System.out.println("startTime = " + startTime);
+        System.out.println("endTime = " + endTime);
+        // 포맷터
+        OffsetDateTime offsetDateTime1 = OffsetDateTime.parse(addDateRqDto.getStartTime(), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        OffsetDateTime offsetDateTime2 = OffsetDateTime.parse(addDateRqDto.getEndTime(), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        OffsetDateTime kstStartTime = offsetDateTime1.withOffsetSameInstant(ZoneOffset.ofHours(9));
+        OffsetDateTime kstEndTime = offsetDateTime2.withOffsetSameInstant(ZoneOffset.ofHours(9));
+        LocalDateTime localDateTime1 = kstStartTime.toLocalDateTime();
+        LocalDateTime localDateTime2 = kstEndTime.toLocalDateTime();
+
+
         block.getProject().getProjectMembers().stream()
                 .filter(projectMember -> projectMember.getMember().equals(member))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트의 멤버가 아닙니다."));
 
-        block.updatePlan(addDateRqDto.getStartTime(), addDateRqDto.getEndTime());
+        block.updatePlan(localDateTime1, localDateTime2);
         return block.toDetailDto();
     }
 

@@ -78,6 +78,9 @@ public class ProjectController {
 
     @GetMapping("/{projectId}/detail")
     public ResponseEntity<?> getProjectDetail(@PathVariable Long projectId, @AuthenticationPrincipal UserInfo userInfo) {
+        if (userInfo == null || userInfo.getEmail() == null) {
+            return new ResponseEntity<>(new CommonResDto(HttpStatus.BAD_REQUEST, "Invalid user information", null), HttpStatus.BAD_REQUEST);
+        }
         ProjectDetailRsDto projectDetailRsDto = projectService.getProjectDetail(projectId, userInfo.getEmail());
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", projectDetailRsDto);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
