@@ -14,6 +14,8 @@ import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.HashOperations;
@@ -36,7 +38,10 @@ public class BlockService {
     private final HeartRepository heartRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
+
+    @Qualifier("heart")
+    private final RedisTemplate<String, Object> heartRedisTemplate;
+
 
     @Transactional
     public Block createBlock(CreateBlockRqDto request, UserInfo userInfo) {
@@ -113,7 +118,7 @@ public class BlockService {
     }
 
     private Block updateRedisHeartCount(Block block) {
-        HashOperations<String, String, Object> hashOperations = redisTemplate.opsForHash();
+        HashOperations<String, String, Object> hashOperations = heartRedisTemplate.opsForHash();
         String key = "blockId::" + block.getId();
         String hashKey = "heartCount";
 
@@ -136,7 +141,7 @@ public class BlockService {
     }
 
     private Long getLikesCountFromCache(String key, String hashKey) {
-        HashOperations<String, String, Object> hashOperations = redisTemplate.opsForHash();
+        HashOperations<String, String, Object> hashOperations = heartRedisTemplate.opsForHash();
         Object cachedValue = hashOperations.get(key, hashKey);
 
         if (cachedValue instanceof Long) {
@@ -155,7 +160,7 @@ public class BlockService {
     }
 
     private void updateCache(String key, String hashKey, Long likesCount) {
-        HashOperations<String, String, Object> hashOperations = redisTemplate.opsForHash();
+        HashOperations<String, String, Object> hashOperations = heartRedisTemplate.opsForHash();
         hashOperations.put(key, hashKey, likesCount);
     }
 

@@ -1,5 +1,6 @@
 package com.example.want.api.member.service;
 
+import com.example.want.api.member.dto.RefreshDto;
 import com.example.want.api.member.login.dto.GoogleLoginRqDto;
 import com.example.want.api.member.login.jwt.TokenProvider;
 import com.example.want.api.member.login.jwt.TokenResponse;
@@ -11,14 +12,19 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +34,9 @@ public class AuthService {
 
     private final TokenProvider tokenProvider;
     private final MemberRepository memberRepository;
+    @Qualifier("login")
+    private final RedisTemplate<String, Object> loginRedisTemplate;
+
 
     @Transactional
     public TokenResponse googleLogin(GoogleLoginRqDto idToken){
@@ -61,7 +70,9 @@ public class AuthService {
 //                        userRepository.save(userEntity);
 //                    }
                 }
-                return sendGenerateJwtToken(userInfo.getEmail(), userInfo.getName(), member.getProfileUrl());
+                TokenResponse tokenResponse = sendGenerateJwtToken(userInfo.getEmail(), userInfo.getName(), member.getProfileUrl());
+                loginRedisTemplate.opsForValue().set(member.getEmail(), tokenResponse.getRefreshToken(), 240, TimeUnit.HOURS); //240시간
+                return tokenResponse;
             }
         }catch (InternalAuthenticationServiceException e) {
             throw e;
@@ -77,6 +88,44 @@ public class AuthService {
     private TokenResponse createToken(String email, String name, String profileUrl) {
         return tokenProvider.generateJwtToken(email, name, profileUrl , Role.MEMBER);
     }
+
+    public String refreshToken(RefreshDto dto) {
+        String refreshToken = dto.getRefreshToken();
+
+        // 1. Refresh Token 유효성 검사
+        if (!tokenProvider.validateToken(refreshToken)) {
+            throw new InternalAuthenticationServiceException("토큰이 유효하지 않습니다.");
+        }
+
+        // 2. Refresh Token에서 이메일 정보 추출
+        Claims claims;
+        try {
+            claims = tokenProvider.parseClaims(refreshToken);
+        } catch (ExpiredJwtException e) {
+            // 만료된 토큰일 경우
+            throw new InternalAuthenticationServiceException("만료된 토큰입니다.");
+        } catch (Exception e) {
+            // 다른 예외 처리
+            throw new InternalAuthenticationServiceException("토큰 파싱 중 오류가 발생했습니다.");
+        }
+
+        // 3. 이메일로 사용자를 확인
+        String email = (String) claims.get("email");
+        if (email == null) {
+            throw new InternalAuthenticationServiceException("토큰에 이메일 정보가 없습니다.");
+        }
+        Member member = memberRepository.findByEmail(email).orElseThrow(() ->
+                new EntityNotFoundException("가입되어 있지 않은 회원입니다."));
+        // 4. Redis에 저장된 Refresh Token과 비교
+        String storedRefreshToken = (String) loginRedisTemplate.opsForValue().get(email);
+        if (!refreshToken.equals(storedRefreshToken)) {
+            throw new InternalAuthenticationServiceException("토큰이 유효하지 않습니다.");
+        }
+        // 5. 새로운 액세스 토큰 생성
+        TokenResponse tokenResponse =  tokenProvider.generateJwtToken(email, member.getName(), member.getProfileUrl(), Role.MEMBER);
+        return tokenResponse.getAccessToken();
+    }
+
 
 //    private String randomNickname() {
 //        final String[] adjectives = {
