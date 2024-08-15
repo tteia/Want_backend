@@ -62,7 +62,8 @@ public class Cmt extends BaseEntity {
         return CmtRsDto.builder()
                 .commentId(this.commentId)
                 .blockId(this.block.getId())
-                .memberId(this.member.getId())
+                .memberName(this.member.getName())
+                .memberProfile(this.member.getProfileUrl())
                 .contents(this.contents)
                 .createdTime(this.getCreatedTime())
                 .build();

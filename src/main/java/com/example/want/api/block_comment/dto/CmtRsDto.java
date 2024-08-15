@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 public class CmtRsDto {
     private Long commentId;
     private Long blockId;
-    private Long memberId;
+    private String memberName;
+    private String memberProfile;
     private String contents;
     private LocalDateTime createdTime;
 

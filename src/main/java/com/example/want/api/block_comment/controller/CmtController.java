@@ -10,6 +10,7 @@ import com.example.want.common.CommonResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -29,13 +30,18 @@ public class CmtController {
     @PostMapping("/create")
     public ResponseEntity<Object> createBlockComment(@RequestBody CreateCmtRqDto dto, @AuthenticationPrincipal UserInfo userInfo) {
         Cmt cmt = cmtService.create(dto, userInfo.getEmail());
-        return new ResponseEntity<>(new CommonResDto(HttpStatus.CREATED, "comment is successfully created", cmt), HttpStatus.CREATED);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "comment is successfully created", cmt.getCommentId());
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
     // 댓글 조회
     @GetMapping("/list/{blockId}")
-    public ResponseEntity<Object> cmtList(@PathVariable Long blockId,@AuthenticationPrincipal UserInfo userInfo , @PageableDefault(size=10, sort="createdTime", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<CmtRsDto> comments = cmtService.cmtList(pageable, blockId, userInfo.getEmail());
+    public ResponseEntity<Object> cmtList(
+            @PathVariable Long blockId,
+            @AuthenticationPrincipal UserInfo userInfo,
+            @PageableDefault(size = 10, sort = "createdTime", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        Slice<CmtRsDto> comments = cmtService.cmtList(pageable, blockId, userInfo.getEmail());
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", comments), HttpStatus.OK);
     }
 
