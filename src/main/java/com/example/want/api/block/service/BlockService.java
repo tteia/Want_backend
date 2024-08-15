@@ -63,11 +63,29 @@ public class BlockService {
         return project;
     }
 
-    public Page<BlockActiveListRsDto> getNotActiveBlockList(Long projectId, Pageable pageable, String memberEmail) {
+    public List<BlockActiveListRsDto> getNotActiveBlockList(Long projectId, String memberEmail, Category category) {
+        // 프로젝트와 회원을 검증합니다.
         Project project = validateProjectMember(projectId, memberEmail);
-        Page<Block> blocks = blockRepository.findAllByProjectAndIsActivated(project, "N", pageable);
-        return blocks.map(BlockActiveListRsDto::fromEntity);
+        Member member = getMemberByEmail(memberEmail);
+
+        List<Block> blocks;
+        // Category가 null인 경우와 아닌 경우에 따라 쿼리를 다르게 수행
+        if (category == null) {
+            blocks = blockRepository.findAllByProjectAndIsActivated(project, "N"); // Boolean 타입으로 변경
+        } else {
+            blocks = blockRepository.findAllByProjectAndIsActivatedAndCategory(project, "N", category); // Boolean 타입으로 변경
+        }
+        // Block 리스트에서 Hearted 상태를 체크하여 DTO로 변환
+        return blocks.stream()
+                .map(block -> {
+                    BlockActiveListRsDto dto = BlockActiveListRsDto.fromEntity(block);
+                    // Heart 상태를 확인하고 DTO에 반영
+                    dto.setIsHearted(heartRepository.existsByMemberAndBlock(member, block));
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
+
 
     public Page<BlockActiveListRsDto> getActiveBlockList(Long projectId, String memberEmail , Pageable pageable) {
         Project project = validateProjectMember(projectId, memberEmail);

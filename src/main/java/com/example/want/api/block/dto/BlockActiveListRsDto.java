@@ -23,6 +23,7 @@ public class BlockActiveListRsDto {
     private Long heartCount;
     private Category category;
     private String isActivated;
+    private Boolean isHearted;
 
 
     public static BlockActiveListRsDto fromEntity(Block block) {
