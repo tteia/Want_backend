@@ -15,6 +15,7 @@ import com.example.want.api.projectMember.domain.ProjectMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,12 +40,13 @@ public class CmtService {
     }
 
     // Read
-    public Page<CmtRsDto> cmtList(Pageable pageable, Long blockId, String email){
+    public Slice<CmtRsDto> cmtList(Pageable pageable, Long blockId, String email) {
         Member member = findMemberByEmail(email);
         Block block = findBlockById(blockId);
         ProjectMember projectMember = checkProjectMember(block, member);
-        Page<Cmt> cmts = cmtRepository.findByBlockIdAndIsDeleted(pageable, blockId, "N");
-        Page<CmtRsDto> dtos = cmts.map(a -> a.listFromEntity());
+
+        Slice<Cmt> cmts = cmtRepository.findByBlockIdAndIsDeleted(pageable, blockId, "N");
+        Slice<CmtRsDto> dtos = cmts.map(Cmt::listFromEntity);
         return dtos;
     }
 
