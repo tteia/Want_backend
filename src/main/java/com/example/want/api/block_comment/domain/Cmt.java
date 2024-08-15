@@ -50,8 +50,8 @@ public class Cmt extends BaseEntity {
 //        contents = this.contents;
 //    }
 
-    public void updateCmt(CmtUpdateRqDto dto){
-        this.contents = dto.getContents();
+    public void updateCmt(String contents){
+        this.contents = contents;
     }
 
     public void deleteCmt(String isDeleted){
