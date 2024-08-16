@@ -15,4 +15,5 @@ public class AddDateBlockRqDto {
     private Long blockId;
     private String startTime;
     private String endTime;
+    private String title;
 }
