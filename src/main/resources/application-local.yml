@@ -33,6 +33,7 @@ spring:
                 scope: ${local.oauth2.google.scope}
   servlet:
     multipart:
+      enabled: true
       max-file-size: 5MB #파일의 용량 제한
       max-request-size: 10MB #전체 최대 크기 용량 제한
       resolve-lazily: true
