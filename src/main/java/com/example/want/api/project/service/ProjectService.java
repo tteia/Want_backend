@@ -144,8 +144,6 @@ public class ProjectService {
         if(existsMember) {
             throw new IllegalArgumentException("Member already exists.");
         }
-        
-        String invitationCode = UUID.randomUUID().toString();
 
         ProjectMember projectMember = ProjectMember.builder()
                 .project(project)
