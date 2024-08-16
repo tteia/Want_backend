@@ -144,8 +144,6 @@ public class ProjectService {
         if(existsMember) {
             throw new IllegalArgumentException("Member already exists.");
         }
-        
-        String invitationCode = UUID.randomUUID().toString();
 
         ProjectMember projectMember = ProjectMember.builder()
                 .project(project)
@@ -233,4 +231,14 @@ public class ProjectService {
         return projectRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Project not found"));
     }
+
+    public boolean isMemberOfProject(Long projectId, String email) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid project ID"));
+
+        // projectMembers에서 이메일이 일치하고 isExists가 'Y'인 경우에만 true를 반환
+        return project.getProjectMembers().stream()
+                .anyMatch(member -> member.getMember().getEmail().equals(email) && "Y".equals(member.getIsExist()));
+    }
+
 }

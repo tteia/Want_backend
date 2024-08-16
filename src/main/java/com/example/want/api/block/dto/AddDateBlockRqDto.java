@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Builder
 @Data
 @AllArgsConstructor
@@ -15,4 +13,5 @@ public class AddDateBlockRqDto {
     private Long blockId;
     private String startTime;
     private String endTime;
+    private String title;
 }

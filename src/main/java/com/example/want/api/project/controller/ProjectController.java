@@ -81,6 +81,12 @@ public class ProjectController {
         if (userInfo == null || userInfo.getEmail() == null) {
             return new ResponseEntity<>(new CommonResDto(HttpStatus.BAD_REQUEST, "Invalid user information", null), HttpStatus.BAD_REQUEST);
         }
+
+        boolean isMember = projectService.isMemberOfProject(projectId, userInfo.getEmail());
+        if (!isMember) {
+            return new ResponseEntity<>(new CommonResDto(HttpStatus.FORBIDDEN, "Access denied. You are not a member of this project.", null), HttpStatus.FORBIDDEN);
+        }
+
         ProjectDetailRsDto projectDetailRsDto = projectService.getProjectDetail(projectId, userInfo.getEmail());
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", projectDetailRsDto);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
