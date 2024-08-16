@@ -23,7 +23,7 @@ public class PhotoController {
     private final PhotoService photoService;
 
     // 사진 S3 업로드 및 DB 저장
-    @PostMapping(value="/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value="/upload", consumes = "multipart/form-data")
     public ResponseEntity<Object> photoUpload(@RequestPart Long blockId, @RequestPart(value = "files", required = false) List<MultipartFile> files){
         // 입력된 파일의 개수가 10개 이하인지 판별
         if (files.size() > 10) {
@@ -72,5 +72,8 @@ public class PhotoController {
             return new ResponseEntity<>(new CommonResDto(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload files.", null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+
 }
 

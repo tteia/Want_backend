@@ -148,8 +148,8 @@ public class PhotoService {
 
         // url에서 file 이름 추출
         List<String> oldFileNames = new ArrayList<>();
-        for (String ordFileUrl : oldFileUrls){
-            oldFileNames.add(extractFilename(ordFileUrl));
+        for (String oldFileUrl : oldFileUrls){
+            oldFileNames.add(extractFilename(oldFileUrl));
         }
 
         List<String> updatedFileUrls = new ArrayList<>();
