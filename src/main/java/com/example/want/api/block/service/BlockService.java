@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,7 @@ public class BlockService {
     private final HeartRepository heartRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Qualifier("heart")
     private final RedisTemplate<String, Object> heartRedisTemplate;
@@ -209,6 +211,11 @@ public class BlockService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트의 멤버가 아닙니다."));
 
         block.updatePlan(localDateTime1, localDateTime2);
+
+        // Redis 채널에 알림 메시지 발행
+        String notificationMessage = "Block " + block.getId() + " has been activated by " + memberEmail;
+        stringRedisTemplate.convertAndSend("project:notifications", notificationMessage);
+
         return block.toDetailDto();
     }
 

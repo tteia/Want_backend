@@ -1,5 +1,6 @@
 package com.example.want.config;
 
+import com.example.want.api.sse.NotificationService;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import lombok.RequiredArgsConstructor;
@@ -8,11 +9,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -104,4 +109,31 @@ public class RedisConfig {
         return redisTemplate;
     }
 
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(LettuceConnectionFactory lettuceConnectionFactory,
+                                                                       MessageListenerAdapter messageListenerAdapter,
+                                                                       ChannelTopic topic) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(lettuceConnectionFactory);
+        container.addMessageListener(messageListenerAdapter, topic);
+        return container;
+    }
+
+    // Redis 메시지를 처리하는 어댑터, 메시지를 수신하면 알림을 전송
+    @Bean
+    public MessageListenerAdapter messageListenerAdapter(NotificationService notificationService) {
+        return new MessageListenerAdapter(new MessageListener() {
+            @Override
+            public void onMessage(Message message, byte[] pattern) {
+                String messageBody = new String(message.getBody());  // 메시지의 본문을 바이트 배열에서 문자열로 변환
+                notificationService.sendNotification(messageBody);  // SSE를 통해 메시지 전송
+            }
+        });
+    }
+
+    // Pub/Sub에서 사용할 Redis 채널을 설정
+    @Bean
+    public ChannelTopic topic() {
+        return new ChannelTopic("project:notifications");
+    }
 }

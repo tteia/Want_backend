@@ -71,7 +71,7 @@ public class AuthService {
 //                    }
                 }
                 TokenResponse tokenResponse = sendGenerateJwtToken(userInfo.getEmail(), userInfo.getName(), member.getProfileUrl());
-                loginRedisTemplate.opsForValue().set(member.getEmail(), tokenResponse.getRefreshToken(), 240, TimeUnit.HOURS); //240시간
+//                loginRedisTemplate.opsForValue().set(member.getEmail(), tokenResponse.getRefreshToken(), 240, TimeUnit.HOURS); //240시간
                 return tokenResponse;
             }
         }catch (InternalAuthenticationServiceException e) {
