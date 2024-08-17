@@ -10,6 +10,8 @@ spring:
     url: ${local.datasource.url}
     username: ${local.datasource.username}
     password: ${local.datasource.password}
+#    hikari:
+#      maximum-pool-size:
   jpa:
     database-platform: org.hibernate.dialect.MariaDBDialect
     database: mysql
@@ -20,8 +22,8 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${local.redis.host}
+      port: ${local.redis.port}
       timeout: 10
   security:
     oauth2:

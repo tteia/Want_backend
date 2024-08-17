@@ -8,6 +8,7 @@ import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
 import com.example.want.api.projectMember.domain.ProjectMember;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +32,7 @@ public class NotificationController {
         this.projectRepository = projectRepository;
     }
 
-    @GetMapping("/api/notifications/{projectId}")
+    @GetMapping(value = "/api/notifications/{projectId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE )
     public SseEmitter streamNotifications(@PathVariable Long projectId, @AuthenticationPrincipal UserInfo userInfo ) {
         // 멤버가 해당 프로젝트에 속해 있는지 확인
         Member member = memberRepository.findByEmail(userInfo.getEmail())

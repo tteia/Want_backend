@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
+import io.lettuce.core.resource.DefaultClientResources;
+import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,6 +56,12 @@ public class RedisConfig {
                 .clientOptions(clientOptions) // 클라이언트 옵션 설정 (소켓 옵션 설정)
                 .commandTimeout(Duration.ofMinutes(1)) // 명령 시간 초과 설정 (1분)
                 .shutdownTimeout(Duration.ZERO) // 종료 시간 초과 설정 (0초)
+//                // 최대 연결 수 설정
+                .clientResources(DefaultClientResources.builder()
+                        .eventExecutorGroup(new DefaultEventExecutorGroup(10)) // 이벤트 실행 그룹 설정 (4개)
+                        .ioThreadPoolSize(10) // IO 스레드 풀 크기 설정 (4개)
+                        .computationThreadPoolSize(10) // 계산 스레드 풀 크기 설정 (4개)
+                        .build())
                 .build();
 
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(host, port); // RedisStandaloneConfiguration 설정
