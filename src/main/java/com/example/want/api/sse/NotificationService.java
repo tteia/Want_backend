@@ -3,32 +3,50 @@ package com.example.want.api.sse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @Service
 public class NotificationService {
 
-    // 연결된 클라이언트의 SSE Emitters를 관리
-    private final CopyOnWriteArrayList<SseEmitter> emitters = new CopyOnWriteArrayList<>();
+    // 프로젝트별로 SSE Emitters를 관리 (Set 사용)
+    private final Map<Long, Set<SseEmitter>> projectEmitters = new ConcurrentHashMap<>();
 
-    // 새로운 SSE 연결을 추가
-    public SseEmitter addEmitter() {
-        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);  // 연결 시간을 무제한으로 설정
-        emitters.add(emitter);
-        emitter.onCompletion(() -> emitters.remove(emitter));  // 완료되면 제거
-        emitter.onTimeout(() -> emitters.remove(emitter));     // 타임아웃 시 제거
-        emitter.onError(e -> emitters.remove(emitter));        // 에러 발생 시 제거
+    // 프로젝트별 SSE 연결을 추가
+    public SseEmitter addEmitter(Long projectId, Long memberId) {
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+
+        projectEmitters.computeIfAbsent(projectId, k -> new CopyOnWriteArraySet<>()).add(emitter);
+
+        emitter.onCompletion(() -> {
+            projectEmitters.get(projectId).remove(emitter);
+        });
+
+        emitter.onTimeout(() -> {
+            projectEmitters.get(projectId).remove(emitter);
+        });
+
+        emitter.onError(e -> {
+            projectEmitters.get(projectId).remove(emitter);
+        });
+
         return emitter;
     }
 
-    // 메시지를 모든 연결된 클라이언트에게 전송
-    public void sendNotification(String message) {
-        emitters.forEach(emitter -> {
-            try {
-                emitter.send(SseEmitter.event().name("message").data(message));
-            } catch (Exception e) {
-                emitters.remove(emitter);  // 에러 발생 시 해당 Emitter를 제거
+    // 특정 프로젝트의 모든 멤버에게 알림 전송
+    public void sendNotificationToProject(Long projectId, String message) {
+        Set<SseEmitter> emitters = projectEmitters.get(projectId);
+        if (emitters != null) {
+            for (SseEmitter emitter : emitters) {
+                try {
+                    emitter.send(SseEmitter.event().name("message").data(message));
+                } catch (Exception e) {
+                    emitters.remove(emitter);
+                }
             }
-        });
+        }
     }
 }
+

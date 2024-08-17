@@ -1,6 +1,8 @@
 package com.example.want.config;
 
 import com.example.want.api.sse.NotificationService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import lombok.RequiredArgsConstructor;
@@ -110,28 +112,73 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer(LettuceConnectionFactory lettuceConnectionFactory,
-                                                                       MessageListenerAdapter messageListenerAdapter,
-                                                                       ChannelTopic topic) {
+    @Qualifier("sse")
+    public LettuceConnectionFactory sseConnectionFactory() {
+        final SocketOptions socketOptions = SocketOptions.builder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+
+        final ClientOptions clientOptions = ClientOptions.builder()
+                .socketOptions(socketOptions)
+                .build();
+
+        LettuceClientConfiguration lettuceClientConfiguration = LettuceClientConfiguration.builder()
+                .clientOptions(clientOptions)
+                .commandTimeout(Duration.ofMinutes(1))
+                .shutdownTimeout(Duration.ZERO)
+                .build();
+
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(host, port);
+        redisStandaloneConfiguration.setDatabase(2); // 2번 데이터베이스 사용
+
+        return new LettuceConnectionFactory(redisStandaloneConfiguration, lettuceClientConfiguration);
+    }
+
+    @Bean
+    @Qualifier("sse")
+    public RedisTemplate<String, Object> sseRedisTemplate() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(sseConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(
+            @Qualifier("sse") LettuceConnectionFactory sseConnectionFactory,
+            MessageListenerAdapter messageListenerAdapter,
+            ChannelTopic topic) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(lettuceConnectionFactory);
+        container.setConnectionFactory(sseConnectionFactory);
         container.addMessageListener(messageListenerAdapter, topic);
         return container;
     }
 
-    // Redis 메시지를 처리하는 어댑터, 메시지를 수신하면 알림을 전송
     @Bean
     public MessageListenerAdapter messageListenerAdapter(NotificationService notificationService) {
         return new MessageListenerAdapter(new MessageListener() {
             @Override
             public void onMessage(Message message, byte[] pattern) {
-                String messageBody = new String(message.getBody());  // 메시지의 본문을 바이트 배열에서 문자열로 변환
-                notificationService.sendNotification(messageBody);  // SSE를 통해 메시지 전송
+                String messageBody = new String(message.getBody());
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode jsonNode = objectMapper.readTree(messageBody);
+                    Long projectId = jsonNode.get("projectId").asLong();
+                    String notificationMessage = jsonNode.get("message").asText();
+
+                    // 프로젝트별로 알림 전송
+                    notificationService.sendNotificationToProject(projectId, notificationMessage);
+                } catch (Exception e) {
+                    e.printStackTrace();  // JSON 파싱 오류 처리
+                }
             }
         });
     }
 
-    // Pub/Sub에서 사용할 Redis 채널을 설정
     @Bean
     public ChannelTopic topic() {
         return new ChannelTopic("project:notifications");

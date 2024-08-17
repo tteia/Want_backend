@@ -12,6 +12,7 @@ import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
+import com.example.want.api.sse.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ public class BlockService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final StringRedisTemplate stringRedisTemplate;
+    private final NotificationService notificationService;
 
     @Qualifier("heart")
     private final RedisTemplate<String, Object> heartRedisTemplate;
@@ -212,8 +214,11 @@ public class BlockService {
 
         block.updatePlan(localDateTime1, localDateTime2);
 
-        // Redis 채널에 알림 메시지 발행
-        String notificationMessage = "Block " + block.getId() + " has been activated by " + memberEmail;
+        // 프로젝트 ID 가져오기
+        Long projectId = block.getProject().getId();
+
+        // Redis 채널에 알림 메시지 발행 (JSON 형식)
+        String notificationMessage = "{ \"projectId\": " + projectId + ", \"message\": \"Block " + block.getId() + " has been activated by " + memberEmail + "\" }";
         stringRedisTemplate.convertAndSend("project:notifications", notificationMessage);
 
         return block.toDetailDto();
@@ -356,5 +361,11 @@ public class BlockService {
 
         block.changeIsActivated("N");
         return block.toDetailDto();
+    }
+
+    public Long findProjectIdByBlockId(Long blockId) {
+       Block block = blockRepository.findById(blockId)
+               .orElseThrow(() -> new EntityNotFoundException("해당 블럭이 없습니다."));
+       return block.getProject().getId();
     }
 }
