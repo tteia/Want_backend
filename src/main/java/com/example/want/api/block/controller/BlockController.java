@@ -135,4 +135,11 @@ public class BlockController {
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", deletedBlock.getIsDeleted());
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
+
+    @GetMapping("/city/{stateId}")
+    public ResponseEntity<CommonResDto> getBlocksByCity(@PathVariable Long stateId) {
+        List<BlockActiveListRsDto> blocks = blockService.getBlocksByState(stateId);
+        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", blocks), HttpStatus.OK);
+    }
+
 }

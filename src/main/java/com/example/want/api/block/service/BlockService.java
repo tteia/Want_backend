@@ -12,6 +12,8 @@ import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
+import com.example.want.api.state.domain.State;
+import com.example.want.api.state.repository.StateRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +44,7 @@ public class BlockService {
     private final HeartRepository heartRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final StateRepository stateRepository;
 
     @Qualifier("heart")
     private final RedisTemplate<String, Object> heartRedisTemplate;
@@ -350,4 +354,23 @@ public class BlockService {
         block.changeIsActivated("N");
         return block.toDetailDto();
     }
+
+    @Transactional
+    public List<BlockActiveListRsDto> getBlocksByState(Long stateId) {
+        State state = stateRepository.findById(stateId)
+                .orElseThrow(() -> new EntityNotFoundException("State not found"));
+        List<Project> projects = projectRepository.findByProjectStatesState(state);
+        List<Long> projectIds = new ArrayList<>();
+        for (Project project : projects) {
+            projectIds.add(project.getId());
+        }
+        List<Block> blocks = blockRepository.findByProjectIdIn(projectIds);
+        List<BlockActiveListRsDto> blockDtos = new ArrayList<>();
+        for (Block block : blocks) {
+            BlockActiveListRsDto dto = BlockActiveListRsDto.fromEntity(block);
+            blockDtos.add(dto);
+        }
+        return blockDtos;
+    }
+
 }
