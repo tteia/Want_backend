@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "예제 API", description = "Swagger 테스트용 API")
@@ -31,6 +32,7 @@ public class MemberController {
     }
 
 //    초대 요청 목록 확인
+    @Transactional
     @GetMapping("/invitations")
     public ResponseEntity<?> getInvitations(@AuthenticationPrincipal UserInfo userInfo,
                                             @PageableDefault(size = 10) Pageable pageable) {

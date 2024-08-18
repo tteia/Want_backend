@@ -44,6 +44,9 @@ public class MemberService {
 //        Page 객체는 페이징 정보를 포함하고 있으므로, 실제 순수 데이터를 리스트로 가져오려면
 //        getContent() 메서드를 사용해야함
         for (ProjectMember projectMember : projectMembers.getContent()) {
+
+            String inviterName = projectMember.getInviterName();
+
             Project project = projectRepository.findById(projectMember.getProject().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Project Not found"));
 
@@ -51,6 +54,7 @@ public class MemberService {
                     .projectId(project.getId())
                     .projectTitle(project.getTitle())
                     .invitationAccepted(projectMember.getInvitationAccepted())
+                    .inviterName(inviterName)
                     .createdTime(projectMember.getCreatedTime())
                     .startTravel(project.getStartTravel().toString())
                     .endTravel(project.getEndTravel().toString())
