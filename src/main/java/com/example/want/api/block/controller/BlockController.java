@@ -142,4 +142,11 @@ public class BlockController {
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", blocks), HttpStatus.OK);
     }
 
+    @PostMapping("/block/import")
+    public ResponseEntity<CommonResDto> importIntoProject(@AuthenticationPrincipal UserInfo userInfo, @RequestBody CreateBlockRqDto createDto) {
+        Block block = blockService.importBlock(userInfo, createDto);
+        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", block.getId()), HttpStatus.OK);
+    }
+
+
 }

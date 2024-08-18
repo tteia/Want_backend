@@ -373,4 +373,14 @@ public class BlockService {
         return blockDtos;
     }
 
+    @Transactional
+    public Block importBlock(UserInfo userInfo, CreateBlockRqDto createDto) {
+        Project project = validateProjectMember(createDto.getProjectId(), userInfo.getEmail());
+        Block findBlock = blockRepository.findById(createDto.getBlockId()).orElseThrow(() -> new EntityNotFoundException("해당 블록을 찾을 수 없습니다."));
+        Block block = createDto.toImport(findBlock, project);
+        System.out.println(block);
+        return blockRepository.save(block);
+    }
+
+
 }

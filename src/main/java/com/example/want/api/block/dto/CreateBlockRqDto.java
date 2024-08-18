@@ -13,12 +13,24 @@ import java.time.LocalDateTime;
 public class CreateBlockRqDto {
     private Category category;
     private Long projectId;
+    private Long blockId;
 
     public Block toEntity(Category category, Project project) {
         return Block.builder()
                 .title("제목을 입력해주세요")
                 .content("내용을 입력해주세요")
                 .category(category)
+                .project(project)
+                .heartCount(0L)
+                .isActivated("N")
+                .build();
+    }
+
+    public Block toImport(Block findBlock, Project project) {
+        return Block.builder()
+                .title(findBlock.getTitle())
+                .content(findBlock.getContent())
+                .category(findBlock.getCategory())
                 .project(project)
                 .heartCount(0L)
                 .isActivated("N")
