@@ -18,7 +18,7 @@ public class InvitationResDto {
     private Long projectId;
     private String projectTitle;
     private String invitationAccepted;
-
+    private String inviterName;
     private LocalDateTime createdTime;
     private String startTravel;
     private String endTravel;

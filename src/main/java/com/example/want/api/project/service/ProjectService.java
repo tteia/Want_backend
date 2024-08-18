@@ -150,6 +150,7 @@ public class ProjectService {
                 .member(otherMember)
                 .authority(Authority.MEMBER)
                 .invitationAccepted("N") // 초대 수락을 하면 "Y"로 변경
+                .inviterName(member.getName())
                 .build();
 
         projectMemberRepository.save(projectMember);
