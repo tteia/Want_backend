@@ -36,5 +36,5 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
 
     List<Block> findAllByProjectAndIsActivatedAndCategory(Project project, String n, Category category);
 
-    List<Block> findByProjectIdIn(List<Long> projectIds);
+    List<Block> findAllByProject(Project project);
 }

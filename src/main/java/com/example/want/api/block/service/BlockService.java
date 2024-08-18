@@ -357,20 +357,28 @@ public class BlockService {
 
     @Transactional
     public List<BlockActiveListRsDto> getBlocksByState(Long stateId) {
+        List<Block> blocks = new ArrayList<>();
+        List<BlockActiveListRsDto> blockDtos = new ArrayList<>();
         State state = stateRepository.findById(stateId)
                 .orElseThrow(() -> new EntityNotFoundException("State not found"));
         List<Project> projects = projectRepository.findByProjectStatesState(state);
-        List<Long> projectIds = new ArrayList<>();
         for (Project project : projects) {
-            projectIds.add(project.getId());
+            blocks.addAll(blockRepository.findAllByProject(project));
         }
-        List<Block> blocks = blockRepository.findByProjectIdIn(projectIds);
-        List<BlockActiveListRsDto> blockDtos = new ArrayList<>();
         for (Block block : blocks) {
-            BlockActiveListRsDto dto = BlockActiveListRsDto.fromEntity(block);
-            blockDtos.add(dto);
+            blockDtos.add(BlockActiveListRsDto.fromEntity(block));
         }
         return blockDtos;
     }
+
+    @Transactional
+    public Block importBlock(UserInfo userInfo, ImportBlockRqDto importDto) {
+        Project project = validateProjectMember(importDto.getProjectId(), userInfo.getEmail());
+        Block findBlock = blockRepository.findById(importDto.getBlockId()).orElseThrow(() -> new EntityNotFoundException("해당 블록을 찾을 수 없습니다."));
+        Block block = importDto.toImport(findBlock, project);
+        System.out.println(block);
+        return blockRepository.save(block);
+    }
+
 
 }
