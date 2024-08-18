@@ -28,6 +28,7 @@ public class ProjectDetailRsDto {
         private Long userId;
         private String userName;
         private String userProfile;
+        private String isExist;
     }
 
     @Data
