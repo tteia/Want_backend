@@ -4,7 +4,7 @@ import com.example.want.api.member.login.UserInfo;
 import com.example.want.api.project.dto.*;
 import com.example.want.api.project.service.ProjectService;
 import com.example.want.common.CommonResDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -14,15 +14,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/project")
 public class ProjectController {
 
     private final ProjectService projectService;
-
-    @Autowired
-    public ProjectController(ProjectService projectService) {
-        this.projectService = projectService;
-    }
 
     //    일정 생성
     //    로그인 되어 있는 사용자의 id를 받아서 일정을 생성

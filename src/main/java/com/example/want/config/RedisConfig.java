@@ -1,5 +1,8 @@
 package com.example.want.config;
 
+import com.example.want.api.sse.NotificationService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import lombok.RequiredArgsConstructor;
@@ -8,11 +11,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -104,4 +111,76 @@ public class RedisConfig {
         return redisTemplate;
     }
 
+    @Bean
+    @Qualifier("sse")
+    public LettuceConnectionFactory sseConnectionFactory() {
+        final SocketOptions socketOptions = SocketOptions.builder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+
+        final ClientOptions clientOptions = ClientOptions.builder()
+                .socketOptions(socketOptions)
+                .build();
+
+        LettuceClientConfiguration lettuceClientConfiguration = LettuceClientConfiguration.builder()
+                .clientOptions(clientOptions)
+                .commandTimeout(Duration.ofMinutes(1))
+                .shutdownTimeout(Duration.ZERO)
+                .build();
+
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(host, port);
+        redisStandaloneConfiguration.setDatabase(2); // 2번 데이터베이스 사용
+
+        return new LettuceConnectionFactory(redisStandaloneConfiguration, lettuceClientConfiguration);
+    }
+
+    @Bean
+    @Qualifier("sse")
+    public RedisTemplate<String, Object> sseRedisTemplate() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(sseConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(
+            @Qualifier("sse") LettuceConnectionFactory sseConnectionFactory,
+            MessageListenerAdapter messageListenerAdapter,
+            ChannelTopic topic) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(sseConnectionFactory);
+        container.addMessageListener(messageListenerAdapter, topic);
+        return container;
+    }
+
+    @Bean
+    public MessageListenerAdapter messageListenerAdapter(NotificationService notificationService) {
+        return new MessageListenerAdapter(new MessageListener() {
+            @Override
+            public void onMessage(Message message, byte[] pattern) {
+                String messageBody = new String(message.getBody());
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode jsonNode = objectMapper.readTree(messageBody);
+                    Long projectId = jsonNode.get("projectId").asLong();
+                    String notificationMessage = jsonNode.get("message").asText();
+
+                    // 프로젝트별로 알림 전송
+                    notificationService.sendNotificationToProject(projectId, notificationMessage);
+                } catch (Exception e) {
+                    e.printStackTrace();  // JSON 파싱 오류 처리
+                }
+            }
+        });
+    }
+
+    @Bean
+    public ChannelTopic topic() {
+        return new ChannelTopic("project:notifications");
+    }
 }

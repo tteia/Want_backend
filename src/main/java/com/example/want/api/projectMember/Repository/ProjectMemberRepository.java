@@ -32,4 +32,6 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Lo
     List<ProjectMember> findByProject(Project project);
 
     Page<ProjectMember> findByMemberEmailAndInvitationAccepted(String email, Pageable pageable, String n);
+
+    ProjectMember findByProjectIdAndMemberId(Long projectId, Long memberId);
 }
