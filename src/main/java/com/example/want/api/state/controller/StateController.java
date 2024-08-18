@@ -25,14 +25,11 @@ public class StateController {
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
-    @GetMapping("/state/city")
-    public ResponseEntity<?> getCity(@RequestParam String countryName){
-        List<CityResDto> city = stateService.getCityList(countryName);
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", city);
+    @GetMapping("/popular/destinations")
+    public ResponseEntity<?> getCitiesWithProjects() {
+        List<CityResDto> cities = stateService.getCitiesWithProjectCounts();
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", cities);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
-
-
-
 
 }
