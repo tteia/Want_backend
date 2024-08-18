@@ -209,6 +209,7 @@ public class ProjectService {
                                 .userId(projectMember.getMember().getId())
                                 .userName(projectMember.getMember().getName())
                                 .userProfile(projectMember.getMember().getProfileUrl())
+                                .isExist(projectMember.getIsExist())
                                 .build())
                         .collect(Collectors.toList()))
                 .projectStates(project.getProjectStates().stream()

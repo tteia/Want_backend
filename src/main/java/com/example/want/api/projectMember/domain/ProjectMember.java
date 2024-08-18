@@ -25,7 +25,6 @@ public class ProjectMember extends BaseEntity {
     @Column(length = 1)
     private String invitationAccepted;
 
-
     private String isExist;
 
     @ManyToOne(fetch = FetchType.LAZY)
