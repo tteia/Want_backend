@@ -144,7 +144,7 @@ public class BlockService {
 
     private Block updateRedisHeartCount(Block block) {
         HashOperations<String, String, Object> hashOperations = heartRedisTemplate.opsForHash();
-        String key = "blockId::" + block.getId();
+        String key = "blockId:heart::" + block.getId();
         String hashKey = "heartCount";
 
         // Redis에서 좋아요 수를 업데이트
@@ -153,7 +153,7 @@ public class BlockService {
     }
 
     public Long getLikesCount(Long blockId) {
-        String key = "blockId::" + blockId;
+        String key = "blockId:heart::" + blockId;
         String hashKey = "heartCount";
 
         Long likesCount = getLikesCountFromCache(key, hashKey);

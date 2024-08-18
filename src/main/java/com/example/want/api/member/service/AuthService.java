@@ -72,6 +72,13 @@ public class AuthService {
                 }
                 TokenResponse tokenResponse = sendGenerateJwtToken(userInfo.getEmail(), userInfo.getName(), member.getProfileUrl());
 //                loginRedisTemplate.opsForValue().set(member.getEmail(), tokenResponse.getRefreshToken(), 240, TimeUnit.HOURS); //240시간
+                try {
+                    loginRedisTemplate.opsForValue().set(member.getEmail(), tokenResponse.getRefreshToken(), 240, TimeUnit.HOURS);
+                    System.out.println("Token saved in Redis for email: " + member.getEmail());
+                } catch (Exception e) {
+                    System.err.println("Error saving token to Redis: " + e.getMessage());
+                    e.printStackTrace();
+                }
                 return tokenResponse;
             }
         }catch (InternalAuthenticationServiceException e) {
