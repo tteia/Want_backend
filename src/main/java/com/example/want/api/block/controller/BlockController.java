@@ -129,7 +129,7 @@ public class BlockController {
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/block/{id}/delete")
     public ResponseEntity<CommonResDto> deleteBlock(@AuthenticationPrincipal UserInfo userInfo, @PathVariable Long id) {
         Block deletedBlock = blockService.blockDelete(userInfo, id);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", deletedBlock.getIsDeleted());
