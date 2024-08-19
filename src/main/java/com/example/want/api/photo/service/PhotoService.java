@@ -136,34 +136,34 @@ public class PhotoService {
 
 
     // 파일 삭제
-    public void deleteFile(Long blockId, String filename){
-        amazonS3.deleteObject(bucket, filename);
-        photoRepository.deleteAllByBlockId(blockId);
+    @Transactional
+    public void deleteFiles(Long blockId,  List<String> delFiles){
+        for (String photoId : delFiles){
+            Long longPhotoId = Long.parseLong(photoId);
+            Photo photo = photoRepository.findById(longPhotoId).orElseThrow(()->new EntityNotFoundException("존재하지 않는 Id입니다."));
+            String filename = extractFilename(photo.getPhotoUrl());
+            amazonS3.deleteObject(bucket, filename);
+            photoRepository.deleteByPhotoId(longPhotoId);
+        }
+
     }
 
     // 파일 업데이트
+    @Transactional
     public PhotoListRsDto updateFiles(Long blockId,
-                            List<String> oldFileUrls,
+                            List<String> delFiles,
                             List<MultipartFile> newFiles) throws IOException {
 
-        // url에서 file 이름 추출
-        List<String> oldFileNames = new ArrayList<>();
-        for (String oldFileUrl : oldFileUrls){
-            oldFileNames.add(extractFilename(oldFileUrl));
-        }
+        // delFiles 삭제
+        deleteFiles(blockId, delFiles);
 
-        List<String> updatedFileUrls = new ArrayList<>();
-
-        // 기존 파일 삭제
-        for (String oldFileName : oldFileNames) {
-            deleteFile(blockId, oldFileName);
-        }
         // 새 파일 업로드
         List<PhotoListRsDto.PhotoInfoDto> infoDtos = new ArrayList<>();
         for (MultipartFile newFile : newFiles){
             PhotoListRsDto.PhotoInfoDto photoInfoDto = uploadFile(blockId, newFile);
             infoDtos.add(photoInfoDto);
         }
+
         PhotoListRsDto photoListRsDto = PhotoListRsDto.builder()
                 .blockId(blockId)
                 .photoList(infoDtos)

@@ -10,4 +10,6 @@ import java.util.List;
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
     List<Photo> findByBlockId(Long blockId);
     void deleteAllByBlockId(Long blockId);
+
+    void deleteByPhotoId(Long photoId);
 }
