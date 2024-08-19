@@ -236,7 +236,7 @@ public class BlockService {
         Project project = validateProjectMember(projectId, memberEmail);
         LocalDateTime startDate = date.atStartOfDay();
         LocalDateTime endDate = date.atStartOfDay().plusDays(1);
-        List<Block> blocks = blockRepository.findAllByProjectAndStartTimeBetweenOrderByEndTimeAsc(project, startDate, endDate);
+        List<Block> blocks = blockRepository.findByProjectAndIsActivatedAndStartTimeBetweenOrderByStartTimeAsc(project,"Y", startDate, endDate);
         List<BlockActiveListRsDto> blockActiveListRsDtos = blocks.stream()
                 .map(BlockActiveListRsDto::fromEntity)
                 .collect(Collectors.toList());
