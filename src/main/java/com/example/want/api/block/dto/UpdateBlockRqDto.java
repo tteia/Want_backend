@@ -28,7 +28,4 @@ public class UpdateBlockRqDto {
 
     private Category category;
 
-    private String isActivated;
-
-
 }

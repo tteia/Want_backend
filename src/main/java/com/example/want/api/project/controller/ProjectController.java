@@ -3,6 +3,7 @@ package com.example.want.api.project.controller;
 import com.example.want.api.member.login.UserInfo;
 import com.example.want.api.project.dto.*;
 import com.example.want.api.project.service.ProjectService;
+import com.example.want.api.sse.NotificationService;
 import com.example.want.common.CommonResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final NotificationService notificationService;
 
     //    일정 생성
     //    로그인 되어 있는 사용자의 id를 받아서 일정을 생성
@@ -61,6 +63,13 @@ public class ProjectController {
     @PostMapping("/invite")
     public ResponseEntity<Object> inviteUser(@RequestBody InvitationDto dto, @AuthenticationPrincipal UserInfo userInfo) {
         projectService.inviteUser(dto.getProjectId(), dto.getEmail() , userInfo.getEmail());
+        // Send notification to the invited user
+        String message = "You have been invited to the project with ID: " + dto.getProjectId();
+        try {
+        notificationService.sendInvitation(dto.getEmail(), message);
+        }catch (Exception e){
+            System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXx");
+        }
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Member invited successfully.", "Member Email : " + dto.getEmail());
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }

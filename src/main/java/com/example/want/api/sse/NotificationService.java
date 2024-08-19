@@ -1,9 +1,11 @@
 package com.example.want.api.sse;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +19,8 @@ public class NotificationService {
     private final Map<Long, Set<SseEmitter>> projectEmitters = new ConcurrentHashMap<>();
     // 멤버별로 프로젝트에 대한 구독을 관리 (Map 사용)
     private final Map<Long, Map<Long, SseEmitter>> memberSubscriptions = new ConcurrentHashMap<>();
+    private final Map<String, SseEmitter> inviteEmitters = new ConcurrentHashMap<>();
+
 
     // 프로젝트별 SSE 연결을 추가
     public SseEmitter addEmitter(Long projectId, Long memberId) {
@@ -108,4 +112,55 @@ public class NotificationService {
             }
         }
     }
+
+    public SseEmitter subscribeEmitter(String email) {
+        SseEmitter existingEmitter = inviteEmitters.remove(email);
+        if (existingEmitter != null) {
+            return existingEmitter;
+        }
+
+        SseEmitter newEmitter = new SseEmitter(Long.MAX_VALUE);
+        inviteEmitters.put(email, newEmitter);
+
+        newEmitter.onCompletion(() -> {
+            inviteEmitters.remove(email);
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
+            log.info("SseEmitter for email {} completed.", email);
+        });
+
+        newEmitter.onTimeout(() -> {
+            inviteEmitters.remove(email);
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!2");
+            log.info("SseEmitter for email {} timed out.", email);
+        });
+
+        newEmitter.onError(e -> {
+            inviteEmitters.remove(email);
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!3");
+            log.error("SseEmitter for email {} encountered an error.", email, e);
+        });
+
+        try {
+            newEmitter.send(SseEmitter.event().name("subscribed").data("구독되었습니다!"));
+        } catch (Exception e) {
+            log.error("Failed to send connection message to email {}.", email, e);
+        }
+
+        log.info("SseEmitter connected for email {}.", email);
+
+        return newEmitter;
+    }
+
+    public void sendInvitation(String email, String message) {
+        SseEmitter emitter = inviteEmitters.get(email);
+        if (emitter != null) {
+            try {
+                String jsonData = new ObjectMapper().writeValueAsString(Collections.singletonMap("message", message));
+                emitter.send(SseEmitter.event().name("invite").data(jsonData));            } catch (Exception e) {
+                inviteEmitters.remove(email);
+                log.error("Failed to send invitation to email {}.", email, e);
+            }
+        }
+    }
+
 }

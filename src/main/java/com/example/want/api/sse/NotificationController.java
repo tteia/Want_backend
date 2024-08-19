@@ -47,4 +47,13 @@ public class NotificationController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Member is not part of this project");
         }
     }
+
+    @GetMapping(value = "/api/subscribe", produces = "text/event-stream")
+    public SseEmitter streamNotifications(@AuthenticationPrincipal UserInfo userInfo) {
+        Member member = memberRepository.findByEmail(userInfo.getEmail())
+                .orElseThrow(() -> new EntityNotFoundException("Member not found"));
+        System.out.println("구독 좋아요 알림설정 : " + member.getEmail());
+        return notificationService.subscribeEmitter(member.getEmail());
+    }
+
 }
