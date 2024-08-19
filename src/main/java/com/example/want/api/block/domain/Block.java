@@ -37,9 +37,9 @@ public class Block extends BaseEntity {
     private String isActivated;
     private Long heartCount;
     private String isDeleted;
+  
     @Builder.Default
     private boolean isHearted = false;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
@@ -60,6 +60,7 @@ public class Block extends BaseEntity {
                 .endTime(this.endTime != null ? this.endTime.toString() : null)
                 .isActivated(this.isActivated)
                 .heartCount(this.heartCount)
+                .isHearted(this.isHearted)
                 .build();
     }
 
