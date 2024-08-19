@@ -24,4 +24,5 @@ public class BlockDetailRsDto {
     private String isActivated;
     private Long heartCount;
     private Boolean isHearted;
+    private Long projectId;
 }
