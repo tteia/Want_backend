@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.UUID;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -122,6 +122,7 @@ public class ProjectService {
 
         } else {
             projectMember.updateIsExist("N");
+            projectMember.updateInvitationAccepted("N");
             projectMemberRepository.save(projectMember);
         }
     }
@@ -134,26 +135,35 @@ public class ProjectService {
         Member otherMember = memberRepository.findByEmail(otherMemberEmail)
                 .orElseThrow(() -> new EntityNotFoundException("초대하려는 멤버 이메일이 없습니다."));
         Project project = findProjectById(projectId);
+
         if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
             throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
         }
 
-        System.out.println("tqqqqqqqqqqqqqqqqqqqqqq");
-//        멤버가 이미 팀원목록에 속해 있는지 확인하는 검증코드
         boolean existsMember = projectMemberRepository.existsByProjectAndMember(project, otherMember);
         if(existsMember) {
             throw new IllegalArgumentException("Member already exists.");
         }
 
+        ProjectMember projectMember = projectMemberRepository.findByProjectAndMember(project, otherMember)
+                .orElseGet(() -> createProjectNewMember(project, otherMember, member));
+
+        if(Objects.equals(projectMember.getIsExist(), "N")){
+            projectMember.updateIsExist("Y");
+        }
+    }
+    public ProjectMember createProjectNewMember(Project project, Member otherMember, Member inviter){
         ProjectMember projectMember = ProjectMember.builder()
                 .project(project)
                 .member(otherMember)
                 .authority(Authority.MEMBER)
                 .invitationAccepted("N") // 초대 수락을 하면 "Y"로 변경
-                .inviterName(member.getName())
+                .isExist("Y")
+                .inviterName(inviter.getName())
                 .build();
-
         projectMemberRepository.save(projectMember);
+
+        return projectMember;
     }
 
     public Page<MyProjectListRsDto> getMyProjectList(Pageable pageable, String email) {

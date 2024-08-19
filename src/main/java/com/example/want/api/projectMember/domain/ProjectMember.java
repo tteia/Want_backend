@@ -4,10 +4,7 @@ import com.example.want.api.member.domain.Member;
 import com.example.want.api.project.domain.Authority;
 import com.example.want.api.project.domain.Project;
 import com.example.want.common.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -15,7 +12,8 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Data
+@Getter
+@Setter
 public class ProjectMember extends BaseEntity {
 
     @Id
@@ -43,5 +41,9 @@ public class ProjectMember extends BaseEntity {
 
     public void updateIsExist(String isExist) {
         this.isExist = isExist;
+    }
+
+    public void updateInvitationAccepted(String invitationAccepted) {
+        this.invitationAccepted = invitationAccepted;
     }
 }
