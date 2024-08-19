@@ -14,6 +14,7 @@ import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
 import com.example.want.api.state.domain.State;
 import com.example.want.api.state.repository.StateRepository;
+import com.example.want.api.sse.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +47,8 @@ public class BlockService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final StateRepository stateRepository;
+    private final StringRedisTemplate stringRedisTemplate;
+    private final NotificationService notificationService;
 
     @Qualifier("heart")
     private final RedisTemplate<String, Object> heartRedisTemplate;
@@ -147,7 +151,7 @@ public class BlockService {
 
     private Block updateRedisHeartCount(Block block) {
         HashOperations<String, String, Object> hashOperations = heartRedisTemplate.opsForHash();
-        String key = "blockId::" + block.getId();
+        String key = "blockId:heart::" + block.getId();
         String hashKey = "heartCount";
 
         // Redis에서 좋아요 수를 업데이트
@@ -156,7 +160,7 @@ public class BlockService {
     }
 
     public Long getLikesCount(Long blockId) {
-        String key = "blockId::" + blockId;
+        String key = "blockId:heart::" + blockId;
         String hashKey = "heartCount";
 
         Long likesCount = getLikesCountFromCache(key, hashKey);
@@ -216,6 +220,14 @@ public class BlockService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트의 멤버가 아닙니다."));
 
         block.updatePlan(localDateTime1, localDateTime2);
+
+        // 프로젝트 ID 가져오기
+        Long projectId = block.getProject().getId();
+
+        // Redis 채널에 알림 메시지 발행 (JSON 형식)
+        String notificationMessage = "{ \"projectId\": " + projectId + ", \"message\": \"Block " + block.getId() + " has been activated by " + memberEmail + "\" }";
+        stringRedisTemplate.convertAndSend("project:notifications", notificationMessage);
+
         return block.toDetailDto();
     }
 
@@ -383,5 +395,11 @@ public class BlockService {
         return blockRepository.save(block);
     }
 
+
+    public Long findProjectIdByBlockId(Long blockId) {
+       Block block = blockRepository.findById(blockId)
+               .orElseThrow(() -> new EntityNotFoundException("해당 블럭이 없습니다."));
+       return block.getProject().getId();
+    }
 
 }
