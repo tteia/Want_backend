@@ -333,13 +333,7 @@ public class BlockService {
             block.updateCategory(updateBlockRqDto.getCategory());
 
         }
-        if (updateBlockRqDto.getIsActivated() != null) {
-            if(updateBlockRqDto.getIsActivated().equals("Y")){
-                block.changeIsActivated("N");
-            } else {
-                block.changeIsActivated("Y");
-            }
-        }
+
     return block.toDetailDto();
     }
 
