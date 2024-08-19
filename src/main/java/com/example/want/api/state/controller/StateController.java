@@ -32,4 +32,11 @@ public class StateController {
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
+    @GetMapping("/state/city")
+    public ResponseEntity<?> getCity(@RequestParam String countryName){
+        List<CityResDto> city = stateService.getCityList(countryName);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", city);
+        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+    }
+
 }
