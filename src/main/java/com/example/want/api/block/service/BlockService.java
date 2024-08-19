@@ -12,6 +12,8 @@ import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
+import com.example.want.api.state.domain.State;
+import com.example.want.api.state.repository.StateRepository;
 import com.example.want.api.sse.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +46,7 @@ public class BlockService {
     private final HeartRepository heartRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final StateRepository stateRepository;
     private final StringRedisTemplate stringRedisTemplate;
     private final NotificationService notificationService;
 
@@ -97,9 +101,12 @@ public class BlockService {
         return blockList.map(b -> BlockActiveListRsDto.fromEntity(b));
     }
 
-    public BlockDetailRsDto getBlockDetail(Long id) {
+    public BlockDetailRsDto getBlockDetail(Long id, UserInfo userInfo) {
         Block block = blockRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
-        return block.toDetailDto();
+        Member member = getMemberByEmail(userInfo.getEmail());
+        BlockDetailRsDto detailDto = block.toDetailDto();
+        detailDto.setIsHearted(heartRepository.existsByMemberAndBlock(member, block));
+        return detailDto;
     }
     @Transactional
     public Block addLikeToPost(Long blockId, String memberEmail) {
@@ -363,9 +370,36 @@ public class BlockService {
         return block.toDetailDto();
     }
 
+    @Transactional
+    public List<BlockActiveListRsDto> getBlocksByState(Long stateId) {
+        List<Block> blocks = new ArrayList<>();
+        List<BlockActiveListRsDto> blockDtos = new ArrayList<>();
+        State state = stateRepository.findById(stateId)
+                .orElseThrow(() -> new EntityNotFoundException("State not found"));
+        List<Project> projects = projectRepository.findByProjectStatesState(state);
+        for (Project project : projects) {
+            blocks.addAll(blockRepository.findAllByProject(project));
+        }
+        for (Block block : blocks) {
+            blockDtos.add(BlockActiveListRsDto.fromEntity(block));
+        }
+        return blockDtos;
+    }
+
+    @Transactional
+    public Block importBlock(UserInfo userInfo, ImportBlockRqDto importDto) {
+        Project project = validateProjectMember(importDto.getProjectId(), userInfo.getEmail());
+        Block findBlock = blockRepository.findById(importDto.getBlockId()).orElseThrow(() -> new EntityNotFoundException("해당 블록을 찾을 수 없습니다."));
+        Block block = importDto.toImport(findBlock, project);
+        System.out.println(block);
+        return blockRepository.save(block);
+    }
+
+
     public Long findProjectIdByBlockId(Long blockId) {
        Block block = blockRepository.findById(blockId)
                .orElseThrow(() -> new EntityNotFoundException("해당 블럭이 없습니다."));
        return block.getProject().getId();
     }
+
 }

@@ -52,8 +52,8 @@ public class BlockController {
 
     @Operation(summary = "블록 상세조회 (완료)")
     @GetMapping("/block/{id}/detail")
-    public ResponseEntity<Object> getBlock(@PathVariable Long id) {
-        BlockDetailRsDto block = blockService.getBlockDetail(id);
+    public ResponseEntity<Object> getBlock(@PathVariable Long id, @AuthenticationPrincipal UserInfo userInfo) {
+        BlockDetailRsDto block = blockService.getBlockDetail(id, userInfo);
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", block), HttpStatus.OK);
     }
 
@@ -135,4 +135,18 @@ public class BlockController {
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", deletedBlock.getIsDeleted());
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
+
+    @GetMapping("/city/{stateId}")
+    public ResponseEntity<CommonResDto> getBlocksByCity(@PathVariable Long stateId) {
+        List<BlockActiveListRsDto> blocks = blockService.getBlocksByState(stateId);
+        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", blocks), HttpStatus.OK);
+    }
+
+    @PostMapping("/block/import")
+    public ResponseEntity<CommonResDto> importIntoProject(@AuthenticationPrincipal UserInfo userInfo, @RequestBody ImportBlockRqDto importDto) {
+        Block block = blockService.importBlock(userInfo, importDto);
+        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", block.getId()), HttpStatus.OK);
+    }
+
+
 }

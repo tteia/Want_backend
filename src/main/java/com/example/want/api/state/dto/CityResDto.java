@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 public class CityResDto {
     private Long id;
     private String city;
+    private String country;
+    private Long projectCount;
 
 
     public static CityResDto fromEntity(State state) {
@@ -21,4 +23,15 @@ public class CityResDto {
             .city(state.getCity())
             .build();
     }
+
+    public static CityResDto withProjectCount(State state, Long projectCount) {
+        return CityResDto.builder()
+                .id(state.getId())
+                .city(state.getCity())
+                .country(state.getCountry())
+                .projectCount(projectCount)
+                .build();
+    }
+
+
 }

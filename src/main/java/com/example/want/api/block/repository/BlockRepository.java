@@ -35,4 +35,6 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
     List<Block> findAllByProjectAndStartTimeBetweenOrderByEndTimeAsc(Project project, LocalDateTime startDate, LocalDateTime endDate);
 
     List<Block> findAllByProjectAndIsActivatedAndCategory(Project project, String n, Category category);
+
+    List<Block> findAllByProject(Project project);
 }

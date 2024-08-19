@@ -1,6 +1,7 @@
 package com.example.want.api.project.repository;
 
 import com.example.want.api.project.domain.Project;
+import com.example.want.api.state.domain.State;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Optional<Project> findByTitle(String title);
 
     List<Project> findByIsDeleted(String n);
+
+    List<Project> findByProjectStatesState(State state);
 }

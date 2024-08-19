@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+
 
 @Entity
 @Getter
@@ -38,6 +37,9 @@ public class Block extends BaseEntity {
     private String isActivated;
     private Long heartCount;
     private String isDeleted;
+    @Builder.Default
+    private Boolean isHearted = false;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
@@ -58,6 +60,7 @@ public class Block extends BaseEntity {
                 .endTime(this.endTime != null ? this.endTime.toString() : null)
                 .isActivated(this.isActivated)
                 .heartCount(this.heartCount)
+                .isHearted(this.isHearted)
                 .build();
     }
 
