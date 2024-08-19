@@ -37,7 +37,7 @@ public class StateService {
     }
 
     public List<CityResDto> getCitiesWithProjectCounts() {
-        List<State> states = stateRepository.findAll();
+        List<State> states = stateRepository.findAllByCityIsNotNull();
         List<CityResDto> cityResDtos = new ArrayList<>();
         for (State state : states) {
             Long projectCount = projectStateRepository.countByStateId(state.getId());
