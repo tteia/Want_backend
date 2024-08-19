@@ -97,9 +97,12 @@ public class BlockService {
         return blockList.map(b -> BlockActiveListRsDto.fromEntity(b));
     }
 
-    public BlockDetailRsDto getBlockDetail(Long id) {
+    public BlockDetailRsDto getBlockDetail(Long id, UserInfo userInfo) {
         Block block = blockRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
-        return block.toDetailDto();
+        Member member = getMemberByEmail(userInfo.getEmail());
+        BlockDetailRsDto detailDto = block.toDetailDto();
+        detailDto.setIsHearted(heartRepository.existsByMemberAndBlock(member, block));
+        return detailDto;
     }
     @Transactional
     public Block addLikeToPost(Long blockId, String memberEmail) {
