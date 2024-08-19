@@ -57,7 +57,7 @@ public class PhotoController {
     // 2 ) newFiles 업로드 및 저장
     @PutMapping("/update")
     public ResponseEntity<?> updatePhotos(@RequestParam Long blockId,
-                                          @RequestParam("oldFiles") List<String> oldFileUrls,
+                                          @RequestParam("delFiles") List<String> delFiles,
                                           @RequestParam("newFiles") List<MultipartFile> newFiles) {
 
         // 입력된 파일의 개수가 10개 이하인지 판별
@@ -65,12 +65,19 @@ public class PhotoController {
             return new ResponseEntity<>(new CommonResDto(HttpStatus.BAD_REQUEST, "There are too many files to upload", null), HttpStatus.BAD_REQUEST);
         }
         try {
-            PhotoListRsDto photoListRsDto = photoService.updateFiles(blockId, oldFileUrls, newFiles);
+            PhotoListRsDto photoListRsDto = photoService.updateFiles(blockId, delFiles, newFiles);
             return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Successfully uploaded " + newFiles.size() + " files.", photoListRsDto), HttpStatus.OK);
 
         } catch (IOException e) {
             return new ResponseEntity<>(new CommonResDto(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload files.", null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PutMapping("/delete")
+    public ResponseEntity<?> deletePhoto(@RequestParam Long blockId,
+                                         @RequestParam("delFiles") List<String> delFiles){
+        photoService.deleteFiles(blockId, delFiles);
+        return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Successfully deleted " + delFiles.size() + " files.", null), HttpStatus.OK);
     }
 
 
