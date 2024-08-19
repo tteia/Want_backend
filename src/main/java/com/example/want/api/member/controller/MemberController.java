@@ -41,6 +41,7 @@ public class MemberController {
     }
 
     //    초대 요청 처리 (수락, 거절)
+    @Transactional
     @PostMapping("/invitations/response")
     public ResponseEntity<?> responseInvitation(@RequestBody AcceptInvitationDto dto, @AuthenticationPrincipal UserInfo userInfo, @PageableDefault(size = 10) Pageable pageable) {
         String email = userInfo.getEmail();

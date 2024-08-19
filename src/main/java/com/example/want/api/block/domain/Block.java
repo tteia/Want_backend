@@ -37,9 +37,9 @@ public class Block extends BaseEntity {
     private String isActivated;
     private Long heartCount;
     private String isDeleted;
+  
     @Builder.Default
-    private Boolean isHearted = false;
-
+    private boolean isHearted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull

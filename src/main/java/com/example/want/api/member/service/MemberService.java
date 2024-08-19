@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +37,7 @@ public class MemberService {
 
     // TODO: 7/29/24 is done 이런거 확인
 //    초대 요청 목록 조회
+    @Transactional
     public Page<InvitationResDto> getMyInvitations(String email, Pageable pageable) {
 //        사용자의 email을 이용하여 projectMember에서 List를 가져옴
         Page<ProjectMember> projectMembers = projectMemberRepository.findByMemberEmailAndInvitationAccepted(email, pageable,"N");
@@ -44,33 +46,39 @@ public class MemberService {
 //        Page 객체는 페이징 정보를 포함하고 있으므로, 실제 순수 데이터를 리스트로 가져오려면
 //        getContent() 메서드를 사용해야함
         for (ProjectMember projectMember : projectMembers.getContent()) {
+            if (Objects.equals(projectMember.getIsExist(), "Y")) {
+                Project project = projectMember.getProject();
+                Long projectId = project.getId();
 
-            String inviterName = projectMember.getInviterName();
+                Project memberProject = projectRepository.findById(projectId).orElseThrow(EntityNotFoundException::new);
 
-            Project project = projectRepository.findById(projectMember.getProject().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Project Not found"));
+                String inviterName = projectMember.getInviterName();
 
-            InvitationResDto invitationResDto = InvitationResDto.builder()
-                    .projectId(project.getId())
-                    .projectTitle(project.getTitle())
-                    .invitationAccepted(projectMember.getInvitationAccepted())
-                    .inviterName(inviterName)
-                    .createdTime(projectMember.getCreatedTime())
-                    .startTravel(project.getStartTravel().toString())
-                    .endTravel(project.getEndTravel().toString())
-                    // todo 여행 장소 추가
-                    .projectStates(project.getProjectStates().stream()
-                            .map(projectState -> ProjectDetailRsDto.ProjectStateList.builder()
-                                    .stateId(projectState.getState().getId())
-                                    .country(projectState.getState().getCountry())
-                                    .city(projectState.getState().getCity())
-                                    .build())
-                            .collect(Collectors.toList()))
-                    .build();
-            invitationResDtos.add(invitationResDto);
+//            Project project = projectRepository.findById(projectMember.getProject().getId())
+//                    .orElseThrow(() -> new EntityNotFoundException("Project Not found"));
+
+                InvitationResDto invitationResDto = InvitationResDto.builder()
+                        .projectId(memberProject.getId())
+                        .projectTitle(memberProject.getTitle())
+                        .invitationAccepted(projectMember.getInvitationAccepted())
+                        .inviterName(inviterName)
+                        .createdTime(projectMember.getCreatedTime())
+                        .startTravel(memberProject.getStartTravel().toString())
+                        .endTravel(memberProject.getEndTravel().toString())
+                        // todo 여행 장소 추가
+                        .projectStates(memberProject.getProjectStates().stream()
+                                .map(projectState -> ProjectDetailRsDto.ProjectStateList.builder()
+                                        .stateId(projectState.getState().getId())
+                                        .country(projectState.getState().getCountry())
+                                        .city(projectState.getState().getCity())
+                                        .build())
+                                .collect(Collectors.toList()))
+                        .build();
+                invitationResDtos.add(invitationResDto);
+            }
         }
 //        PageImpl(List<T> content, Pageable pageable, long total)
-        return new PageImpl<>(invitationResDtos, pageable, projectMembers.getTotalElements());
+         return new PageImpl<>(invitationResDtos, pageable, projectMembers.getTotalElements());
     }
 
 //    초대 요청 수락
@@ -81,6 +89,7 @@ public class MemberService {
         ProjectMember projectMember = projectMemberRepository.findByMemberAndProjectId(member, dto.getProjectId())
                 .orElseThrow(() -> new IllegalArgumentException("ProjectMember Not found"));
 
+        System.out.println("projectMember: " + projectMember);
 ////        초대 코드 검증
 //        if (!projectMember.getInvitationCode().equals(dto.getInvitationCode())) {
 //            throw new IllegalArgumentException("Uncorrected invitation code");
