@@ -61,6 +61,7 @@ public class Block extends BaseEntity {
                 .isActivated(this.isActivated)
                 .heartCount(this.heartCount)
                 .isHearted(this.isHearted)
+                .projectId(this.project.getId())
                 .build();
     }
 
