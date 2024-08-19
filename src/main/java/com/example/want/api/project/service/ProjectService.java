@@ -138,7 +138,6 @@ public class ProjectService {
             throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
         }
 
-        System.out.println("tqqqqqqqqqqqqqqqqqqqqqq");
 //        멤버가 이미 팀원목록에 속해 있는지 확인하는 검증코드
         boolean existsMember = projectMemberRepository.existsByProjectAndMember(project, otherMember);
         if(existsMember) {
