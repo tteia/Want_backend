@@ -79,9 +79,9 @@ public class BlockService {
         List<Block> blocks;
         // Category가 null인 경우와 아닌 경우에 따라 쿼리를 다르게 수행
         if (category == null) {
-            blocks = blockRepository.findAllByProjectAndIsActivated(project, "N"); // Boolean 타입으로 변경
+            blocks = blockRepository.findAllByProjectAndIsActivatedAndIsDeleted(project, "N", "N"); // Boolean 타입으로 변경
         } else {
-            blocks = blockRepository.findAllByProjectAndIsActivatedAndCategory(project, "N", category); // Boolean 타입으로 변경
+            blocks = blockRepository.findAllByProjectAndIsActivatedAndCategoryAndIsDeleted(project, "N", category, "N"); // Boolean 타입으로 변경
         }
         // Block 리스트에서 Hearted 상태를 체크하여 DTO로 변환
         return blocks.stream()
@@ -236,7 +236,7 @@ public class BlockService {
         Project project = validateProjectMember(projectId, memberEmail);
         LocalDateTime startDate = date.atStartOfDay();
         LocalDateTime endDate = date.atStartOfDay().plusDays(1);
-        List<Block> blocks = blockRepository.findAllByProjectAndStartTimeBetweenOrderByEndTimeAsc(project, startDate, endDate);
+        List<Block> blocks = blockRepository.findByProjectAndIsActivatedAndStartTimeBetweenOrderByStartTimeAsc(project,"Y", startDate, endDate);
         List<BlockActiveListRsDto> blockActiveListRsDtos = blocks.stream()
                 .map(BlockActiveListRsDto::fromEntity)
                 .collect(Collectors.toList());
@@ -333,13 +333,7 @@ public class BlockService {
             block.updateCategory(updateBlockRqDto.getCategory());
 
         }
-        if (updateBlockRqDto.getIsActivated() != null) {
-            if(updateBlockRqDto.getIsActivated().equals("Y")){
-                block.changeIsActivated("N");
-            } else {
-                block.changeIsActivated("Y");
-            }
-        }
+
     return block.toDetailDto();
     }
 
