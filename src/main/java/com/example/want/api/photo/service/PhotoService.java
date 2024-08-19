@@ -154,18 +154,6 @@ public class PhotoService {
                             List<String> delFiles,
                             List<MultipartFile> newFiles) throws IOException {
 
-//        // url에서 file 이름 추출
-//        List<String> oldFileNames = new ArrayList<>();
-//        for (String oldFileUrl : oldFiles){
-//            oldFileNames.add(extractFilename(oldFileUrl));
-//        }
-//
-//        List<String> updatedFileUrls = new ArrayList<>();
-//
-//        // 기존 파일 삭제
-//        for (String oldFileName : oldFileNames) {
-//            deleteFile(blockId, oldFileName);
-//        }
         // delFiles 삭제
         deleteFiles(blockId, delFiles);
 
