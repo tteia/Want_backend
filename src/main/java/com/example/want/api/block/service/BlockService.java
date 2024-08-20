@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class BlockService {
     private final BlockRepository blockRepository;
     private final MemberRepository memberRepository;

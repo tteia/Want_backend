@@ -23,6 +23,7 @@ import javax.persistence.EntityNotFoundException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CmtService {
 
     private final CmtRepository cmtRepository;

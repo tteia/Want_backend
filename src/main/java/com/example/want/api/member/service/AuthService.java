@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService {
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
