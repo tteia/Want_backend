@@ -16,7 +16,7 @@ spring:
     generate-ddl: true
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
 springdoc:
   packages-to-scan: com.example.want
