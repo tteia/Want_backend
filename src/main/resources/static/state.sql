@@ -17,3 +17,17 @@ INSERT INTO state (id, country, city) VALUES (15, '일본', '후쿠오카');
 INSERT INTO state (id, country, city) VALUES (16, '일본', '교토');
 INSERT INTO state (id, country, city) VALUES (17, '일본', '고베');
 INSERT INTO state (id, country, city) VALUES (18, '일본', '요코하마');
+
+INSERT INTO state (id, country) VALUES (1,  'KOREA');
+INSERT INTO state (id,  country) VALUES (2, 'JAPAN');
+INSERT INTO state (id, country) VALUES (3,  'USA');
+INSERT INTO state (id, country) VALUES (4,  'FRANCE');
+
+INSERT INTO state (id, city, country) VALUES (5, 'Seoul', 'KOREA');
+INSERT INTO state (id, city, country) VALUES (6, 'Osaka', 'JAPAN');
+INSERT INTO state (id, city, country) VALUES (7, 'NewYork', 'USA');
+INSERT INTO state (id, city, country) VALUES (8, 'Fukuoka', 'JAPAN');
+INSERT INTO state (id, city, country) VALUES (9, 'Jeju', 'KOREA');
+INSERT INTO state (id, city, country) VALUES (10, 'Gyeongju', 'KOREA');
+INSERT INTO state (id, city, country) VALUES (11, 'Busan', 'KOREA');
+INSERT INTO state (id, city, country) VALUES (12, 'Paris', 'FRANCE');
