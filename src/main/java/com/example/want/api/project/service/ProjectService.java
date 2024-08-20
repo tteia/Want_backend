@@ -142,7 +142,7 @@ public class ProjectService {
 
 
 //        멤버가 이미 팀원목록에 속해 있는지 확인하는 검증코드
-        boolean existsMember = projectMemberRepository.existsByProjectAndMember(project, otherMember);
+        boolean existsMember = projectMemberRepository.existsByProjectAndMemberAndIsExistAndInvitationAccepted(project, otherMember, "Y", "Y");
         if(existsMember) {
             throw new IllegalArgumentException("Member already exists.");
         }
