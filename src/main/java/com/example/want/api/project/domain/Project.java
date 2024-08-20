@@ -26,7 +26,6 @@ public class Project extends BaseEntity {
     private LocalDate startTravel;
     private LocalDate endTravel;
 
-    private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
 
 //    일정 삭제 여부
@@ -51,7 +50,6 @@ public class Project extends BaseEntity {
 //    엔티티가 생성 될 때 마다 실행되어야 하는 로직
     @PrePersist
     public void initializeFields() {
-        this.createdAt = LocalDateTime.now();
         if(this.isDeleted == null) {
             this.isDeleted = "N";
         }
