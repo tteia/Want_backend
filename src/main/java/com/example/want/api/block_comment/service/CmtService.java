@@ -23,7 +23,6 @@ import javax.persistence.EntityNotFoundException;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class CmtService {
 
     private final CmtRepository cmtRepository;
@@ -33,6 +32,7 @@ public class CmtService {
     private final ProjectRepository projectRepository;
 
     // Create
+    @Transactional
     public Cmt create(CreateCmtRqDto dto, String email){
         Member member = findMemberByEmail(email);
         Block block = findBlockById(dto.getBlockId());
@@ -51,6 +51,7 @@ public class CmtService {
     }
 
     // Update
+    @Transactional
     public void update(CmtUpdateRqDto dto, String email){
         Member member = findMemberByEmail(email);
         Cmt cmt = cmtRepository.findById(dto.getCommentId()).orElseThrow(()->new EntityNotFoundException("존재하지 않는 댓글 아이디입니다."));
@@ -60,6 +61,7 @@ public class CmtService {
     }
 
     // Delete
+    @Transactional
     public void delete(Long commentId, String email){
         Member member = findMemberByEmail(email);
         Cmt cmt = cmtRepository.findById(commentId).orElseThrow(()->new EntityNotFoundException("존재하지 않는 댓글 아이디입니다."));

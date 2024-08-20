@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -38,6 +37,7 @@ public class MemberService {
 
     // TODO: 7/29/24 is done 이런거 확인
 //    초대 요청 목록 조회
+    @Transactional
     public Page<InvitationResDto> getMyInvitations(String email, Pageable pageable) {
 //        사용자의 email을 이용하여 projectMember에서 List를 가져옴
         Page<ProjectMember> projectMembers = projectMemberRepository.findByMemberEmailAndInvitationAccepted(email, pageable,"N");
@@ -82,6 +82,7 @@ public class MemberService {
     }
 
 //    초대 요청 수락
+    @Transactional
     public void invitationAcceptOrReject(String email, AcceptInvitationDto dto) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Member Not found"));

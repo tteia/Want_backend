@@ -40,7 +40,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional(readOnly = true)
 public class BlockService {
     private final BlockRepository blockRepository;
     private final MemberRepository memberRepository;
@@ -55,6 +54,7 @@ public class BlockService {
     private final RedisTemplate<String, Object> heartRedisTemplate;
 
 
+    @Transactional
     public Block createBlock(CreateBlockRqDto request, UserInfo userInfo) {
         Project project = validateProjectMember(request.getProjectId(), userInfo.getEmail());
         Block block = request.toEntity(request.getCategory(), project);
@@ -108,7 +108,7 @@ public class BlockService {
         detailDto.setIsHearted(heartRepository.existsByMemberAndBlock(member, block));
         return detailDto;
     }
-
+    @Transactional
     public Block addLikeToPost(Long blockId, String memberEmail) {
         Block block = getBlockById(blockId);
         Member member = getMemberByEmail(memberEmail);
@@ -197,6 +197,7 @@ public class BlockService {
     }
 
     // Block 을 끌어다 놓음 -> Block 에 일정 날짜 등록
+    @Transactional
     public BlockDetailRsDto addDateBlock(AddDateBlockRqDto addDateRqDto, String memberEmail) {
         Block block = getBlockById(addDateRqDto.getBlockId());
         Member member = getMemberByEmail(memberEmail);
@@ -244,6 +245,7 @@ public class BlockService {
 
     // 좋아요 수에 따라 Block 을 정렬하여 반환하는 메서드
     // 프로젝트별로 조회할 수 있도록 추가.
+    @Transactional
     public Page<BlockActiveListRsDto> activeBlocksByPopular(Long projectId, Pageable pageable) {
         Page<Block> blocks = blockRepository.findByProjectIdAndIsActivatedOrderByHeartCountDesc(projectId, "Y", pageable);
         return blocks.map(BlockActiveListRsDto::fromEntity);
@@ -305,7 +307,7 @@ public class BlockService {
 //        return block.toDetailDto();
 //    }
 
-
+    @Transactional
     public BlockDetailRsDto updateBlock(Long id, UpdateBlockRqDto updateBlockRqDto, UserInfo userInfo) {
 
         Block block = blockRepository.findById(id)
@@ -335,6 +337,7 @@ public class BlockService {
     return block.toDetailDto();
     }
 
+    @Transactional
     public Block blockDelete(UserInfo userInfo, Long id) {
         Block block = blockRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
@@ -346,6 +349,7 @@ public class BlockService {
         return block;
     }
 
+    @Transactional
     public BlockDetailRsDto notActiveBlock(Long blockId, String email) {
         Block block = blockRepository.findById(blockId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 없습니다."));
@@ -360,6 +364,7 @@ public class BlockService {
         return block.toDetailDto();
     }
 
+    @Transactional
     public List<BlockActiveListRsDto> getBlocksByState(Long stateId) {
         List<Block> blocks = new ArrayList<>();
         List<BlockActiveListRsDto> blockDtos = new ArrayList<>();
@@ -375,6 +380,7 @@ public class BlockService {
         return blockDtos;
     }
 
+    @Transactional
     public Block importBlock(UserInfo userInfo, ImportBlockRqDto importDto) {
         Project project = validateProjectMember(importDto.getProjectId(), userInfo.getEmail());
         Block findBlock = blockRepository.findById(importDto.getBlockId()).orElseThrow(() -> new EntityNotFoundException("해당 블록을 찾을 수 없습니다."));
@@ -382,6 +388,7 @@ public class BlockService {
         System.out.println(block);
         return blockRepository.save(block);
     }
+
 
     public Long findProjectIdByBlockId(Long blockId) {
        Block block = blockRepository.findById(blockId)

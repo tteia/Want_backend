@@ -7,14 +7,12 @@ import com.example.want.api.state.repository.ProjectStateRepository;
 import com.example.want.api.state.repository.StateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class StateService {
 
     private final StateRepository stateRepository;

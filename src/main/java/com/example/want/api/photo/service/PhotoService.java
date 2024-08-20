@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class PhotoService {
 
     private final AmazonS3 amazonS3;
