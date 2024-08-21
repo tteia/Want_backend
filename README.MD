@@ -35,17 +35,17 @@
 <img src="https://img.shields.io/badge/css-1572B6?style=for-the-badge&logo=css3&logoColor=white"> 
 <img src="https://img.shields.io/badge/googleMaps-4285F4?style=for-the-badge&logo=googlemaps&logoColor=white">
 <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white">
+<img src="https://img.shields.io/badge/Amazon%20S3-569A31?style=for-the-badge&logo=Amazon%20S3&logoColor=white">
 
 ## WBS
 
 <img width="942" alt="WANT_WBS" src="https://github.com/user-attachments/assets/a42f9f90-8f75-4c70-80ec-6612182c1248">
-<br>
+
 [📋 WANT WBS 확인하기](https://docs.google.com/spreadsheets/d/1AKTX7JtqpI28EJqFKCD5n1wEYQKJhZEEVgXBd4mYtGw/edit?gid=0#gid=0)
 <br>
 
 ## 요구사항 명세서
 
-<br>
 [📋 WANT 요구사항 명세서 확인하기](https://docs.google.com/spreadsheets/d/1whi5LGlmyUgDl8jmJtMxTqNgG_-gQuIfjY2ZRrQhv8U/edit?gid=0#gid=0)
 <br>
 
@@ -58,6 +58,23 @@
    
 ## 협업 방식
 
+<details>
+  <summary>Github flow
+  </summary>
+
+![githubflow](https://github.com/user-attachments/assets/e7afc000-bdcd-41d8-b5b9-10b3eac11eff)
+![githubflow1](https://github.com/user-attachments/assets/87e6c821-b986-4afe-8dfb-b6d9038b6688)
+
+  </details>
+  <br>
+
+  <details>
+    <summary>Notion 활용
+    </summary>
+  
+  ![NotionBE](https://github.com/user-attachments/assets/e37fc115-8196-4801-9748-23376208c6e7)
+
+<
 <br>
 
 ## Test Result
