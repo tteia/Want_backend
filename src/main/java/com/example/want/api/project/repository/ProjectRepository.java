@@ -24,4 +24,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> findByIsDeleted(String n);
 
     List<Project> findByProjectStatesState(State state);
+
+    @Query("select p from Project p join fetch p.projectMembers pm join fetch pm.member where p.id = :projectId")
+    Optional<Project> findProjectWithDetails(Long projectId);
 }

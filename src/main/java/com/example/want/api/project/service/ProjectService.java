@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -190,26 +191,50 @@ public class ProjectService {
     }
 
     public ProjectDetailRsDto getProjectDetail(Long projectId, String email) {
-
+        // 입력값 검증
         if (projectId == null) {
-            System.out.println("projectId가 null입니다.");
+            throw new IllegalArgumentException("projectId가 null입니다.");
         }
         if (email == null) {
-            System.out.println("email이 null입니다.");
+            throw new IllegalArgumentException("email이 null입니다.");
         }
 
+        // 이메일로 멤버 찾기
         Member member = findMemberByEmail(email);
         if (member == null) {
-            System.out.println("member가 null입니다.");
+            throw new EntityNotFoundException("Member not found");
         }
 
-        Project project = findProjectById(projectId);
-        if (project == null) {
-            System.out.println("project가 null입니다.");
+        // 프로젝트와 관련된 멤버 및 상태 로드
+        Project project = projectRepository.findProjectWithDetails(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+
+        // 멤버 접근 권한 확인
+        boolean isMember = project.getProjectMembers().stream()
+                .anyMatch(projectMember -> projectMember.getMember().equals(member));
+        if (!isMember) {
+            throw new IllegalArgumentException("프로젝트에 접근할 수 있는 유저가 아닙니다.");
         }
 
-        if (project.getProjectMembers().stream().noneMatch(projectMember -> projectMember.getMember().equals(member))) {
-            throw new IllegalArgumentException("프로젝트에 접근할수있는 유저가 아닙니다.");
+        // DTO 생성
+        List<ProjectDetailRsDto.ProjectMemberList> projectMembers = new ArrayList<>();
+        List<ProjectDetailRsDto.ProjectStateList> projectStates = new ArrayList<>();
+
+        for (ProjectMember projectMember : project.getProjectMembers()) {
+            projectMembers.add(ProjectDetailRsDto.ProjectMemberList.builder()
+                    .userId(projectMember.getMember().getId())
+                    .userName(projectMember.getMember().getName())
+                    .userProfile(projectMember.getMember().getProfileUrl())
+                    .isExist(projectMember.getIsExist())
+                    .build());
+        }
+
+        for (ProjectState projectState : project.getProjectStates()) {
+            projectStates.add(ProjectDetailRsDto.ProjectStateList.builder()
+                    .stateId(projectState.getState().getId())
+                    .country(projectState.getState().getCountry())
+                    .city(projectState.getState().getCity())
+                    .build());
         }
 
         return ProjectDetailRsDto.builder()
@@ -217,23 +242,11 @@ public class ProjectService {
                 .projectTitle(project.getTitle())
                 .startTravel(project.getStartTravel())
                 .endTravel(project.getEndTravel())
-                .projectMembers(project.getProjectMembers().stream()
-                        .map(projectMember -> ProjectDetailRsDto.ProjectMemberList.builder()
-                                .userId(projectMember.getMember().getId())
-                                .userName(projectMember.getMember().getName())
-                                .userProfile(projectMember.getMember().getProfileUrl())
-                                .isExist(projectMember.getIsExist())
-                                .build())
-                        .collect(Collectors.toList()))
-                .projectStates(project.getProjectStates().stream()
-                        .map(projectState -> ProjectDetailRsDto.ProjectStateList.builder()
-                                .stateId(projectState.getState().getId())
-                                .country(projectState.getState().getCountry())
-                                .city(projectState.getState().getCity())
-                                .build())
-                        .collect(Collectors.toList()))
+                .projectMembers(projectMembers)
+                .projectStates(projectStates)
                 .build();
     }
+
 
 
 
