@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-docker-
 
       - name: Build with Jib
-        run: ./gradlew clean jib --image=jsangmin00/want_project:latest
+        run: ./gradlew clean jib --image=jsangmin00/want_project:latest --no-daemon
 
       - name: Docker Hub login
         uses: docker/login-action@v2

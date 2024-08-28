@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.11'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'com.google.cloud.tools.jib' version '3.3.2' // Jib 플러그인 추가
+    id 'com.google.cloud.tools.jib' version '3.3.0' // Jib 플러그인 버전 확인
 
 }
 group = 'com.example'
