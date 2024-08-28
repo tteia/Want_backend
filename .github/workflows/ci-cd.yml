@@ -46,8 +46,6 @@ jobs:
         run: ./gradlew jib --image=jsangmin00/want_project:latest
 
 
-      - name: Push to Docker Hub
-        run: docker push jsangmin00/want_project:latest
 
   deploy:
     runs-on: ubuntu-latest
