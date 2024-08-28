@@ -76,7 +76,7 @@ jib {
     container {
         ports = ['8088']
         jvmFlags = ['-Xms512m', '-Xmx512m'] // JVM 옵션
-        environment = ['SPRING_PROFILES_ACTIVE': 'local'] // 환경 변수
+        environment = ['SPRING_PROFILES_ACTIVE': 'prod'] // 환경 변수
         mainClass = 'com.example.want.WantApplication' // 메인 클래스
     }
 }
