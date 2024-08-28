@@ -1,8 +1,8 @@
 spring:
   profiles:
-    active: local # default
+    active: prod # default
     group:
       local:
         - secret
-      dev:   # dev, jwt, oauth profile을 그룹지어 함께 어플리케이션 구동
+      prod:
         - secret
