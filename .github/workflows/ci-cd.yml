@@ -67,5 +67,10 @@ jobs:
           port: 22
           script: |
             cd ~/want
-            sudo docker-compose pull
-            sudo docker-compose up -d
+            if ! type docker > /dev/null; then
+              sudo snap install docker || echo "docker install failed"
+            else
+              echo "docker is already installed"
+            fi
+            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            sudo docker-compose pull && sudo docker-compose up -d
