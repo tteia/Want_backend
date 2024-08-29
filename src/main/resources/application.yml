@@ -1,8 +1,14 @@
 spring:
   profiles:
-    active: prod # default
+    active: local # default
     group:
       local:
         - secret
       prod:
         - secret
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
