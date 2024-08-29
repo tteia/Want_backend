@@ -68,4 +68,5 @@ jobs:
               echo "docker is already installed"
             fi
             sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            chmod +x deploy.sh
             ./deploy.sh jsangmin00/want_project:latest
