@@ -1,6 +1,7 @@
 package com.example.want.api.block.dto;
 
 import com.example.want.api.block.domain.Category;
+import com.example.want.api.location.domain.Location;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class BlockDetailRsDto {
     private Category category;
     private Double latitude;
     private Double longitude;
+    private Location location;
     private String startTime;
     private String endTime;
     private String isActivated;

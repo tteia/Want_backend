@@ -183,4 +183,40 @@ public class RedisConfig {
     public ChannelTopic topic() {
         return new ChannelTopic("project:notifications");
     }
+
+    @Bean
+    @Qualifier("popular")
+    public LettuceConnectionFactory popularConnectionFactory() {
+        final SocketOptions socketOptions = SocketOptions.builder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+
+        final ClientOptions clientOptions = ClientOptions.builder()
+                .socketOptions(socketOptions)
+                .build();
+
+        LettuceClientConfiguration lettuceClientConfiguration = LettuceClientConfiguration.builder()
+                .clientOptions(clientOptions)
+                .commandTimeout(Duration.ofMinutes(1))
+                .shutdownTimeout(Duration.ZERO)
+                .build();
+
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(host, port);
+        redisStandaloneConfiguration.setDatabase(3); // 3번 데이터베이스 사용
+
+        return new LettuceConnectionFactory(redisStandaloneConfiguration, lettuceClientConfiguration);
+    }
+
+    @Bean
+    @Qualifier("popular")
+    public RedisTemplate<String, Object> popularRedisTemplate() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(popularConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
 }

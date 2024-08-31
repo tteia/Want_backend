@@ -2,6 +2,7 @@ package com.example.want.api.block.dto;
 
 import com.example.want.api.block.domain.Block;
 import com.example.want.api.block.domain.Category;
+import com.example.want.api.location.domain.Location;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,7 @@ public class BlockActiveListRsDto {
     private String placeName;
     private Double latitude;
     private Double longitude;
+    private Location location;
     private String startTime;
     private String endTime;
     private Long heartCount;
@@ -33,8 +35,8 @@ public class BlockActiveListRsDto {
                 .title(block.getTitle())
                 .content(block.getContent())
                 .placeName(block.getPlaceName())
-                .latitude(block.getLatitude())
-                .longitude(block.getLongitude())
+                .latitude(block.getLocation().getLatitude())
+                .longitude(block.getLocation().getLongitude())
                 .startTime(block.getStartTime() != null ? block.getStartTime().toString() : null)
                 .endTime(block.getEndTime() != null ? block.getEndTime().toString() : null)
                 .heartCount(block.getHeartCount())

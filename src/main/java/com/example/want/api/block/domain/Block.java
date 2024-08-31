@@ -1,6 +1,7 @@
 package com.example.want.api.block.domain;
 
 import com.example.want.api.block.dto.BlockDetailRsDto;
+import com.example.want.api.location.domain.Location;
 import com.example.want.api.project.domain.Project;
 import com.example.want.common.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -29,8 +30,9 @@ public class Block extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    private Double latitude;
-    private Double longitude;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
+    private Location location;
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
@@ -54,8 +56,8 @@ public class Block extends BaseEntity {
                 .content(this.content)
                 .placeName(this.placeName)
                 .category(this.category)
-                .latitude(this.latitude)
-                .longitude(this.longitude)
+                .latitude(this.location.getLatitude())
+                .longitude(this.location.getLongitude())
                 .startTime(this.startTime != null ? this.startTime.toString() : null)
                 .endTime(this.endTime != null ? this.endTime.toString() : null)
                 .isActivated(this.isActivated)
@@ -100,11 +102,11 @@ public class Block extends BaseEntity {
     }
 
     public void updatePoint(Double latitude, Double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.location = Location.builder()
+                .latitude(latitude)
+                .longitude(longitude)
+                .build();
     }
-
-
 
     @PrePersist
     public void initializeFields() {

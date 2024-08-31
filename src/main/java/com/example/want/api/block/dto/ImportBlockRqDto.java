@@ -2,6 +2,7 @@ package com.example.want.api.block.dto;
 
 import com.example.want.api.block.domain.Block;
 import com.example.want.api.block.domain.Category;
+import com.example.want.api.location.domain.Location;
 import com.example.want.api.project.domain.Project;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,12 +14,18 @@ public class ImportBlockRqDto {
     private Long blockId;
 
     public Block toImport(Block findBlock, Project project) {
+        Location location = Location.builder()
+                .latitude(findBlock.getLocation().getLatitude())
+                .longitude(findBlock.getLocation().getLongitude())
+                .build();
+
         return Block.builder()
                 .title(findBlock.getTitle())
                 .content(findBlock.getContent())
                 .category(findBlock.getCategory())
                 .project(project)
                 .heartCount(0L)
+                .location(location)
                 .isActivated("N")
                 .build();
     }

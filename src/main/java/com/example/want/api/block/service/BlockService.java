@@ -12,12 +12,13 @@ import com.example.want.api.member.repository.MemberRepository;
 import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
+import com.example.want.api.location.domain.Location;
 import com.example.want.api.state.domain.State;
+import com.example.want.api.location.repository.LocationRepository;
 import com.example.want.api.state.repository.StateRepository;
 import com.example.want.api.sse.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,11 +49,15 @@ public class BlockService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final StateRepository stateRepository;
+    private final LocationRepository locationRepository;
     private final StringRedisTemplate stringRedisTemplate;
     private final NotificationService notificationService;
 
     @Qualifier("heart")
     private final RedisTemplate<String, Object> heartRedisTemplate;
+
+    @Qualifier("popular")
+    private final RedisTemplate<String, Object> popularRedisTemplate;
 
 
     @Transactional
@@ -380,6 +385,51 @@ public class BlockService {
         }
         return blockDtos;
     }
+
+    public void addPopularCount(Block block) {
+        Double latitude = block.getLocation().getLatitude();
+        Double longitude = block.getLocation().getLongitude();
+        String redisKey = latitude + ":" + longitude;
+
+        // 레디스에서 해당 블록의 popularCount +1
+        Long popularCount = popularRedisTemplate.opsForValue().increment(redisKey);
+
+        // DB에서도 업데이트 (레디스와의 싱크를 맞추기 위해)
+        Location location = locationRepository.findByLatitudeAndLongitude(latitude, longitude);
+        location.popularCount(popularCount);
+        locationRepository.save(location);
+    }
+
+    public void removePopularCount(Block block) {
+        Double latitude = block.getLocation().getLatitude();
+        Double longitude = block.getLocation().getLongitude();
+        String redisKey = latitude + ":" + longitude;
+
+        // 레디스에서 해당 블록의 popularCount -1
+        Long popularCount = popularRedisTemplate.opsForValue().decrement(redisKey);
+
+        // DB에서도 업데이트 (레디스와의 싱크를 맞추기 위해)
+        Location location = locationRepository.findByLatitudeAndLongitude(latitude, longitude);
+        location.popularCount(popularCount);
+        locationRepository.save(location);
+    }
+
+    public List<BlockActiveListRsDto> getPopularFromDb() {
+        List<Location> locations = locationRepository.findAllByOrderByPopularCountDesc();
+        List<BlockActiveListRsDto> blockDtos = new ArrayList<>();
+
+        for (Location location : locations) {
+            Block block = blockRepository.findByLocationLatitudeAndLocationLongitude(location.getLatitude(), location.getLongitude());
+            if (block != null) {
+                blockDtos.add(BlockActiveListRsDto.fromEntity(block));
+            }
+        }
+
+        return blockDtos;
+    }
+
+
+
 
     @Transactional
     public Block importBlock(UserInfo userInfo, ImportBlockRqDto importDto) {
