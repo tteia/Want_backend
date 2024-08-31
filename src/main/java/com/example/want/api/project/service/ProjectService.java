@@ -172,21 +172,27 @@ public class ProjectService {
     public Page<MyProjectListRsDto> getMyProjectList(Pageable pageable, String email) {
         Member member = findMemberByEmail(email);
         Page<MyProjectListRsDto> myProjectListRsDto = projectMemberRepository.findActiveProjectByMember(member, pageable)
-                .map(project -> MyProjectListRsDto.builder()
-                        .projectId(project.getId())
-                        .projectTitle(project.getTitle())
-                        .startTravel(project.getStartTravel().toString())
-                        .endTravel(project.getEndTravel().toString())
-                        .createdTime(project.getCreatedTime().toString())
-                        .isDone(project.getIsDone())
-                        .travelUsers(project.getProjectMembers().stream()
-                                .map(projectMember -> MyProjectListRsDto.MyProjectMember.builder()
-                                        .userId(projectMember.getMember().getId())
-                                        .userName(projectMember.getMember().getName())
-                                        .userProfile(projectMember.getMember().getProfileUrl())
-                                        .build())
-                                .collect(Collectors.toList()))
-                        .build());
+                .map(project -> {
+                    // 도시 정보 추출
+                    String city = project.getProjectStates().isEmpty() ? "default" : project.getProjectStates().get(0).getState().getCity();
+
+                    return MyProjectListRsDto.builder()
+                            .projectId(project.getId())
+                            .projectTitle(project.getTitle())
+                            .startTravel(project.getStartTravel().toString())
+                            .endTravel(project.getEndTravel().toString())
+                            .createdTime(project.getCreatedTime().toString())
+                            .isDone(project.getIsDone())
+                            .city(city)  // city 정보 추가
+                            .travelUsers(project.getProjectMembers().stream()
+                                    .map(projectMember -> MyProjectListRsDto.MyProjectMember.builder()
+                                            .userId(projectMember.getMember().getId())
+                                            .userName(projectMember.getMember().getName())
+                                            .userProfile(projectMember.getMember().getProfileUrl())
+                                            .build())
+                                    .collect(Collectors.toList()))
+                            .build();
+                });
         return myProjectListRsDto;
     }
 
