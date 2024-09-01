@@ -21,6 +21,7 @@ public class BlockActiveListRsDto {
     private String startTime;
     private String endTime;
     private Long heartCount;
+    private Long popularCount;
     private Category category;
     private String isActivated;
     private Boolean isHearted;
@@ -33,11 +34,12 @@ public class BlockActiveListRsDto {
                 .title(block.getTitle())
                 .content(block.getContent())
                 .placeName(block.getPlaceName())
-                .latitude(block.getLatitude())
-                .longitude(block.getLongitude())
+                .latitude(block.getLocation().getLatitude())
+                .longitude(block.getLocation().getLongitude())
                 .startTime(block.getStartTime() != null ? block.getStartTime().toString() : null)
                 .endTime(block.getEndTime() != null ? block.getEndTime().toString() : null)
                 .heartCount(block.getHeartCount())
+                .popularCount(block.getLocation().getPopularCount())
                 .isActivated(block.getIsActivated())
                 .build();
     }

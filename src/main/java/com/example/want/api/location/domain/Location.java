@@ -1,11 +1,9 @@
-package com.example.want.api.state.domain;
+package com.example.want.api.location.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.annotation.security.DenyAll;
 import javax.persistence.*;
 
 @Entity
@@ -14,18 +12,18 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 public class Location {
-//    블록에 추가되면 로케이션에 갱신
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String country;
-    private String city;
+    private Double latitude;
+    private Double longitude;
 
+    private Long popularCount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "state_id")
-    private State state;
-
-
+    public void popularCount(Long popularCount) {
+        Location location = Location.builder()
+                .popularCount(popularCount)
+                .build();
+    }
 }
