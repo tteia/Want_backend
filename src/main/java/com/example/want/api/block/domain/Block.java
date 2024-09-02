@@ -108,14 +108,13 @@ public class Block extends BaseEntity {
             this.location = Location.builder()
                     .latitude(latitude)
                     .longitude(longitude)
-                    .popularCount(1L)
+                    .popularCount(0L)
                     .build();
         }
         else{
             this.location = Location.builder()
                     .latitude(latitude)
                     .longitude(longitude)
-                    .popularCount(popularCount ++)
                     .build();
         }
     }

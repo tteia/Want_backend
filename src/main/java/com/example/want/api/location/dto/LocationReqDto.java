@@ -15,14 +15,15 @@ import lombok.NoArgsConstructor;
 public class LocationReqDto {
     private Double latitude;
     private Double longitude;
-    private Long popularCount;
 
-    public static LocationReqDto fromEntity(Location location) {
+    public static LocationReqDto toEntity(Location location) {
         LocationReqDto dto = LocationReqDto.builder()
                 .latitude(location.getLatitude())
                 .longitude(location.getLongitude())
                 .build();
-
         return dto;
     }
+
+
+
 }

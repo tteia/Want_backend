@@ -54,6 +54,8 @@ public class BlockService {
     @Qualifier("heart")
     private final RedisTemplate<String, Object> heartRedisTemplate;
 
+    @Qualifier("popular")
+    private final RedisTemplate<String, Object> popularRedisTemplate;
 
     @Transactional
     public Block createBlock(CreateBlockRqDto request, UserInfo userInfo) {
@@ -325,6 +327,14 @@ public class BlockService {
         }
         if (updateBlockRqDto.getLatitude() != null && updateBlockRqDto.getLongitude() != null) {
             block.updatePoint(updateBlockRqDto.getLatitude(), updateBlockRqDto.getLongitude());
+            Long stateId = stateRepository.findByProjectId(block.getProject().getId());
+            String redisKey = updateBlockRqDto.getLatitude() + ":" + updateBlockRqDto.getLongitude() + ":" + stateId;
+
+            if (popularRedisTemplate.opsForValue().get(redisKey) == null) {
+                popularRedisTemplate.opsForValue().set(redisKey, 0L);
+            }
+            // 레디스에서 해당 위치의 popularCount +1
+            popularRedisTemplate.opsForValue().increment(redisKey);
         }
 
         if (updateBlockRqDto.getStartTime() != null && updateBlockRqDto.getEndTime() != null) {
@@ -393,7 +403,14 @@ public class BlockService {
         Project project = validateProjectMember(importDto.getProjectId(), userInfo.getEmail());
         Block findBlock = blockRepository.findById(importDto.getBlockId()).orElseThrow(() -> new EntityNotFoundException("해당 블록을 찾을 수 없습니다."));
         Block block = importDto.toImport(findBlock, project);
-        System.out.println(block);
+
+        Long stateId = stateRepository.findByProjectId(project.getId());
+        String redisKey = block.getLocation().getLatitude() + ":" + block.getLocation().getLongitude() + ":" + stateId;
+        // 레디스에서 해당 위치의 popularCount +1
+        if (popularRedisTemplate.opsForValue().get(redisKey) == null) {
+            popularRedisTemplate.opsForValue().set(redisKey, 0L);
+        }
+        popularRedisTemplate.opsForValue().increment(redisKey);
         return blockRepository.save(block);
     }
 

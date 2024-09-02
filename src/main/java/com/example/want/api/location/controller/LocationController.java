@@ -1,5 +1,6 @@
 package com.example.want.api.location.controller;
 
+import com.example.want.api.location.domain.Location;
 import com.example.want.api.location.dto.LocationReqDto;
 import com.example.want.api.location.service.LocationService;
 import com.example.want.common.CommonResDto;
@@ -18,16 +19,9 @@ public class LocationController {
     private final LocationService locationService;
 
     @PostMapping("/popular/increment")
-    public ResponseEntity<CommonResDto> incrementPopularCount(@RequestBody LocationReqDto locationDto) {
-        locationService.addPopularCount(locationDto);
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "인기도 카운트 완료", locationDto.getPopularCount());
-        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
-    }
-
-    @PostMapping("/popular/decrement")
-    public ResponseEntity<CommonResDto> decrementPopularCount(@RequestBody LocationReqDto locationReqDto) {
-        locationService.removePopularCount(locationReqDto);
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "인기도 카운트 완료", locationReqDto.getPopularCount());
+    public ResponseEntity<CommonResDto> incrementPopularCount(@RequestBody LocationReqDto locationReqDto) {
+        Location location = locationService.addPopularCount(locationReqDto);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "인기도 카운트 완료", location);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 

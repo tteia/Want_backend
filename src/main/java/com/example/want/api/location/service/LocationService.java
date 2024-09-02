@@ -22,7 +22,7 @@ public class LocationService {
     @Qualifier("popular")
     private final RedisTemplate<String, Object> popularRedisTemplate;
 
-    public void addPopularCount(LocationReqDto locationReqDto) {
+    public Location addPopularCount(LocationReqDto locationReqDto) {
         String redisKey = locationReqDto.getLatitude() + ":" + locationReqDto.getLongitude();
 
         // 레디스에서 해당 위치의 popularCount +1
@@ -32,6 +32,7 @@ public class LocationService {
         Location location = locationRepository.findByLatitudeAndLongitude(locationReqDto.getLatitude(), locationReqDto.getLongitude());
         location.popularCount(popularCount);
         locationRepository.save(location);
+        return location;
     }
 
     public void removePopularCount(LocationReqDto locationReqDto) {
@@ -50,8 +51,10 @@ public class LocationService {
         List<Location> locations = locationRepository.findAllByOrderByPopularCountDesc();
         List<LocationReqDto> locationReqDtos = new ArrayList<>();
         for (Location location : locations) {
-            locationReqDtos.add(LocationReqDto.fromEntity(location));
+            locationReqDtos.add(LocationReqDto.toEntity(location));
         }
         return locationReqDtos;
     }
+
+
 }
