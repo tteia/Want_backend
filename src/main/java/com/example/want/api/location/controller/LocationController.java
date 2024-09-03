@@ -1,7 +1,6 @@
 package com.example.want.api.location.controller;
 
-import com.example.want.api.location.domain.Location;
-import com.example.want.api.location.dto.LocationReqDto;
+import com.example.want.api.location.dto.LocationResDto;
 import com.example.want.api.location.service.LocationService;
 import com.example.want.common.CommonResDto;
 import lombok.RequiredArgsConstructor;
@@ -18,16 +17,10 @@ public class LocationController {
 
     private final LocationService locationService;
 
-    @PostMapping("/popular/increment")
-    public ResponseEntity<CommonResDto> incrementPopularCount(@RequestBody LocationReqDto locationReqDto) {
-        Location location = locationService.addPopularCount(locationReqDto);
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "인기도 카운트 완료", location);
-        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
-    }
-
-    @GetMapping("/popular")
-    public ResponseEntity<CommonResDto> getPopularLocations() {
-        List<LocationReqDto> popularLocations = locationService.getPopularFromDb();
+    // 추천 블럭 리스트에 사용할 코드
+    @GetMapping("/city/{stateId}")
+    public ResponseEntity<CommonResDto> getPopularLocations(@PathVariable Long stateId) {
+        List<LocationResDto> popularLocations = locationService.getPopularLocations(stateId);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "조회 완료", popularLocations);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }

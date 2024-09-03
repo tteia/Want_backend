@@ -34,6 +34,9 @@ public class Block extends BaseEntity {
     @JoinColumn(name = "location_id")
     private Location location;
 
+    private Double latitude;
+    private Double longitude;
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String isActivated;
@@ -103,20 +106,10 @@ public class Block extends BaseEntity {
         this.isActivated = isActivated;
     }
 
-    public void updatePoint(Double latitude, Double longitude) {
-        if(this.location.getPopularCount() == null){
-            this.location = Location.builder()
-                    .latitude(latitude)
-                    .longitude(longitude)
-                    .popularCount(0L)
-                    .build();
-        }
-        else{
-            this.location = Location.builder()
-                    .latitude(latitude)
-                    .longitude(longitude)
-                    .build();
-        }
+    public void updatePoint(Double latitude, Double longitude, String placeName) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.placeName = placeName;
     }
 
 
@@ -128,5 +121,9 @@ public class Block extends BaseEntity {
 
     public void changeIsDelete() {
         this.isDeleted = "Y";
+    }
+
+    public void updateLocation(Location location) {
+        this.location = location;
     }
 }
