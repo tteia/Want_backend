@@ -7,6 +7,7 @@ import com.example.want.api.member.login.jwt.TokenResponse;
 import com.example.want.common.CommonResDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +18,14 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/auth/google")
     public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRqDto request) throws Exception {
+        log.info("############ googleLogin ############");
+        log.info("request: {}", request.getCode());
         TokenResponse tokenResponse = authService.googleLogin(request);
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", tokenResponse);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
