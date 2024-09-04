@@ -20,15 +20,14 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: server.devhot.kr-tls
-  namespace: sm
+  name: server.jsangmin.co.kr-tls
 spec:
-  secretName: server.devhot.kr-tls
+  secretName: server.jsangmin.co.kr-tls
   duration: 2160h  # 90일동안 유효함
   renewBefore: 360h # 15일 전에 갱신된다.
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-  commonName: server.devhot.kr
+  commonName: server.jsangmin.co.kr
   dnsNames:
   - server.devhot.kr
