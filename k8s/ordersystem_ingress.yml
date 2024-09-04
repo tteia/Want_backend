@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: want-ingress
+  namespace: sm
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+  - hosts:
+    - server.jsangmin.co.kr
+    secretName: server.jsangmin.co.kr-tls
+  rules:
+    - host: server.jsangmin.co.kr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: o-service
+                port:
+                  number: 80
+        
