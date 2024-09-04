@@ -15,17 +15,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-@Tag(name = "소셜 로그인 API", description = "소셯 로그인 API")
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
 
-//   구글 로그인
     @PostMapping("/auth/google")
-    public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRqDto token) throws Exception {
-        TokenResponse tokenResponse = authService.googleLogin(token);
-        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK , "Success", tokenResponse);
+    public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRqDto request) throws Exception {
+        TokenResponse tokenResponse = authService.googleLogin(request);
+        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", tokenResponse);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
@@ -37,6 +35,7 @@ public class AuthController {
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "Success", info);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
+}
 
 //    로그아웃
 //    @PostMapping("/token")
@@ -53,4 +52,3 @@ public class AuthController {
 //        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
 //    }
 
-}

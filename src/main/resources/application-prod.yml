@@ -34,9 +34,9 @@ spring:
       client:
         registration:
           google:
-            client-id: ${local.oauth2.google.client-id}
-            client-secret: ${local.oauth2.google.client-secret}
-            scope: ${local.oauth2.google.scope}
+            client-id: ${google.client-id}
+            client-secret: ${google.client-secret}
+            scope: ${google.scope}
   servlet:
     multipart:
       enabled: true

@@ -1,5 +1,6 @@
 package com.example.want.api.member.service;
 
+import com.example.want.api.member.dto.GoogleAccessTokenResponse;
 import com.example.want.api.member.dto.RefreshDto;
 import com.example.want.api.member.login.dto.GoogleLoginRqDto;
 import com.example.want.api.member.login.jwt.TokenProvider;
@@ -18,121 +19,148 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.*;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+
+
+import com.fasterxml.jackson.databind.ObjectMapper; // Jackson 라이브러리 추가
+
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class AuthService {
+
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
 
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    private String googleClientSecret;
+
     private final TokenProvider tokenProvider;
     private final MemberRepository memberRepository;
-    @Qualifier("login")
     private final RedisTemplate<String, Object> loginRedisTemplate;
-
+    private final RestTemplate restTemplate = new RestTemplate(); // RestTemplate 인스턴스
+    private final ObjectMapper objectMapper = new ObjectMapper(); // Jackson ObjectMapper 인스턴스 추가
 
     @Transactional
-    public TokenResponse googleLogin(GoogleLoginRqDto idToken){
+    public TokenResponse googleLogin(GoogleLoginRqDto request) {
+        try {
+            String code = request.getCode();
+            GoogleAccessTokenResponse tokenResponse = getAccessTokenFromGoogle(code);
+            GoogleIdToken googleIdToken = verifyGoogleIdToken(tokenResponse.getIdToken());
+
+            Payload payload = googleIdToken.getPayload();
+            String email = payload.getEmail();
+            String name = (String) payload.get("name");
+            String profileUrl = (String) payload.get("picture");
+
+            Member member = memberRepository.findByEmail(email)
+                    .orElseGet(() -> memberRepository.save(new Member(email, name, profileUrl)));
+
+            TokenResponse response = createJwtTokens(email, name, profileUrl);
+            storeRefreshTokenInRedis(email, response.getRefreshToken());
+
+            return response;
+        } catch (Exception e) {
+            throw new RuntimeException("Error during Google login", e);
+        }
+    }
+
+    private GoogleAccessTokenResponse getAccessTokenFromGoogle(String code) {
+        String tokenUrl = "https://oauth2.googleapis.com/token";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("code", code);
+        params.add("redirect_uri", "http://localhost:3000/oauth2/callback"); // 프론트엔드에서 설정한 리디렉션 URI
+        params.add("client_id", googleClientId);
+        params.add("client_secret", googleClientSecret);
+
+        HttpEntity<LinkedMultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                tokenUrl,
+                HttpMethod.POST,
+                request,
+                String.class
+        );
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            try {
+                // 응답 문자열을 GoogleAccessTokenResponse 객체로 변환
+                return objectMapper.readValue(response.getBody(), GoogleAccessTokenResponse.class);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to parse access token response", e);
+            }
+        } else {
+            throw new RuntimeException("Failed to get access token from Google. Response: " + response.getBody());
+        }
+    }
+
+    private GoogleIdToken verifyGoogleIdToken(String idToken) throws GeneralSecurityException, IOException {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(Collections.singletonList(googleClientId))
                 .build();
 
-        try {
-            GoogleIdToken googleIdToken = verifier.verify(idToken.getIdToken());
-            System.out.println("googleIdToken : " + googleIdToken);
-
-            if (googleIdToken == null) {
-                throw new InternalAuthenticationServiceException("토큰이 없습니다.");
-            } else {
-                GoogleOAuth2UserInfo userInfo = new GoogleOAuth2UserInfo(googleIdToken.getPayload());
-                String email = userInfo.getEmail();
-
-                // 이미 가입된 회원인지 확인
-//                가입 안되어있으면 가입
-                Member member = null;
-                if (!memberRepository.existsByEmail(userInfo.getEmail())) {
-//                    Member member = new Member(userInfo, randomNickname());
-                    member = new Member(userInfo);
-                    memberRepository.save(member);
-                } else { // 가입되어있으면 닉네임이 있는지 확인
-                     member = memberRepository.findByEmail(email).orElseThrow(() ->
-                            new EntityNotFoundException("가입되어있지 않은 회원입니다."));
-//                    랜덤 닉네임 생성
-//                    if (member.getNickname() == null) {
-//                        UserEntity userEntity = new UserEntity(userInfo, randomNickname());
-//                        userRepository.save(userEntity);
-//                    }
-                }
-                TokenResponse tokenResponse = sendGenerateJwtToken(userInfo.getEmail(), userInfo.getName(), member.getProfileUrl());
-//                loginRedisTemplate.opsForValue().set(member.getEmail(), tokenResponse.getRefreshToken(), 240, TimeUnit.HOURS); //240시간
-                try {
-                    loginRedisTemplate.opsForValue().set(member.getEmail(), tokenResponse.getRefreshToken(), 240, TimeUnit.HOURS);
-                    System.out.println("Token saved in Redis for email: " + member.getEmail());
-                } catch (Exception e) {
-                    System.err.println("Error saving token to Redis: " + e.getMessage());
-                    e.printStackTrace();
-                }
-                return tokenResponse;
-            }
-        }catch (InternalAuthenticationServiceException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new InternalAuthenticationServiceException("토큰이 유효하지 않습니다.");
+        GoogleIdToken googleIdToken = verifier.verify(idToken);
+        if (googleIdToken == null) {
+            throw new RuntimeException("Invalid ID token.");
         }
+        return googleIdToken;
     }
 
-    private TokenResponse sendGenerateJwtToken(String email, String name, String profileUrl) {
-        return createToken(email, name, profileUrl);
+    private TokenResponse createJwtTokens(String email, String name, String profileUrl) {
+        return tokenProvider.generateJwtToken(email, name, profileUrl, Role.MEMBER);
     }
 
-    private TokenResponse createToken(String email, String name, String profileUrl) {
-        return tokenProvider.generateJwtToken(email, name, profileUrl , Role.MEMBER);
+    private void storeRefreshTokenInRedis(String email, String refreshToken) {
+        try {
+            loginRedisTemplate.opsForValue().set(email, refreshToken, 240, TimeUnit.HOURS);
+        } catch (Exception e) {
+            throw new RuntimeException("Error saving token to Redis", e);
+        }
     }
 
     public String refreshToken(RefreshDto dto) {
         String refreshToken = dto.getRefreshToken();
 
-        // 1. Refresh Token 유효성 검사
         if (!tokenProvider.validateToken(refreshToken)) {
-            throw new InternalAuthenticationServiceException("토큰이 유효하지 않습니다.");
+            throw new RuntimeException("Invalid refresh token.");
         }
 
-        // 2. Refresh Token에서 이메일 정보 추출
-        Claims claims;
-        try {
-            claims = tokenProvider.parseClaims(refreshToken);
-        } catch (ExpiredJwtException e) {
-            // 만료된 토큰일 경우
-            throw new InternalAuthenticationServiceException("만료된 토큰입니다.");
-        } catch (Exception e) {
-            // 다른 예외 처리
-            throw new InternalAuthenticationServiceException("토큰 파싱 중 오류가 발생했습니다.");
-        }
+        String email = tokenProvider.getEmailFromToken(refreshToken);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // 3. 이메일로 사용자를 확인
-        String email = (String) claims.get("email");
-        if (email == null) {
-            throw new InternalAuthenticationServiceException("토큰에 이메일 정보가 없습니다.");
-        }
-        Member member = memberRepository.findByEmail(email).orElseThrow(() ->
-                new EntityNotFoundException("가입되어 있지 않은 회원입니다."));
-        // 4. Redis에 저장된 Refresh Token과 비교
         String storedRefreshToken = (String) loginRedisTemplate.opsForValue().get(email);
         if (!refreshToken.equals(storedRefreshToken)) {
-            throw new InternalAuthenticationServiceException("토큰이 유효하지 않습니다.");
+            throw new RuntimeException("Invalid refresh token.");
         }
-        // 5. 새로운 액세스 토큰 생성
-        TokenResponse tokenResponse =  tokenProvider.generateJwtToken(email, member.getName(), member.getProfileUrl(), Role.MEMBER);
+
+        TokenResponse tokenResponse = tokenProvider.generateJwtToken(email, member.getName(), member.getProfileUrl(), Role.MEMBER);
         return tokenResponse.getAccessToken();
     }
+}
+
+
 
 
 //    private String randomNickname() {
@@ -185,4 +213,3 @@ public class AuthService {
 //        userRepository.save(userEntity);
 //    }
 
-}

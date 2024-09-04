@@ -120,6 +120,11 @@ public class TokenProvider {
         }
     }
 
+    public String getEmailFromToken(String refreshToken) {
+        Claims claims = parseClaims(refreshToken);
+        return claims.get("email").toString();
+    }
+
     public class TokenNotValidateException extends JwtException {
         public TokenNotValidateException(String message) {
             super(message);

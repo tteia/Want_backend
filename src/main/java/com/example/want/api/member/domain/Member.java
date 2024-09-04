@@ -33,4 +33,11 @@ public class Member{
         this.profileUrl = userInfo.getProfileImageUrl();
         this.role = Role.MEMBER;
     }
+
+    public Member(String email, String name, String profileUrl) {
+        this.email = email;
+        this.name = name;
+        this.profileUrl = profileUrl;
+        this.role = Role.MEMBER;
+    }
 }
