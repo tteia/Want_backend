@@ -20,6 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -183,4 +184,42 @@ public class RedisConfig {
     public ChannelTopic topic() {
         return new ChannelTopic("project:notifications");
     }
+
+
+    @Bean
+    @Qualifier("popular")
+    public LettuceConnectionFactory popularConnectionFactory() {
+        final SocketOptions socketOptions = SocketOptions.builder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+
+        final ClientOptions clientOptions = ClientOptions.builder()
+                .socketOptions(socketOptions)
+                .build();
+
+        LettuceClientConfiguration lettuceClientConfiguration = LettuceClientConfiguration.builder()
+                .clientOptions(clientOptions)
+                .commandTimeout(Duration.ofMinutes(1))
+                .shutdownTimeout(Duration.ZERO)
+                .build();
+
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(host, port);
+        redisStandaloneConfiguration.setDatabase(3); // 3번 데이터베이스 사용
+
+        return new LettuceConnectionFactory(redisStandaloneConfiguration, lettuceClientConfiguration);
+    }
+
+    @Bean
+    @Qualifier("popular")
+    public RedisTemplate<String, Long> popularRedisTemplate() {
+        RedisTemplate<String, Long> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(popularConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new GenericToStringSerializer<>(Long.class)); // Long 타입에 맞게 설정
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new GenericToStringSerializer<>(Long.class)); // Long 타입에 맞게 설정
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
 }

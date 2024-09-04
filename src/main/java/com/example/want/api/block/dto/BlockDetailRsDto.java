@@ -1,6 +1,7 @@
 package com.example.want.api.block.dto;
 
 import com.example.want.api.block.domain.Category;
+import com.example.want.api.location.domain.Location;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +24,7 @@ public class BlockDetailRsDto {
     private String endTime;
     private String isActivated;
     private Long heartCount;
+    private Long popularCount;
     private Boolean isHearted;
     private Long projectId;
 }
