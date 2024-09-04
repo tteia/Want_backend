@@ -7,6 +7,6 @@ spec:
   ports:
     - name: http
       port: 80 # service Port를 의미,
-      targetPort: 8080 #service가 라우팅해줄 대상의 port
+      targetPort: 8088 #service가 라우팅해줄 대상의 port
   selector:
     app: want

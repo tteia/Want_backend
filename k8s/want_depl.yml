@@ -17,7 +17,7 @@ spec:
         # AWS의 ECR를 사용 
           image: 346903264902.dkr.ecr.ap-northeast-2.amazonaws.com/want:latest
           ports: 
-            - containerPort: 8080
+            - containerPort: 8088
           resources:
             limits: # 최대 할당량
               cpu: "0.5"
@@ -62,6 +62,12 @@ spec:
                   key: cloud.aws.credentials.secret-key
                   name: want-secrets
 
+            - name: cloud.aws.s3.bucket
+              valueFrom:
+                secretKeyRef:
+                  key: cloud.aws.s3.bucket
+                  name: want-secrets
+
             - name: google.client-id
               valueFrom:
                 secretKeyRef:
@@ -92,11 +98,17 @@ spec:
                   key: cloud.aws.region.static
                   name: want-secrets
 
+            - name: local.oauth2.google.redirect-uri
+              valueFrom:
+                secretKeyRef:
+                  key: local.oauth2.google.redirect-uri
+                  name: want-secrets
+
           # 무중단 배포를 위한 컨테이너 health check
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: 8080
+              port: 8088
           # 컨테이너 시작후 지연시간 설정
             initialDelaySeconds: 10
           # 확인 반복 주기
