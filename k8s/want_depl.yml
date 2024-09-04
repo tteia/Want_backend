@@ -76,6 +76,7 @@ spec:
               secretKeyRef:
                 key: JWT_SECRET_KEY_RT
                 name: sm-app-secrets
+
           # 무중단 배포를 위한 컨테이너 health check
           readinessProbe:
             httpGet:
