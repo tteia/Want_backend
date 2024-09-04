@@ -31,9 +31,7 @@ public class Location {
     private State state;
 
     public void updatePopularCount(Long popularCount) {
-        Location location = Location.builder()
-                .popularCount(popularCount)
-                .build();
+        this.popularCount += popularCount;
     }
 
     public LocationResDto fromEntity(Location location) {

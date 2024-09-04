@@ -34,12 +34,12 @@ public class BlockActiveListRsDto {
                 .title(block.getTitle())
                 .content(block.getContent())
                 .placeName(block.getPlaceName())
-                .latitude(block.getLocation().getLatitude())
-                .longitude(block.getLocation().getLongitude())
+                .latitude(block.getLatitude())
+                .longitude(block.getLongitude())
                 .startTime(block.getStartTime() != null ? block.getStartTime().toString() : null)
                 .endTime(block.getEndTime() != null ? block.getEndTime().toString() : null)
                 .heartCount(block.getHeartCount())
-                .popularCount(block.getLocation().getPopularCount())
+                .popularCount(block.getPopularCount())
                 .isActivated(block.getIsActivated())
                 .build();
     }

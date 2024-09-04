@@ -1,15 +1,10 @@
 package com.example.want.api.location.service;
 
-import com.example.want.api.block.domain.Block;
-import com.example.want.api.block.dto.BlockActiveListRsDto;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.location.domain.Location;
-import com.example.want.api.location.dto.LocationReqDto;
 import com.example.want.api.location.dto.LocationResDto;
 import com.example.want.api.location.repository.LocationRepository;
-import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.repository.ProjectRepository;
-import com.example.want.api.state.domain.State;
 import com.example.want.api.state.repository.StateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,9 +13,9 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -47,20 +42,42 @@ public class LocationService {
     }
 
     // 스케줄링 (redis -> db)
-    private void getPopularCountFromCache(String key, Long locationId) {
+    @Transactional
+    public void getPopularCountFromCache() {
         ValueOperations<String, Long> valueOperations = popularRedisTemplate.opsForValue();
-        Long cachedValue = valueOperations.get(key);
-        // key 찾아서 해당 key 가 location 에 있으면 그 location 의 popularCount 값 증가
-        // 없으면 해당 value 로 popularCount 값 세팅
-        if (cachedValue != null) {
-            Location location = locationRepository.findById(locationId).orElseThrow(() -> new EntityNotFoundException("해당 Location 을 찾을 수 없습니다."));
-            location.updatePopularCount(cachedValue);
-            locationRepository.save(location);
+
+        // Redis 에 저장된 모든 key 를 가져옴.
+        Set<String> keys = popularRedisTemplate.keys("*");
+
+        if (keys != null) {
+            for (String cacheKey : keys) {
+                Long cacheValue = valueOperations.get(cacheKey);
+                if (cacheValue != null) {
+                    // key는 "위도:경도" 형식. 이를 분리.
+                    String[] findKey = cacheKey.split(":");
+
+                    Double latitude = Double.parseDouble(findKey[0]);
+                    Double longitude = Double.parseDouble(findKey[1]);
+
+                    // 해당 위치를 LocationRepository 에서 찾기
+                    Location location = locationRepository.findByLatitudeAndLongitude(latitude, longitude);
+                    if (location == null) {
+                        Location newLocation = Location.builder()
+                                .latitude(latitude)
+                                .longitude(longitude)
+                                .popularCount(cacheValue)
+                                .build();
+                        locationRepository.save(newLocation);
+                    }
+                    else{
+                        location.updatePopularCount(cacheValue);
+                    }
+                    popularRedisTemplate.delete(cacheKey);
+                }
+
+            }
+
         }
-
     }
-
-
-
 
 }

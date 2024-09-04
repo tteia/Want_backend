@@ -10,6 +10,5 @@ import java.util.List;
 @Repository
 public interface LocationRepository extends JpaRepository<Location, Long> {
     Location findByLatitudeAndLongitude(Double latitude, Double longitude);
-    List<Location> findAllByOrderByPopularCountDesc();
     List<Location> findAllByStateIdOrderByPopularCountDesc(Long stateId);
 }

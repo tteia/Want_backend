@@ -327,16 +327,6 @@ public class BlockService {
             block.updatePlaceName(updateBlockRqDto.getPlaceName());
         }
         if (updateBlockRqDto.getLatitude() != null && updateBlockRqDto.getLongitude() != null) {
-            if (block.getLocation() == null) {
-                System.out.println("비어있음.");
-                Location location = Location.builder()
-                        .placeName(updateBlockRqDto.getPlaceName())
-                        .latitude(updateBlockRqDto.getLatitude())
-                        .longitude(updateBlockRqDto.getLongitude())
-                        .build();
-                locationRepository.save(location);
-                block.updateLocation(location);
-            }
             block.updatePoint(updateBlockRqDto.getLatitude(), updateBlockRqDto.getLongitude(), updateBlockRqDto.getPlaceName());
             String redisKey = updateBlockRqDto.getLatitude() + ":" + updateBlockRqDto.getLongitude();
 
@@ -415,12 +405,14 @@ public class BlockService {
         Block findBlock = blockRepository.findById(importDto.getBlockId()).orElseThrow(() -> new EntityNotFoundException("해당 블록을 찾을 수 없습니다."));
         Block block = importDto.toImport(findBlock, project);
 
-        String redisKey = block.getLocation().getLatitude() + ":" + block.getLocation().getLongitude();
-        // 레디스에서 해당 위치의 popularCount +1
+        String redisKey = findBlock.getLatitude() + ":" + findBlock.getLongitude();
+
+        // Redis에서 값을 가져오거나 초기화
         if (popularRedisTemplate.opsForValue().get(redisKey) == null) {
             popularRedisTemplate.opsForValue().set(redisKey, 0L);
         }
-        popularRedisTemplate.opsForValue().increment(redisKey);
+        // 레디스에서 해당 위치의 popularCount +1
+        popularRedisTemplate.opsForValue().increment(redisKey, 1L);
         return blockRepository.save(block);
     }
 
