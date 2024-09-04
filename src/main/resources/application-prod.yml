@@ -15,6 +15,8 @@ spring:
       maximum-pool-size: 20
       minimum-idle: 10
       leak-detection-threshold: 2000 # 누수 판별 기준값
+    tomcat:
+      max-active: 5
   jpa:
     database-platform: org.hibernate.dialect.MariaDBDialect
     database: mysql
