@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +42,7 @@ public class LocationService {
         return locations;
     }
 
-    // 스케줄링 (redis -> db)
+    @Scheduled(cron = "0 0 4 * * *") // 매일 오전 4시 스케줄링 돌기
     @Transactional
     public void getPopularCountFromCache() {
         ValueOperations<String, Long> valueOperations = popularRedisTemplate.opsForValue();
