@@ -51,6 +51,9 @@ public class AuthService {
     @Value("${spring.security.oauth2.client.registration.google.client-secret}")
     private String googleClientSecret;
 
+    @Value("${local.oauth2.google.redirect-uri}")
+    private String redirectUri;
+
     private final TokenProvider tokenProvider;
     private final MemberRepository memberRepository;
     private final RedisTemplate<String, Object> loginRedisTemplate;
@@ -90,7 +93,7 @@ public class AuthService {
         LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("code", code);
-        params.add("redirect_uri", "http://localhost:3000/oauth2/callback"); // 프론트엔드에서 설정한 리디렉션 URI
+        params.add("redirect_uri", redirectUri); // 프론트엔드에서 설정한 리디렉션 URI
         params.add("client_id", googleClientId);
         params.add("client_secret", googleClientSecret);
 

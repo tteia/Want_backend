@@ -1,10 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: want-deployment
   namespace: sm
-
 spec:
   replicas: 1
   selector:
@@ -29,53 +27,72 @@ spec:
               cpu: "0.25"
               memory: "250Mi"
           env:
-          - name: REDIS_HOST
-            valueFrom:
-              secretKeyRef:
-                key: REDIS_HOST
-                name: sm-app-secrets
+            - name: local.redis.host
+              valueFrom:
+                secretKeyRef:
+                  key: local.redis.host
+                  name: want-secrets
 
-          - name: DB_HOST
-            valueFrom:
-              secretKeyRef:
-                key: DB_HOST
-                name: sm-app-secrets
+            - name: local.datasource.url
+              valueFrom:
+                secretKeyRef:
+                  key: local.datasource.url
+                  name: want-secrets
 
-          - name: DB_USERNAME
-            valueFrom:
-              secretKeyRef:
-                key: DB_USERNAME
-                name: sm-app-secrets
+            - name: local.datasource.username
+              valueFrom:
+                secretKeyRef:
+                  key: local.datasource.username
+                  name: want-secrets
 
-          - name: DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: DB_PASSWORD
-                name: sm-app-secrets
+            - name: local.datasource.password
+              valueFrom:
+                secretKeyRef:
+                  key: local.datasource.password
+                  name: want-secrets
 
-          - name: AWS_ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                key: AWS_ACCESS_KEY
-                name: sm-app-secrets
+            - name: cloud.aws.credentials.access-key
+              valueFrom:
+                secretKeyRef:
+                  key: cloud.aws.credentials.access-key
+                  name: want-secrets
 
-          - name: AWS_SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                key: AWS_SECRET_KEY
-                name: sm-app-secrets
-          
-          - name: JWT_SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                key: JWT_SECRET_KEY
-                name: sm-app-secrets
+            - name: cloud.aws.credentials.secret-key
+              valueFrom:
+                secretKeyRef:
+                  key: cloud.aws.credentials.secret-key
+                  name: want-secrets
 
-          - name: JWT_SECRET_KEY_RT
-            valueFrom:
-              secretKeyRef:
-                key: JWT_SECRET_KEY_RT
-                name: sm-app-secrets
+            - name: google.client-id
+              valueFrom:
+                secretKeyRef:
+                  key: google.client-id
+                  name: want-secrets
+
+            - name: google.client-secret
+              valueFrom:
+                secretKeyRef:
+                  key: google.client-secret
+                  name: want-secrets
+
+            - name: google.scope
+              valueFrom:
+                secretKeyRef:
+                  key: google.scope
+                  name: want-secrets
+
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: JWT_SECRET_KEY
+                  name: want-secrets
+
+            - name: jwt.secret
+              valueFrom:
+                secretKeyRef:
+                  key: jwt.secret
+                  name: want-secrets
+
 
           # 무중단 배포를 위한 컨테이너 health check
           readinessProbe:
