@@ -16,6 +16,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -41,6 +42,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 
 import com.fasterxml.jackson.databind.ObjectMapper; // Jackson 라이브러리 추가
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -86,6 +88,7 @@ public class AuthService {
 
     private GoogleAccessTokenResponse getAccessTokenFromGoogle(String code) {
         String tokenUrl = "https://oauth2.googleapis.com/token";
+        log.info("getAccessTokenFromGoogle Code: {}", code);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -93,7 +96,9 @@ public class AuthService {
         LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("code", code);
+        log.info("code: {}", code);
         params.add("redirect_uri", redirectUri); // 프론트엔드에서 설정한 리디렉션 URI
+        log.info("getAccessTokenFromGoogle redirectUri: {}", redirectUri);
         params.add("client_id", googleClientId);
         params.add("client_secret", googleClientSecret);
 
