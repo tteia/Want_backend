@@ -80,18 +80,17 @@ spec:
                   key: google.scope
                   name: want-secrets
 
-            - name: JWT_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: JWT_SECRET_KEY
-                  name: want-secrets
-
             - name: jwt.secret
               valueFrom:
                 secretKeyRef:
                   key: jwt.secret
                   name: want-secrets
 
+            - name: cloud.aws.region.static
+              valueFrom:
+                secretKeyRef:
+                  key: cloud.aws.region.static
+                  name: want-secrets
 
           # 무중단 배포를 위한 컨테이너 health check
           readinessProbe:
