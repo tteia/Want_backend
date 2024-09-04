@@ -1,6 +1,7 @@
 package com.example.want.api.block.domain;
 
 import com.example.want.api.block.dto.BlockDetailRsDto;
+import com.example.want.api.location.domain.Location;
 import com.example.want.api.project.domain.Project;
 import com.example.want.common.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,10 @@ public class Block extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
+    private Location location;
+
     private Double latitude;
     private Double longitude;
 
@@ -36,8 +41,9 @@ public class Block extends BaseEntity {
     private LocalDateTime endTime;
     private String isActivated;
     private Long heartCount;
+    private Long popularCount;
     private String isDeleted;
-  
+
     @Builder.Default
     private boolean isHearted = false;
 
@@ -54,12 +60,13 @@ public class Block extends BaseEntity {
                 .content(this.content)
                 .placeName(this.placeName)
                 .category(this.category)
-                .latitude(this.latitude)
-                .longitude(this.longitude)
+                .latitude(this.getLatitude())
+                .longitude(this.getLongitude())
                 .startTime(this.startTime != null ? this.startTime.toString() : null)
                 .endTime(this.endTime != null ? this.endTime.toString() : null)
                 .isActivated(this.isActivated)
                 .heartCount(this.heartCount)
+                .popularCount(this.getPopularCount())
                 .isHearted(this.isHearted)
                 .projectId(this.project.getId())
                 .build();
@@ -99,9 +106,10 @@ public class Block extends BaseEntity {
         this.isActivated = isActivated;
     }
 
-    public void updatePoint(Double latitude, Double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
+    public void updatePoint(Double latitude, Double longitude, String placeName) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.placeName = placeName;
     }
 
 
@@ -113,5 +121,9 @@ public class Block extends BaseEntity {
 
     public void changeIsDelete() {
         this.isDeleted = "Y";
+    }
+
+    public void updateLocation(Location location) {
+        this.location = location;
     }
 }

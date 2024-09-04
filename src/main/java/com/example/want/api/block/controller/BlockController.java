@@ -136,7 +136,7 @@ public class BlockController {
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
-    @GetMapping("/city/{stateId}")
+    @GetMapping("/city/stateId")
     public ResponseEntity<CommonResDto> getBlocksByCity(@PathVariable Long stateId) {
         List<BlockActiveListRsDto> blocks = blockService.getBlocksByState(stateId);
         return new ResponseEntity<>(new CommonResDto(HttpStatus.OK, "Success", blocks), HttpStatus.OK);

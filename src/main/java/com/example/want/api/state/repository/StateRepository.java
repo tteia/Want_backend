@@ -16,4 +16,5 @@ public interface StateRepository extends JpaRepository<State, Long> {
     Optional<State> findByCountryAndCity(String country, String city);
 
     List<State> findAllByCityIsNotNull();
+
 }

@@ -6,6 +6,8 @@ import com.example.want.api.block.dto.*;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.heart.domain.Heart;
 import com.example.want.api.heart.repository.HeartRepository;
+import com.example.want.api.location.domain.Location;
+import com.example.want.api.location.repository.LocationRepository;
 import com.example.want.api.member.domain.Member;
 import com.example.want.api.member.login.UserInfo;
 import com.example.want.api.member.repository.MemberRepository;
@@ -17,7 +19,6 @@ import com.example.want.api.state.repository.StateRepository;
 import com.example.want.api.sse.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,12 +49,15 @@ public class BlockService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final StateRepository stateRepository;
+    private final LocationRepository locationRepository;
     private final StringRedisTemplate stringRedisTemplate;
     private final NotificationService notificationService;
 
     @Qualifier("heart")
     private final RedisTemplate<String, Object> heartRedisTemplate;
 
+    @Qualifier("popular")
+    private final RedisTemplate<String, Long> popularRedisTemplate;
 
     @Transactional
     public Block createBlock(CreateBlockRqDto request, UserInfo userInfo) {
@@ -182,7 +186,6 @@ public class BlockService {
         } else if (cachedValue instanceof Integer) {
             return ((Integer) cachedValue).longValue();
         }
-
         return null;
     }
 
@@ -324,7 +327,15 @@ public class BlockService {
             block.updatePlaceName(updateBlockRqDto.getPlaceName());
         }
         if (updateBlockRqDto.getLatitude() != null && updateBlockRqDto.getLongitude() != null) {
-            block.updatePoint(updateBlockRqDto.getLatitude(), updateBlockRqDto.getLongitude());
+            block.updatePoint(updateBlockRqDto.getLatitude(), updateBlockRqDto.getLongitude(), updateBlockRqDto.getPlaceName());
+            String redisKey = updateBlockRqDto.getLatitude() + ":" + updateBlockRqDto.getLongitude();
+
+            // Redis에서 값을 가져오거나 초기화
+            if (popularRedisTemplate.opsForValue().get(redisKey) == null) {
+                popularRedisTemplate.opsForValue().set(redisKey, 0L);
+            }
+            // 레디스에서 해당 위치의 popularCount +1
+            popularRedisTemplate.opsForValue().increment(redisKey, 1L);
         }
 
         if (updateBlockRqDto.getStartTime() != null && updateBlockRqDto.getEndTime() != null) {
@@ -393,7 +404,15 @@ public class BlockService {
         Project project = validateProjectMember(importDto.getProjectId(), userInfo.getEmail());
         Block findBlock = blockRepository.findById(importDto.getBlockId()).orElseThrow(() -> new EntityNotFoundException("해당 블록을 찾을 수 없습니다."));
         Block block = importDto.toImport(findBlock, project);
-        System.out.println(block);
+
+        String redisKey = findBlock.getLatitude() + ":" + findBlock.getLongitude();
+
+        // Redis에서 값을 가져오거나 초기화
+        if (popularRedisTemplate.opsForValue().get(redisKey) == null) {
+            popularRedisTemplate.opsForValue().set(redisKey, 0L);
+        }
+        // 레디스에서 해당 위치의 popularCount +1
+        popularRedisTemplate.opsForValue().increment(redisKey, 1L);
         return blockRepository.save(block);
     }
 
