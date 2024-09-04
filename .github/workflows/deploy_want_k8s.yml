@@ -49,9 +49,9 @@ jobs:
 
       - name: Build, tag, and push image to Amazon ECR with Jib
         run: |
-          ./gradlew :OrderSystem:jib --image=346903264902.dkr.ecr.ap-northeast-2.amazonaws.com/want:latest
+          ./gradlew :jib --image=346903264902.dkr.ecr.ap-northeast-2.amazonaws.com/want:latest
 
       - name: kubectl apply
         run: |
-          kubectl apply -f ./OrderSystem/k8s/want_depl.yml
-          kubectl rollout restart deployment want-deployment -n sm
+          kubectl apply -f ./k8s/want_depl.yml
+          kubectl rollout restart deployment want-deployment
