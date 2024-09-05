@@ -15,6 +15,7 @@ import com.example.want.api.project.domain.Project;
 import com.example.want.api.project.repository.ProjectRepository;
 import com.example.want.api.projectMember.Repository.ProjectMemberRepository;
 import com.example.want.api.state.domain.State;
+import com.example.want.api.state.repository.ProjectStateRepository;
 import com.example.want.api.state.repository.StateRepository;
 import com.example.want.api.sse.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,7 @@ public class BlockService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final StateRepository stateRepository;
+    private final ProjectStateRepository projectStateRepository;
     private final LocationRepository locationRepository;
     private final StringRedisTemplate stringRedisTemplate;
     private final NotificationService notificationService;
@@ -328,7 +330,8 @@ public class BlockService {
         }
         if (updateBlockRqDto.getLatitude() != null && updateBlockRqDto.getLongitude() != null) {
             block.updatePoint(updateBlockRqDto.getLatitude(), updateBlockRqDto.getLongitude(), updateBlockRqDto.getPlaceName());
-            String redisKey = updateBlockRqDto.getLatitude() + ":" + updateBlockRqDto.getLongitude();
+            Long stateId = projectStateRepository.findByProject(block.getProject()).getState().getId();
+            String redisKey = updateBlockRqDto.getLatitude() + ":" + updateBlockRqDto.getLongitude() + ":" + stateId + ":" + block.getCategory() + ":" + block.getPlaceName();
 
             // Redis에서 값을 가져오거나 초기화
             if (popularRedisTemplate.opsForValue().get(redisKey) == null) {
@@ -405,7 +408,8 @@ public class BlockService {
         Block findBlock = blockRepository.findById(importDto.getBlockId()).orElseThrow(() -> new EntityNotFoundException("해당 블록을 찾을 수 없습니다."));
         Block block = importDto.toImport(findBlock, project);
 
-        String redisKey = findBlock.getLatitude() + ":" + findBlock.getLongitude();
+        Long stateId = projectStateRepository.findByProject(block.getProject()).getState().getId();
+        String redisKey = findBlock.getLatitude() + ":" + findBlock.getLongitude() + ":" + stateId + ":" + findBlock.getCategory() + ":" + block.getPlaceName();
 
         // Redis에서 값을 가져오거나 초기화
         if (popularRedisTemplate.opsForValue().get(redisKey) == null) {
