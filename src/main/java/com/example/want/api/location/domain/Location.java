@@ -25,6 +25,7 @@ public class Location {
 
     private Long popularCount;
     private String placeName;
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)

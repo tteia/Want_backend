@@ -6,7 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.time.LocalDateTime;
 
 @Data
@@ -26,6 +27,7 @@ public class UpdateBlockRqDto {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
+    @Enumerated(value = EnumType.STRING)
     private Category category;
 
 }

@@ -331,7 +331,7 @@ public class BlockService {
         if (updateBlockRqDto.getLatitude() != null && updateBlockRqDto.getLongitude() != null) {
             block.updatePoint(updateBlockRqDto.getLatitude(), updateBlockRqDto.getLongitude(), updateBlockRqDto.getPlaceName());
             Long stateId = projectStateRepository.findByProject(block.getProject()).getState().getId();
-            String redisKey = updateBlockRqDto.getLatitude() + ":" + updateBlockRqDto.getLongitude() + ":" + stateId + ":" + block.getCategory() + ":" + block.getPlaceName();
+            String redisKey = updateBlockRqDto.getLatitude() + ":" + updateBlockRqDto.getLongitude() + ":" + stateId + ":" + updateBlockRqDto.getCategory() + ":" + updateBlockRqDto.getPlaceName();
 
             // Redis에서 값을 가져오거나 초기화
             if (popularRedisTemplate.opsForValue().get(redisKey) == null) {
