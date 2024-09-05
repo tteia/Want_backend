@@ -1,26 +1,31 @@
-# 멀티 스테이지 빌드 방법 사용
-# 첫번쨰 스테이지
+# 첫 번째 스테이지: 애플리케이션 빌드
 FROM openjdk:11 as stage1
 WORKDIR /app
 
-# /app/gradlew 파일로 생성
+# Gradle Wrapper와 빌드 파일 복사 (자주 변경되지 않는 파일)
 COPY gradlew .
-# /app/gradle 디렉토리로 생성
 COPY gradle gradle
-# /app/src 디렉토리로 생성
-COPY src src
-# /app/gradlew 파일로 생성
 COPY build.gradle .
-# gradlew 파일을 실행 가능하게 변경
 COPY settings.gradle .
 
-RUN ./gradlew bootJar
+# Gradle 캐시 사용을 위한 Wrapper 실행 권한 부여
+RUN chmod +x gradlew
 
-# 두번째 스테이지
+# Gradle 종속성 미리 다운로드 (소스 코드 변경 없이 종속성만 캐싱)
+RUN ./gradlew dependencies --no-daemon
+
+# 소스 코드 복사 (자주 변경되는 부분)
+COPY src src
+
+# 애플리케이션 빌드
+RUN ./gradlew bootJar --no-daemon
+
+# 두 번째 스테이지: 빌드된 JAR 파일로 애플리케이션 실행
 FROM openjdk:11 as stage2
 WORKDIR /app
-# stage1에서 생성된 jar 파일을 stage2에 app.jar라는 이름으로 복사
+
+# stage1에서 생성된 JAR 파일을 복사
 COPY --from=stage1 /app/build/libs/*.jar app.jar
 
-# CMD 또는 ENTRYPOINT를 사용하여 실행할 명령어를 지정
+# JAR 파일 실행
 ENTRYPOINT ["java", "-jar", "app.jar"]
