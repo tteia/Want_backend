@@ -50,10 +50,13 @@ public class NotificationService {
     }
 
     private void removeEmitter(Long projectId, Long memberId, String reason) {
-        projectMemberEmitters.computeIfPresent(projectId, (k, members) -> {
+        Map<Long, SseEmitter> members = projectMemberEmitters.get(projectId);
+        if (members != null) {
             members.remove(memberId);
-            return members.isEmpty() ? null : members;
-        });
+            if (members.isEmpty()) {
+                projectMemberEmitters.remove(projectId);  // 명시적으로 projectId 제거
+            }
+        }
         log.info("SseEmitter for project {} and member {} {}.", projectId, memberId, reason);
     }
 
