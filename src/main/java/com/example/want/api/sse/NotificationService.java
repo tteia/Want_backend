@@ -27,10 +27,19 @@ public class NotificationService {
     }
 
     private void removeExistingEmitter(Long projectId, Long memberId) {
-        projectMemberEmitters.computeIfPresent(projectId, (k, members) -> {
+        // 프로젝트 ID에 해당하는 회원 목록을 가져옵니다.
+        Map<Long, SseEmitter> members = projectMemberEmitters.get(projectId);
+
+        if (members != null) {
+            // 해당 멤버 ID의 Emitter를 제거합니다.
             members.remove(memberId);
-            return members.isEmpty() ? null : members;
-        });
+            log.info("Removed emitter for project {} and member {}.", projectId, memberId);
+            // 만약 멤버 목록이 비어 있다면 프로젝트 ID도 제거합니다.
+            if (members.isEmpty()) {
+                projectMemberEmitters.remove(projectId);
+                log.info("Removed project {} from emitters.", projectId);
+            }
+        }
     }
 
     private SseEmitter createNewEmitter() {
