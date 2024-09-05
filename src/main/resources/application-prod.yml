@@ -22,7 +22,7 @@ spring:
     database: mysql
     generate-ddl: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show_sql: false
     open-in-view: false
 
