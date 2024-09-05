@@ -1,5 +1,6 @@
 package com.example.want.api.location.service;
 
+import com.example.want.api.block.domain.Category;
 import com.example.want.api.block.repository.BlockRepository;
 import com.example.want.api.location.domain.Location;
 import com.example.want.api.location.dto.LocationResDto;
@@ -64,7 +65,7 @@ public class LocationService {
                     Double longitude = Double.parseDouble(findKey[1]);
                     Long stateId = Long.parseLong(findKey[2]);
                     State state = stateRepository.findById(stateId).orElseThrow(()->new EntityNotFoundException("해당 지역이 없습니다."));
-                    String category = findKey[3];
+                    Category category = Category.valueOf(findKey[3]);
                     String placeName = findKey[4];
 
                     // 해당 위치를 LocationRepository 에서 찾기

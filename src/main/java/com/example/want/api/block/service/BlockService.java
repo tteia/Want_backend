@@ -405,11 +405,11 @@ public class BlockService {
     @Transactional
     public Block importBlock(UserInfo userInfo, ImportBlockRqDto importDto) {
         Project project = validateProjectMember(importDto.getProjectId(), userInfo.getEmail());
-        Block findBlock = blockRepository.findById(importDto.getBlockId()).orElseThrow(() -> new EntityNotFoundException("해당 블록을 찾을 수 없습니다."));
-        Block block = importDto.toImport(findBlock, project);
+        Location location = importDto.getLocation();
+        Block block = importDto.toImport(location, project);
 
         Long stateId = projectStateRepository.findByProject(block.getProject()).getState().getId();
-        String redisKey = findBlock.getLatitude() + ":" + findBlock.getLongitude() + ":" + stateId + ":" + findBlock.getCategory() + ":" + block.getPlaceName();
+        String redisKey = location.getLatitude() + ":" + location.getLongitude() + ":" + stateId + ":" + location.getCategory() + ":" + location.getPlaceName();
 
         // Redis에서 값을 가져오거나 초기화
         if (popularRedisTemplate.opsForValue().get(redisKey) == null) {

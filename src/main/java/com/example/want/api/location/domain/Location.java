@@ -1,5 +1,6 @@
 package com.example.want.api.location.domain;
 
+import com.example.want.api.block.domain.Category;
 import com.example.want.api.location.dto.LocationResDto;
 import com.example.want.api.state.domain.State;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ public class Location {
 
     private Long popularCount;
     private String placeName;
-    private String category;
+    private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
