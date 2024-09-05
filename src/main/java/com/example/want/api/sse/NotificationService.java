@@ -34,11 +34,13 @@ public class NotificationService {
             // 해당 멤버 ID의 Emitter를 제거합니다.
             members.remove(memberId);
             log.info("Removed emitter for project {} and member {}.", projectId, memberId);
+            log.info("oooooooooooooooooooooo"+ members.size());
             // 만약 멤버 목록이 비어 있다면 프로젝트 ID도 제거합니다.
             if (members.isEmpty()) {
                 projectMemberEmitters.remove(projectId);
                 log.info("Removed project {} from emitters.", projectId);
             }
+            log.info("ppppppppppppppppppppp"+ projectMemberEmitters.size());
         }
     }
 
