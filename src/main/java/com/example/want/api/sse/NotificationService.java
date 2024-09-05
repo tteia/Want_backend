@@ -45,7 +45,8 @@ public class NotificationService {
     }
 
     private SseEmitter createNewEmitter() {
-        return new SseEmitter(Long.MAX_VALUE);
+
+        return new SseEmitter(60 * 10 * 1000L); // 10분
     }
 
     private void registerNewEmitter(Long projectId, Long memberId, SseEmitter newEmitter) {
