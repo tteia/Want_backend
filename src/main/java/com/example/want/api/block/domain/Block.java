@@ -30,10 +30,6 @@ public class Block extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id")
-    private Location location;
-
     private Double latitude;
     private Double longitude;
 
@@ -123,7 +119,4 @@ public class Block extends BaseEntity {
         this.isDeleted = "Y";
     }
 
-    public void updateLocation(Location location) {
-        this.location = location;
-    }
 }
