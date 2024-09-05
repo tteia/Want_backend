@@ -15,5 +15,5 @@ public class LocationResDto {
     private Double longitude;
     private Long popularCount;
     private String placeName;
-    private Category category;
+    private String category;
 }
