@@ -346,7 +346,6 @@ public class BlockService {
         }
         if (updateBlockRqDto.getCategory() != null) {
             block.updateCategory(updateBlockRqDto.getCategory());
-
         }
 
     return block.toDetailDto();
