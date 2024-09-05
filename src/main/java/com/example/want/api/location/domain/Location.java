@@ -24,6 +24,7 @@ public class Location {
 
     private Long popularCount;
     private String placeName;
+    private String category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
@@ -40,6 +41,7 @@ public class Location {
                 .longitude(location.getLongitude())
                 .popularCount(location.getPopularCount())
                 .placeName(location.getPlaceName())
+                .category(location.getCategory())
                 .build();
         return dto;
     }

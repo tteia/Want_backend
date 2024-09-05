@@ -5,6 +5,7 @@ import com.example.want.api.location.domain.Location;
 import com.example.want.api.location.dto.LocationResDto;
 import com.example.want.api.location.repository.LocationRepository;
 import com.example.want.api.project.repository.ProjectRepository;
+import com.example.want.api.state.domain.State;
 import com.example.want.api.state.repository.StateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,8 +15,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -59,6 +62,10 @@ public class LocationService {
 
                     Double latitude = Double.parseDouble(findKey[0]);
                     Double longitude = Double.parseDouble(findKey[1]);
+                    Long stateId = Long.parseLong(findKey[2]);
+                    State state = stateRepository.findById(stateId).orElseThrow(()->new EntityNotFoundException("해당 지역이 없습니다."));
+                    String category = findKey[3];
+                    String placeName = findKey[4];
 
                     // 해당 위치를 LocationRepository 에서 찾기
                     Location location = locationRepository.findByLatitudeAndLongitude(latitude, longitude);
@@ -67,6 +74,9 @@ public class LocationService {
                                 .latitude(latitude)
                                 .longitude(longitude)
                                 .popularCount(cacheValue)
+                                .state(state)
+                                .category(category)
+                                .placeName(placeName)
                                 .build();
                         locationRepository.save(newLocation);
                     }
