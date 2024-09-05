@@ -97,10 +97,10 @@ public class NotificationService {
     }
 
     void removeInviteEmitter(String email, String reason) {
-        inviteEmitters.computeIfPresent(email, (k, emitter) -> {
+        SseEmitter emitter = inviteEmitters.remove(email);  // 명시적으로 삭제
+        if (emitter != null) {
             log.info("SseEmitter for email {} {}.", email, reason);
-            return null;  // This removes the entry
-        });
+        }
     }
 
     public void sendInvitation(String email, String message) {
