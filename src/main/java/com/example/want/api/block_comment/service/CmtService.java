@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +59,9 @@ public class CmtService {
         Cmt cmt = cmtRepository.findById(dto.getCommentId()).orElseThrow(()->new EntityNotFoundException("존재하지 않는 댓글 아이디입니다."));
         Block block = cmt.getBlock();
         ProjectMember projectMember = checkProjectMember(block, member);
+        if(!Objects.equals(cmt.getMember().getEmail(), email)){
+            throw new IllegalArgumentException("email is not match");
+        }
         cmt.updateCmt(dto.getContents());
     }
 
@@ -68,7 +72,9 @@ public class CmtService {
         Cmt cmt = cmtRepository.findById(commentId).orElseThrow(()->new EntityNotFoundException("존재하지 않는 댓글 아이디입니다."));
         Block block = cmt.getBlock();
         ProjectMember projectMember = checkProjectMember(block, member);
-        // 댓글 삭제
+        if(!Objects.equals(cmt.getMember().getEmail(), email)) {
+            throw new IllegalArgumentException("email is not match");
+        }
         cmt.deleteCmt("Y");
     }
 
