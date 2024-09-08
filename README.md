@@ -424,7 +424,7 @@ jobs:
 
 ### 🐳 docker-compose
 <details>
-  <summary><b>docker-copmose.yml</b></summary>
+  <summary><b>docker-compose.yml</b></summary>
   <div markdown="3">
     
 ```yml
